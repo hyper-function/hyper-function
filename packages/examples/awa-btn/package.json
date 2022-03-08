@@ -1,0 +1,24 @@
+{
+  "name": "@hyper.fun/awa-btn",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hfc.config.js",
+  "scripts": {
+    "start": "hfc-cli-service",
+    "build": "hfc-cli-service build",
+    "publish": "hfc-cli-service publish --skip-build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-to-hfc": "^0.0.1"
+  },
+  "devDependencies": {
+    "@types/hyper-function-component": "^1.0.0",
+    "@types/node": "^17.0.21"
+  }
+}

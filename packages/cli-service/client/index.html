@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview</title>
+    <link rel="stylesheet" href="./css/style.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/plugins/autoloader/prism-autoloader.min.js"></script>
+  </head>
+  <body>
+    <template
+      hfz
+      :data="{
+        showMdHtml: false,
+        mdHtml: '',
+        activeTab: 'Readme',
+        attrs:[],
+        events: [],
+        slots: []
+      }"
+      :methods="['init', 'updateHfcDoc', 'updatePropTypes', 'showSubType']"
+    >
+      <div class="main">
+        <div class="nav">
+          <ul class="list">
+            <li
+              v-for="item in ['Readme', 'PropTypes']"
+              @click="activeTab = item"
+            >
+              <div :class="{tab: true, active: item === activeTab}">
+                {{item}}
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="container">
+          <block @mounted="init">
+            <div v-if="activeTab === 'Readme'" id="hfc-doc" class="content" ref="content">
+              <block @mounted="updateHfcDoc" @unmounted="showMdHtml=false">
+                <Transition name="docs" class="docs">
+                  <div v-show="showMdHtml" v-html="mdHtml"></div>
+                </Transition>
+              </block>
+            </div>
+            <div v-else-if="activeTab === 'PropTypes'" class="content">
+              <block @mounted="updatePropTypes"
+                ><Transition name="fade">
+                  <div class="prop-types">
+                    <div class="prop-types-title">Attrs</div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Description</th>
+                          <th>Type</th>
+                          <th>Default</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in attrs">
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(attrs, item, index)"
+                          >
+                            <span :style="{paddingLeft: item.level + 'em'}"
+                              >{{item.name}}</span
+                            >
+                          </td>
+                          <td>{{item.desc}}</td>
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(attrs, item, index)"
+                          >
+                            {{item.type}}
+                          </td>
+                          <td>{{item.default}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    <div class="prop-types-title">Events</div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Description</th>
+                          <th>Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in events">
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(events, item, index)"
+                          >
+                            <span :style="{paddingLeft: item.level + 'em'}"
+                              >{{item.name}}</span
+                            >
+                          </td>
+                          <td>{{item.desc}}</td>
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(events, item, index)"
+                          >
+                            {{item.type}}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div class="prop-types-title">Slots</div>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Description</th>
+                          <th>Type</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item, index) in slots">
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(slots, item, index)"
+                          >
+                            <span :style="{paddingLeft: item.level + 'em'}"
+                              >{{item.name}}</span
+                            >
+                          </td>
+                          <td>{{item.desc}}</td>
+                          <td
+                            :style="{cursor: item.isObject ? 'pointer': ''}"
+                            @click="showSubType(slots, item, index)"
+                          >
+                            {{item.type}}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </Transition></block
+              >
+            </div>
+
+            <div class="side-bar">
+              <div class="sidebar-title">Metadata</div>
+              <div style="height: 40px"></div>
+              <div class="sidebar-title">Repository</div>
+            </div>
+          </block>
+        </div>
+      </div>
+    </template>
+
+    <script
+      id="hfz-script"
+      src="https://cdn.jsdelivr.net/npm/@hyper-function/hfz-global@0.1.0"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hyper-function/hfc-preview@0.0.12"></script>
+    <script src="./index.js" type="module"></script>
+  </body>
+</html>
