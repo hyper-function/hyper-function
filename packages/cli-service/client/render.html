@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"
+    />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script>
+      window.$HFC_NPM_CDN_URL = "https://cdn.jsdelivr.net/npm";
+
+      const id = location.pathname.split("/").pop();
+      fetch("/hfz/template?id=" + id)
+        .then((res) => res.json())
+        .then((res) => {
+          if (!res.code) {
+            document.write("404 not found");
+            return;
+          }
+
+          window[`$HFC_CDN_REWRITE_${res.name}@${res.version}`] =
+            location.protocol + "//" + location.host;
+
+          const container = document.getElementById("app");
+          container.innerHTML = res.code;
+
+          setTimeout(() => {
+            if (window.$HFZ_MOUNT_TEMPLATES) window.$HFZ_MOUNT_TEMPLATES();
+          });
+
+          if (self === top) {
+            listenEvents();
+          }
+        });
+
+      function listenEvents() {
+        const eventSource = new EventSource("/sse");
+        eventSource.addEventListener("error", (error) => {
+          console.error("connect to dev server failed");
+          console.error(error);
+        });
+
+        eventSource.addEventListener("event", (event) => {
+          const data = JSON.parse(event.data);
+          if (data.action === "update-hfc-markdown") {
+            location.reload();
+          }
+
+          if (data.action === "rebuild-complete") {
+            location.reload();
+          }
+        });
+      }
+    </script>
+
+    <script src="/js/vue.global.prod.js"></script>
+    <script src="/js/hfz-global.js"></script>
+
+    <script>
+      window.iFrameResizer = {
+        onMessage(msg) {
+          if (msg.action === "refresh") {
+            location.reload();
+          }
+        },
+      };
+    </script>
+    <script src="/js/iframeSizer.contentWindow.min.js"></script>
+  </body>
+</html>

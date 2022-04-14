@@ -162,6 +162,10 @@ function validateName(input) {
   const ref =
     "\nref: https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name";
 
+  if (input.length > 64) {
+    return "name is too long (max 64 characters)";
+  }
+
   if (!input.includes("-")) {
     return "name must contain hyphen [-] \nlike awesome-button " + ref;
   }

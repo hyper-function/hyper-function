@@ -69,7 +69,10 @@ export class Service extends EventEmitter {
     hfcConfig.name = packageJson.name;
     hfcConfig.hfcName = packageJson.name.replace("@hyper.fun/", "");
     hfcConfig.version = packageJson.version;
-    hfcConfig.dependencies = Object.keys({
+    hfcConfig.license = packageJson.license;
+    hfcConfig.dependencies = packageJson.dependencies;
+    hfcConfig.devDependencies = packageJson.devDependencies;
+    hfcConfig.dependencyKeys = Object.keys({
       ...packageJson.dependencies,
       ...packageJson.devDependencies,
     });
@@ -126,8 +129,21 @@ export class Service extends EventEmitter {
                 loader: require.resolve("swc-loader"),
                 options: {
                   jsc: Object.assign(
-                    {},
                     {
+                      parser: {
+                        syntax: "ecmascript",
+                        jsx: true,
+                        dynamicImport: false,
+                        privateMethod: false,
+                        functionBind: false,
+                        exportDefaultFrom: false,
+                        exportNamespaceFrom: false,
+                        decorators: false,
+                        decoratorsBeforeExport: false,
+                        topLevelAwait: false,
+                        importMeta: false,
+                        preserveAllComments: false,
+                      },
                       target: "es2022",
                       experimental: {
                         cacheRoot: path.resolve(this.context, ".hfc", "swc"),
@@ -145,8 +161,13 @@ export class Service extends EventEmitter {
                 loader: require.resolve("swc-loader"),
                 options: {
                   jsc: Object.assign(
-                    {},
                     {
+                      parser: {
+                        syntax: "typescript",
+                        tsx: true,
+                        decorators: false,
+                        dynamicImport: false,
+                      },
                       target: "es2022",
                       experimental: {
                         cacheRoot: path.resolve(this.context, ".hfc", "swc"),
@@ -176,7 +197,7 @@ export class Service extends EventEmitter {
         },
         output: {
           path: this.hfcConfig.pkgOutputPath,
-          filename: "esm/hfc.js",
+          filename: `esm/${hfcConfig.hfcName}.js`,
           library: {
             type: "module",
           },

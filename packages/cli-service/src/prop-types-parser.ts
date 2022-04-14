@@ -1,14 +1,7 @@
 import * as TJS from "typescript-json-schema";
 import * as desm from "desm";
 
-const hfcDTS = desm.join(
-  import.meta.url,
-  "..",
-  "node_modules",
-  "@types",
-  "hyper-function-component",
-  "index.d.ts"
-);
+const hfcDTS = desm.join(import.meta.url, "..", "hfc.d.ts");
 
 export default function parse(location: string) {
   const compilerOptions: TJS.CompilerOptions = {

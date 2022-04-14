@@ -1,4 +1,9 @@
-const shared = ["react", "react-dom", "react-to-hfc"];
+const shared = [
+  "react",
+  "react-dom",
+  "react-to-hfc"
+];
+
 let sharedAlias = {};<% if (usePreact) { %>
 
 const runtime = process.env.REACT_RUNTIME || "preact";

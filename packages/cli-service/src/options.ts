@@ -4,6 +4,7 @@ export interface Options {
   name: string;
   hfcName: string;
   version: string;
+  license: string;
   context: string;
   command: "serve" | "build";
   entry: string;
@@ -30,7 +31,9 @@ export interface Options {
     js?: any;
     ts?: any;
   };
-  dependencies: string[];
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+  dependencyKeys: string[];
   plugins: {
     name: string;
     apply?: (opts: Partial<Options>) => {};

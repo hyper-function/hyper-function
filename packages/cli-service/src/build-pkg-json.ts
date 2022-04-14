@@ -3,7 +3,7 @@ import path from "path";
 import readPkg from "read-pkg";
 import chokidar from "chokidar";
 import { Options } from "./options.js";
-import { existsSync, writeFile, writeFileSync } from "fs";
+import { existsSync, writeFileSync } from "fs";
 
 export class HfcPkgJsonBuilder extends EventEmitter {
   pkgJsonFilePath: string;
@@ -23,35 +23,19 @@ export class HfcPkgJsonBuilder extends EventEmitter {
   async build() {
     const pkg = await readPkg({ cwd: this.hfcConfig.context });
 
-    const homepage = `https://hyper.fun/${this.hfcConfig.hfcName}/${pkg.version}`;
-
-    const { dependencies = {}, devDependencies = {} } = pkg;
-    const deps: Record<string, string> = {};
-
-    this.hfcConfig.shared?.forEach((item) => {
-      let aliasName = this.hfcConfig.sharedAlias![item];
-      if (aliasName) {
-        if (aliasName.includes("/")) aliasName = aliasName.split("/")[0];
-
-        const version = dependencies[aliasName] || devDependencies[aliasName];
-        if (version) deps[aliasName] = version;
-      }
-
-      const version = dependencies[item] || devDependencies[item];
-      if (version) deps[item] = version;
-    });
+    const hfcPage = `https://hyper.fun/${this.hfcConfig.hfcName}/${pkg.version}`;
 
     const newPkg = {
       name: pkg.name,
       version: pkg.version,
       main: "esm/index.js",
       module: "esm/index.js",
-      homepage,
+      homepage: pkg.homepage,
       description: pkg.description,
-      keywords: pkg.keywords,
+      keywords: ["hyper-function-component", "hfc", ...(pkg.keywords || [])],
       license: pkg.license,
       repository: pkg.repository,
-      dependencies: deps,
+      dependencies: pkg.dependencies,
     };
 
     writeFileSync(
@@ -61,7 +45,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
 
     writeFileSync(
       path.join(this.hfcConfig.pkgOutputPath!, "readme.md"),
-      `👉 ${homepage}`
+      `👉 ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
     );
 
     this.emit("build-complete");

@@ -1,13 +1,28 @@
 import { randomBytes } from "crypto";
-import { readFileSync, createReadStream, createWriteStream } from "fs";
+import { readFileSync, statSync } from "fs";
 import { tmpdir, homedir } from "os";
 import { join } from "path";
-import { pack } from "tar-fs";
-import { createGzip } from "zlib";
-import fetch from "node-fetch";
-import FormData from "form-data";
+import tar from "tar";
+import fetch, { FormData, fileFromSync } from "node-fetch";
 
 export async function publish() {
+  const pkgJsonPath = join(
+    process.cwd(),
+    ".hfc",
+    "build",
+    "pkg",
+    "package.json"
+  );
+
+  const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
+  const { description } = pkgJson;
+  const name = pkgJson.name.replace("@hyper.fun/", "");
+  pkgJson.description = `👉 https://hyper.fun/${name}/${pkgJson.version}${
+    description ? ` - ${description}` : ""
+  }`;
+
+  const token = readToken();
+
   let docTarPath;
   let pkgTarPath;
   try {
@@ -17,73 +32,62 @@ export async function publish() {
     return;
   }
 
-  const pkgJson = readFileSync(
-    join(process.cwd(), ".hfc", "build", "pkg", "package.json"),
-    "utf-8"
+  const sizeJs = statSync(
+    join(process.cwd(), ".hfc", "build", "pkg", "esm", name + ".js")
   );
 
-  const token = readToken();
+  const sizeCss = statSync(
+    join(process.cwd(), ".hfc", "build", "pkg", "hfc.css")
+  );
 
   const form = new FormData();
-  form.append("token", token);
-  form.append("manifest", pkgJson);
-  form.append("doc", createReadStream(docTarPath));
-  form.append("pkg", createReadStream(pkgTarPath));
+  form.append("token", token!);
+  form.append("description", description);
+  form.append("manifest", JSON.stringify(pkgJson));
+  form.append("sizeJs", sizeJs.size.toString());
+  form.append("sizeCss", sizeCss.size.toString());
+  form.append("doc", fileFromSync(docTarPath));
+  form.append("pkg", fileFromSync(pkgTarPath));
 
-  await fetch("http://localhost:3000/publish", { method: "POST", body: form })
-    .then((res) => res.json())
-    .then((json) => console.log(json));
-
-  console.log(docTarPath);
-  console.log(pkgTarPath);
+  try {
+    await fetch("https://hfc-publish.hyper.fun/publish", {
+      method: "POST",
+      body: form,
+    })
+      .then((res) => res.json())
+      .then((json) => console.log(json));
+  } catch (error) {
+    console.log("failed to publish, network error");
+  }
 }
 
-function packDoc(): Promise<string> {
-  const path = join(process.cwd(), ".hfc", "build", "doc");
+async function packDoc(): Promise<string> {
   const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar");
 
-  const source = pack(path);
-  const target = createWriteStream(output, { mode: 0o644 });
+  await tar.create(
+    {
+      cwd: join(process.cwd(), ".hfc", "build", "doc"),
+      file: output,
+    },
+    ["."]
+  );
 
-  return new Promise((resolve, reject) => {
-    source.once("error", (error: Error) => {
-      return reject(error);
-    });
-
-    target.once("error", (error: Error) => {
-      return reject(error);
-    });
-
-    target.once("close", () => {
-      return resolve(output);
-    });
-
-    source.pipe(target);
-  });
+  return output;
 }
 
-function packHfcPkg(): Promise<string> {
-  const path = join(process.cwd(), ".hfc", "build", "pkg");
+async function packHfcPkg(): Promise<string> {
   const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar.gz");
 
-  const source = pack(path);
-  const target = createWriteStream(output, { mode: 0o644 });
+  await tar.create(
+    {
+      cwd: join(process.cwd(), ".hfc", "build"),
+      gzip: true,
+      file: output,
+    },
+    ["pkg"]
+  );
 
-  return new Promise((resolve, reject) => {
-    source.once("error", (error: Error) => {
-      return reject(error);
-    });
-
-    target.once("error", (error: Error) => {
-      return reject(error);
-    });
-
-    target.once("close", () => {
-      return resolve(output);
-    });
-
-    source.pipe(createGzip({ chunkSize: 2 ** 21 })).pipe(target);
-  });
+  return output;
 }
 
 export function readToken() {

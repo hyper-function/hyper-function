@@ -70,7 +70,7 @@ export default (hfcConfig: Partial<Options>) => {
   createCSSRule("css", /\.css$/);
   createCSSRule("postcss", /\.p(ost)?css$/);
 
-  if (hfcConfig.dependencies?.includes("sass-loader")) {
+  if (hfcConfig.dependencyKeys?.includes("sass-loader")) {
     createCSSRule(
       "scss",
       /\.scss$/,
@@ -94,11 +94,11 @@ export default (hfcConfig: Partial<Options>) => {
     );
   }
 
-  if (hfcConfig.dependencies?.includes("less-loader")) {
+  if (hfcConfig.dependencyKeys?.includes("less-loader")) {
     createCSSRule("less", /\.less$/, "less-loader", loaderOptions.less);
   }
 
-  if (hfcConfig.dependencies?.includes("stylus-loader")) {
+  if (hfcConfig.dependencyKeys?.includes("stylus-loader")) {
     createCSSRule(
       "stylus",
       /\.styl(us)?$/,

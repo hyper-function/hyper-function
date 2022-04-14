@@ -43,6 +43,8 @@ export class WfmBuilder extends EventEmitter {
       output: {
         path: this.wfmPath,
         filename: "__hfc.js",
+        chunkFilename:
+          this.hfcConfig.command === "serve" ? undefined : "[chunkhash].js",
       },
       resolve: {
         alias: {
@@ -53,6 +55,7 @@ export class WfmBuilder extends EventEmitter {
         this.hfcConfig.command === "serve"
           ? undefined
           : {
+              chunkIds: false,
               minimize: true,
               minimizer: [
                 new TerserPlugin({
@@ -91,6 +94,9 @@ export class WfmBuilder extends EventEmitter {
           exposes: {
             "./hfc": wfmEntry,
           },
+        }),
+        new webpack.ids.DeterministicChunkIdsPlugin({
+          maxLength: 8,
         }),
       ],
     });

@@ -1,17 +1,22 @@
 {
   "name": "@hyper.fun/awa-btn",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.25",
+  "description": "awesome button",
   "main": "hfc.config.js",
+  "homepage": "",
   "scripts": {
     "start": "hfc-cli-service",
     "build": "hfc-cli-service build",
     "publish": "hfc-cli-service publish --skip-build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "a",
+    "b",
+    "button"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "react": "^17.0.2",
     "react-dom": "^17.0.2",

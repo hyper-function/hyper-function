@@ -19,10 +19,8 @@ export class DocBuilder extends EventEmitter {
   async build() {
     let content = fs.readFileSync(this.mdFilePath, "utf-8");
     content = content.replace(
-      new RegExp(this.hfcConfig.hfcName + "\\s+vdev", "g"),
-      (o) => {
-        return o.replace("vdev", "v" + this.hfcConfig.version);
-      }
+      new RegExp(`import:${this.hfcConfig.hfcName}="dev`, "g"),
+      `import:${this.hfcConfig.hfcName}="${this.hfcConfig.version}`
     );
 
     await hfcMdParser(content, {

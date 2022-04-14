@@ -2,7 +2,7 @@
   "name": "@hyper.fun/<%-name%>",
   "version": "1.0.0",
   "main": "index.js",
-  "description": "hyper fucntion component",
+  "description": "",
   "keywords": [],
   "scripts": {
     "start": "hfc-cli-service",
@@ -12,13 +12,13 @@
   },
   "license": "ISC",
   "dependencies": {<% if (usePreact) { %>
-    "preact": "^10.5.14",<% } %>
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-to-hfc": "^0.0.1"
+    "preact": "^10.0.0",<% } %>
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-to-hfc": "^0.0.6"
   },
   "devDependencies": {
     "@types/hyper-function-component": "^1.0.0",
-    "hfc-cli-service": "^0.0.2"
+    "@hyper-function/cli-service": "^0.1.5"
   }
 }
