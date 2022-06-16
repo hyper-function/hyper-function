@@ -14,17 +14,17 @@ const config = {
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
 
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
   organizationName: "hyper-fun", // Usually your GitHub org/user name.
   projectName: "docs", // Usually your repo name.
 
-  // Even if you don't use internalization, you can use this field to set useful
-  // metadata like html lang. For example, if your site is Chinese, you may want
-  // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: "en",
-    locales: ["en"],
+    locales: ["en", "cn"],
+    localeConfigs: {
+      cn: {
+        label: "简体中文",
+      },
+    },
   },
 
   presets: [
@@ -80,6 +80,10 @@ const config = {
             label: "DevTools",
           },
           {
+            type: "localeDropdown",
+            position: "right",
+          },
+          {
             href: "https://github.com/hyper-fun/hyper-function",
             label: "GitHub",
             position: "right",
@@ -96,10 +100,10 @@ const config = {
               //   label: "Discord",
               //   href: "https://discordapp.com/invite/docusaurus",
               // },
-              // {
-              //   label: "Twitter",
-              //   href: "https://twitter.com/docusaurus",
-              // },
+              {
+                label: "Twitter",
+                href: "https://twitter.com/TheHFN",
+              },
             ],
           },
           {
