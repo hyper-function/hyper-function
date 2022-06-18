@@ -1,3 +1,4 @@
+import "unfetch/polyfill";
 import React from "react";
 import clsx from "clsx";
 import Link from "@docusaurus/Link";
@@ -8,6 +9,7 @@ import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import styles from "./index.module.css";
 
 function HomepageHeader() {
+  console.log(typeof window !== "undefined");
   const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
