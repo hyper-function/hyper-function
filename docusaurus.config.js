@@ -19,12 +19,7 @@ const config = {
 
   i18n: {
     defaultLocale: "en",
-    locales: ["en", "cn"],
-    localeConfigs: {
-      cn: {
-        label: "简体中文",
-      },
-    },
+    locales: ["en", "zh-Hans"],
   },
 
   presets: [
