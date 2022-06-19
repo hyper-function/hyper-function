@@ -69,10 +69,12 @@
             listenEvents() {
               let msgId = 0;
               let self = this;
+              let retryTimes = 0;
               function fetchEvent() {
                 fetch("/events" + (msgId ? "?id=" + msgId : ""))
                   .then((res) => res.json())
                   .then((event) => {
+                    retryTimes = 0;
                     msgId = event.id;
                     fetchEvent();
 
@@ -87,29 +89,17 @@
                   })
                   .catch((err) => {
                     console.error("fetch event error", err);
+                    if (retryTimes > 10) {
+                      return;
+                    }
+
+                    retryTimes++;
                     setTimeout(() => {
                       fetchEvent();
                     }, 3000);
                   });
               }
               fetchEvent();
-              return;
-              const eventSource = new EventSource("/sse");
-              eventSource.addEventListener("error", (error) => {
-                console.error("connect to dev server failed");
-                console.error(error);
-              });
-
-              eventSource.addEventListener("event", (event) => {
-                const data = JSON.parse(event.data);
-                if (data.action === "update-hfc-markdown") {
-                  this.renderHfcDoc();
-                }
-
-                if (data.action === "rebuild-complete") {
-                  this.renderHfcDoc();
-                }
-              });
             },
             async renderHfcDoc() {
               const html = await fetch("/doc/index.html").then((res) =>
