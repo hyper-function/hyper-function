@@ -4,7 +4,7 @@ export default class HFC {
   }
   connected(container) {
     console.log("conn");
-    container.innerHTML = "<button>AWA BTN</button>";
+    container.innerHTML = "<button>AWA BTN!</button>";
   }
   disconnected() {}
 }

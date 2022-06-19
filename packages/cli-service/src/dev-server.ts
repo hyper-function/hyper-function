@@ -1,7 +1,6 @@
 import http from "http";
 import cors from "cors";
-import express from "express";
-import SseStream from "ssestream";
+import express, { Response } from "express";
 import portfinder from "portfinder";
 import * as desm from "desm";
 import { Options } from "./options.js";
@@ -9,28 +8,38 @@ import path from "path";
 import { readFileSync } from "fs";
 import kvCache from "./kv-cache.js";
 
-// @ts-ignore
-const SSE = SseStream.default;
-
 export class DevServer {
   server: http.Server | null = null;
-  sseConnections: SseStream[] = [];
+  eventMessageId = Date.now();
+  eventMessages: { id: number; data: any }[] = [];
+  eventResponses: Response[] = [];
   constructor(private hfcConfig: Partial<Options> = {}) {
     const app = express();
     app.use(cors());
 
     this.server = http.createServer(app);
 
-    this.sseConnections = [];
-    app.get("/sse", (req, res) => {
-      const sse = new SSE(req);
-      sse.pipe(res);
-      this.sseConnections.push(sse);
+    app.get("/events", (req, res) => {
+      const msgId = parseInt(req.query.id + "");
+
+      if (msgId) {
+        const msgIndex = this.eventMessages.findIndex(
+          (item) => item.id === msgId
+        );
+
+        const nextMsg = this.eventMessages[msgIndex + 1];
+        if (nextMsg) {
+          res.json(nextMsg);
+          return;
+        }
+      }
+
+      this.eventResponses.push(res);
 
       res.on("close", () => {
-        const idx = this.sseConnections.indexOf(sse);
-        if (idx >= 0) this.sseConnections.splice(idx, 1);
-        sse.unpipe(res);
+        if (!this.eventResponses.length) return;
+        const idx = this.eventResponses.indexOf(res);
+        if (idx >= 0) this.eventResponses.splice(idx, 1);
       });
     });
 
@@ -69,8 +78,15 @@ export class DevServer {
     app.use(express.static(clientPath));
   }
   sendMessage(msg: any) {
-    this.sseConnections.forEach((sse) => {
-      sse.writeMessage({ event: "event", data: msg });
+    const id = this.eventMessageId++;
+    const event = { id, data: msg };
+    this.eventMessages.push(event);
+    if (this.eventMessages.length > 100) this.eventMessages.shift();
+    const eventResponses = this.eventResponses.slice();
+    this.eventResponses = [];
+
+    eventResponses.forEach((res) => {
+      res.json(event);
     });
   }
   async listen() {

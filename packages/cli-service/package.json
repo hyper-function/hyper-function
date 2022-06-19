@@ -48,7 +48,6 @@
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
     "rimraf": "^3.0.2",
-    "ssestream": "^1.1.0",
     "tar": "^6.1.11",
     "terser-webpack-plugin": "^5.3.1",
     "typescript-json-schema": "^0.53",

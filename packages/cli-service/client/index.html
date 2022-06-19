@@ -67,6 +67,33 @@
           },
           methods: {
             listenEvents() {
+              let msgId = 0;
+              let self = this;
+              function fetchEvent() {
+                fetch("/events" + (msgId ? "?id=" + msgId : ""))
+                  .then((res) => res.json())
+                  .then((event) => {
+                    msgId = event.id;
+                    fetchEvent();
+
+                    const data = event.data;
+                    if (data.action === "update-hfc-markdown") {
+                      self.renderHfcDoc();
+                    }
+
+                    if (data.action === "rebuild-complete") {
+                      self.renderHfcDoc();
+                    }
+                  })
+                  .catch((err) => {
+                    console.error("fetch event error", err);
+                    setTimeout(() => {
+                      fetchEvent();
+                    }, 3000);
+                  });
+              }
+              fetchEvent();
+              return;
               const eventSource = new EventSource("/sse");
               eventSource.addEventListener("error", (error) => {
                 console.error("connect to dev server failed");
@@ -135,6 +162,7 @@
                     "allow-pointer-lock",
                     "allow-scripts",
                     "allow-top-navigation-by-user-activation",
+                    "allow-same-origin",
                   ].join(" ")
                 );
 
