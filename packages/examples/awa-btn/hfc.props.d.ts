@@ -1,10 +1,10 @@
 interface User {
-  name: String;
-  height: Float;
+  name: HfcString;
+  height: HfcFloat;
 }
 
 interface HD {
-  w: String;
+  w: HfcString;
 }
 
 interface HfcPropType {
@@ -13,13 +13,16 @@ interface HfcPropType {
      * The name bajsefjsajkfjselfjlsejfls
      * @default blabla
      */
-    name: String;
-    aas3: String;
-    age: Int;
+    name: HfcString;
+    aas3: HfcString;
+    age: HfcInt;
+    f: HfcFloat;
+    a: HfcAny;
+    girl: HfcBoolean;
     u: User;
     k: {
-      name: String;
-      i: Int;
+      name: HfcString;
+      i: HfcInt;
     };
   };
   events: {
@@ -42,7 +45,7 @@ interface HfcPropType {
      * @default blabla
      */
     header: {
-      name: String;
+      name: HfcString;
     };
   };
 }

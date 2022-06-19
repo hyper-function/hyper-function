@@ -20,8 +20,11 @@ export default function parse(location: string) {
 
   const typeToId: Record<string, string> = {};
   let typeId = 0;
+
   Object.keys(schema.definitions || {}).forEach((key) => {
-    if (["Boolean", "Int", "Float", "Any"].includes(key)) {
+    if (
+      ["HfcString", "HfcBoolean", "HfcInt", "HfcFloat", "HfcAny"].includes(key)
+    ) {
       delete schema.definitions[key];
       return;
     }
@@ -34,19 +37,17 @@ export default function parse(location: string) {
   });
 
   function getScalarType(v: any) {
-    if (v.hasOwnProperty("additionalProperties") && v.patternProperties) {
-      return "#s";
-    }
-
     switch (v.$ref) {
-      case "#/definitions/Any":
-        return "#a";
-      case "#/definitions/Boolean":
+      case "#/definitions/HfcString":
+        return "#s";
+      case "#/definitions/HfcBoolean":
         return "#b";
-      case "#/definitions/Int":
+      case "#/definitions/HfcInt":
         return "#i";
-      case "#/definitions/Float":
+      case "#/definitions/HfcFloat":
         return "#f";
+      case "#/definitions/HfcAny":
+        return "#a";
 
       default:
         break;

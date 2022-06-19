@@ -8,7 +8,12 @@ declare class HyperFunctionComponent {
   constructor(props: HfcProps);
 
   connected(container: HTMLDivElement): void;
-  changed?(type: 'attr' | 'event' | 'slot', name: string, oldValue: any, newValue: any): void;
+  changed?(
+    type: "attr" | "event" | "slot",
+    name: string,
+    oldValue: any,
+    newValue: any
+  ): void;
   disconnected?(): void;
 }
 
@@ -16,7 +21,7 @@ interface HfcProps {
   attrs: { [k: string]: any };
   events: { [k: string]: (args?: { [k: string]: any }) => any };
   slots: {
-      [k: string]: (container: HTMLElement, args?: { [k: string]: any }) => void;
+    [k: string]: (container: HTMLElement, args?: { [k: string]: any }) => void;
   };
 }
 
@@ -28,12 +33,22 @@ interface HfcPropTypes {
 
 type HfcPropTypeDef = any;
 
-interface Int {
-  valueOf(): 'HFC_TYPE_INT';
+interface HfcString {
+  valueOf(): "HFC_TYPE_STRING";
 }
-interface Float {
-  valueOf(): 'HFC_TYPE_FLOAT';
+
+interface HfcBoolean {
+  valueOf(): "HFC_TYPE_BOOLEAN";
 }
-interface Any {
-  valueOf(): 'HFC_TYPE_ANY';
+
+interface HfcInt {
+  valueOf(): "HFC_TYPE_INT";
+}
+
+interface HfcFloat {
+  valueOf(): "HFC_TYPE_FLOAT";
+}
+
+interface HfcAny {
+  valueOf(): "HFC_TYPE_ANY";
 }

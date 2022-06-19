@@ -88,7 +88,11 @@ async function run(command: string) {
     );
     service.run();
   } else if (command === "publish") {
-    let token = readToken();
+    let token = argv.token;
+    if (!token) {
+      token = readToken();
+    }
+
     if (!token) {
       await run("login");
     }
@@ -96,11 +100,11 @@ async function run(command: string) {
     token = readToken();
     if (!token) {
       console.log("fail to read token");
-      return;
+      process.exit(-1);
     }
 
     if (argv["skip-build"]) {
-      publish();
+      publish({ token });
       return;
     }
 
@@ -143,11 +147,18 @@ async function run(command: string) {
         return;
       }
 
-      publish();
+      publish({ token });
     }
   } else {
     console.log("unknow command");
   }
 }
 
-run(argv._[0]);
+(() => {
+  if (argv.v || argv.version) {
+    console.log(pkg.version);
+    process.exit(0);
+  }
+
+  run(argv._[0]);
+})();

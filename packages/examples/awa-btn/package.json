@@ -1,6 +1,6 @@
 {
   "name": "@hyper.fun/awa-btn",
-  "version": "1.1.25",
+  "version": "1.1.28",
   "description": "awesome button",
   "main": "hfc.config.js",
   "homepage": "",
@@ -17,13 +17,8 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-to-hfc": "^0.0.1"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/hyper-function-component": "^1.0.0",
-    "@types/node": "^17.0.21"
+    "@types/hyper-function-component": "^1.0.0"
   }
 }

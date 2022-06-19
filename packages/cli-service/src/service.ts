@@ -122,62 +122,62 @@ export class Service extends EventEmitter {
               exclude: /(node_modules)/,
               type: "asset/resource",
             },
-            {
-              test: /\.jsx?$/,
-              exclude: /(node_modules)/,
-              use: {
-                loader: require.resolve("swc-loader"),
-                options: {
-                  jsc: Object.assign(
-                    {
-                      parser: {
-                        syntax: "ecmascript",
-                        jsx: true,
-                        dynamicImport: false,
-                        privateMethod: false,
-                        functionBind: false,
-                        exportDefaultFrom: false,
-                        exportNamespaceFrom: false,
-                        decorators: false,
-                        decoratorsBeforeExport: false,
-                        topLevelAwait: false,
-                        importMeta: false,
-                        preserveAllComments: false,
-                      },
-                      target: "es2022",
-                      experimental: {
-                        cacheRoot: path.resolve(this.context, ".hfc", "swc"),
-                      },
-                    },
-                    this.hfcConfig.swc?.js
-                  ),
-                },
-              },
-            },
-            {
-              test: /\.tsx?$/,
-              exclude: /(node_modules)/,
-              use: {
-                loader: require.resolve("swc-loader"),
-                options: {
-                  jsc: Object.assign(
-                    {
-                      parser: {
-                        syntax: "typescript",
-                        tsx: true,
-                        decorators: false,
-                        dynamicImport: false,
-                      },
-                      target: "es2022",
-                      experimental: {
-                        cacheRoot: path.resolve(this.context, ".hfc", "swc"),
-                      },
-                    },
-                    this.hfcConfig.swc?.ts
-                  ),
-                },
-              },
-            },
+            // {
+            //   test: /\.jsx?$/,
+            //   exclude: /(node_modules)/,
+            //   use: {
+            //     loader: require.resolve("swc-loader"),
+            //     options: {
+            //       jsc: Object.assign(
+            //         {
+            //           parser: {
+            //             syntax: "ecmascript",
+            //             jsx: true,
+            //             dynamicImport: false,
+            //             privateMethod: false,
+            //             functionBind: false,
+            //             exportDefaultFrom: false,
+            //             exportNamespaceFrom: false,
+            //             decorators: false,
+            //             decoratorsBeforeExport: false,
+            //             topLevelAwait: false,
+            //             importMeta: false,
+            //             preserveAllComments: false,
+            //           },
+            //           target: "es2022",
+            //           experimental: {
+            //             cacheRoot: path.resolve(this.context, ".hfc", "swc"),
+            //           },
+            //         },
+            //         this.hfcConfig.swc?.js
+            //       ),
+            //     },
+            //   },
+            // },
+            // {
+            //   test: /\.tsx?$/,
+            //   exclude: /(node_modules)/,
+            //   use: {
+            //     loader: require.resolve("swc-loader"),
+            //     options: {
+            //       jsc: Object.assign(
+            //         {
+            //           parser: {
+            //             syntax: "typescript",
+            //             tsx: true,
+            //             decorators: false,
+            //             dynamicImport: false,
+            //           },
+            //           target: "es2022",
+            //           experimental: {
+            //             cacheRoot: path.resolve(this.context, ".hfc", "swc"),
+            //           },
+            //         },
+            //         this.hfcConfig.swc?.ts
+            //       ),
+            //     },
+            //   },
+            // },
           ],
         },
         optimization: {

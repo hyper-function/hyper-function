@@ -8,7 +8,11 @@
     <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <template hfz>
+    <template
+      hfz
+      import:side-bar="/side-bar.html"
+      import:prop-types="/prop-types.html"
+    >
       <div class="main">
         <div class="nav">
           <ul class="list">
@@ -185,9 +189,6 @@
         };
       </script>
     </template>
-
-    <template hfz name="prop-types" src="/prop-types.html"></template>
-    <template hfz name="side-bar" src="/side-bar.html"></template>
 
     <script src="/js/vue.global.prod.js"></script>
     <script src="/js/hfz-global.js"></script>

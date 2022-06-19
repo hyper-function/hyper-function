@@ -5,7 +5,7 @@ import { join } from "path";
 import tar from "tar";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
-export async function publish() {
+export async function publish({ token }: { token: string }) {
   const pkgJsonPath = join(
     process.cwd(),
     ".hfc",
@@ -20,8 +20,6 @@ export async function publish() {
   pkgJson.description = `👉 https://hyper.fun/${name}/${pkgJson.version}${
     description ? ` - ${description}` : ""
   }`;
-
-  const token = readToken();
 
   let docTarPath;
   let pkgTarPath;
@@ -49,13 +47,25 @@ export async function publish() {
   form.append("doc", fileFromSync(docTarPath));
   form.append("pkg", fileFromSync(pkgTarPath));
 
+  const publishUrl =
+    process.env.NODE_ENV === "production"
+      ? "https://api.hyper.fun/hfc/publish"
+      : "http://localhost:3000/hfc/publish";
+
   try {
-    await fetch("https://hfc-publish.hyper.fun/publish", {
+    await fetch(publishUrl, {
       method: "POST",
       body: form,
     })
       .then((res) => res.json())
-      .then((json) => console.log(json));
+      .then((res: any) => {
+        if (res.error) {
+          console.log(res.message);
+          return;
+        }
+
+        console.log("publish success");
+      });
   } catch (error) {
     console.log("failed to publish, network error");
   }
