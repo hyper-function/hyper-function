@@ -1,0 +1,15 @@
+{
+  "name": "awesome-hfc",
+  "version": "0.0.1",
+  "license": "MIT",
+  "scripts": {
+    "start": "hfc-cli-service",
+    "publish": "hfc-cli-service publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@hyper-function/cli-service": "^0.1.13",
+    "@types/hyper-function-component": "^1.1.0"
+  },
+  "hfcName": "awa-btn"
+}
