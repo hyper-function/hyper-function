@@ -10,6 +10,7 @@ import * as desm from "desm";
 
 import { Service } from "./service.js";
 import { publish, readToken } from "./publish.js";
+import readPkg from "read-pkg";
 
 const pkg = JSON.parse(
   fs.readFileSync(desm.join(import.meta.url, "..", "package.json"), "utf-8")
@@ -26,7 +27,7 @@ function updateCheck() {
       "Update available: " +
         chalk.green.bold(notifier.update.latest) +
         chalk.gray(" (current: " + notifier.update.current + ")"),
-      "Run " + chalk.magenta("npm install -g " + pkg.name) + " to update."
+      "Run " + chalk.magenta("npm install " + pkg.name) + " to update."
     );
 
     console.log(message.join(" "));
@@ -36,12 +37,9 @@ updateCheck();
 
 const argv = minimist(process.argv.slice(2));
 
-async function run(command: string) {
+async function run(command: string, context: string) {
   if (!command) {
-    const service = new Service(
-      process.env.HFC_CLI_CONTEXT || process.cwd(),
-      "serve"
-    );
+    const service = new Service(context, "serve");
     service.run();
   } else if (command === "login") {
     let token = argv.token;
@@ -82,10 +80,7 @@ async function run(command: string) {
     fs.writeFileSync(path.join(os.homedir(), ".hfc", "token"), token);
     console.log("login success");
   } else if (command === "build") {
-    const service = new Service(
-      process.env.HFC_CLI_CONTEXT || process.cwd(),
-      "build"
-    );
+    const service = new Service(context, "build");
     service.run();
   } else if (command === "publish") {
     let token = argv.token;
@@ -94,7 +89,7 @@ async function run(command: string) {
     }
 
     if (!token) {
-      await run("login");
+      await run("login", context);
     }
 
     token = readToken();
@@ -108,10 +103,7 @@ async function run(command: string) {
       return;
     }
 
-    const service = new Service(
-      process.env.HFC_CLI_CONTEXT || process.cwd(),
-      "build"
-    );
+    const service = new Service(context, "build");
 
     let docBuildComplete = false;
     let hfcPropsBuildComplete = false;
@@ -154,11 +146,79 @@ async function run(command: string) {
   }
 }
 
-(() => {
+function verifyHfcName(input: string) {
+  const ref = "\nref: https://bit.ly/3QzRS7S";
+
+  if (input.length > 64) {
+    return "name is too long (max 64 characters)";
+  }
+
+  if (!input.includes("-")) {
+    return "name must contain hyphen [-] \nlike awesome-button " + ref;
+  }
+
+  if (/[^a-z]/.test(input[0])) {
+    return "first character must be [a-z] " + ref;
+  }
+
+  if (/[^a-z0-9]/.test(input[input.length - 1])) {
+    return "last character must be [a-z] [0-9] ";
+  }
+
+  if (/[^a-z0-9\-]/.test(input)) {
+    return "invalid name, valid character is [a-z] [0-9] and -";
+  }
+
+  if (
+    [
+      "annotation-xml",
+      "color-profile",
+      "font-face",
+      "font-face-src",
+      "font-face-uri",
+      "font-face-format",
+      "font-face-name",
+      "missing-glyph",
+    ].includes(input)
+  ) {
+    return `${input} is reveresd ` + ref;
+  }
+
+  return true;
+}
+
+async function askForHfcName(context: string) {
+  const prompt = inquirer.createPromptModule();
+  const answer = await prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "Please input HFC name:",
+
+      validate(input) {
+        return verifyHfcName(input);
+      },
+    },
+  ]);
+
+  const { name } = answer;
+  const pkgJsonPath = path.join(context, "package.json");
+  const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
+  pkgJson.hfcName = name;
+  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
+}
+
+(async () => {
   if (argv.v || argv.version) {
     console.log(pkg.version);
     process.exit(0);
   }
 
-  run(argv._[0]);
+  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
+  const cwdPkg = await readPkg({ cwd: context });
+  if (!cwdPkg.hfcName || verifyHfcName(cwdPkg.hfcName) !== true) {
+    await askForHfcName(context);
+  }
+
+  run(argv._[0], context);
 })();

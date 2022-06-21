@@ -67,39 +67,15 @@
           },
           methods: {
             listenEvents() {
-              let msgId = 0;
-              let self = this;
-              let retryTimes = 0;
-              function fetchEvent() {
-                fetch("/events" + (msgId ? "?id=" + msgId : ""))
-                  .then((res) => res.json())
-                  .then((event) => {
-                    retryTimes = 0;
-                    msgId = event.id;
-                    fetchEvent();
+              listenBuildEvents((data) => {
+                if (data.action === "update-hfc-markdown") {
+                  this.renderHfcDoc();
+                }
 
-                    const data = event.data;
-                    if (data.action === "update-hfc-markdown") {
-                      self.renderHfcDoc();
-                    }
-
-                    if (data.action === "rebuild-complete") {
-                      self.renderHfcDoc();
-                    }
-                  })
-                  .catch((err) => {
-                    console.error("fetch event error", err);
-                    if (retryTimes > 10) {
-                      return;
-                    }
-
-                    retryTimes++;
-                    setTimeout(() => {
-                      fetchEvent();
-                    }, 3000);
-                  });
-              }
-              fetchEvent();
+                if (data.action === "rebuild-complete") {
+                  this.renderHfcDoc();
+                }
+              });
             },
             async renderHfcDoc() {
               const html = await fetch("/doc/index.html").then((res) =>
@@ -117,8 +93,8 @@
                   this.renderHfcMdImgs();
                   this.renderCodeBlock();
                   this.renderHfcPreview();
-                }, 0);
-              }, 0);
+                });
+              });
             },
 
             renderCodeBlock() {
@@ -211,6 +187,7 @@
     <script src="/js/vue.global.prod.js"></script>
     <script src="/js/hfz-global.js"></script>
     <script src="/js/iframeSizer.min.js"></script>
+    <script src="/js/listen-build-events.js"></script>
 
     <script>
       window.addEventListener("load", () => {

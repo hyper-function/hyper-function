@@ -17,40 +17,40 @@ describe("Hfc Prop Type Parser Tests", () => {
     const tmpPath = writeToTmpFile(`\
 interface HfcPropType {
   attrs: {
-    s: String;
-    b: Boolean;
-    i: Int;
-    f: Float;
-    a: Any;
-    sa: String[];
-    ia: Int[];
+    s: HfcString;
+    b: HfcBoolean;
+    i: HfcInt;
+    f: HfcFloat;
+    a: HfcAny;
+    sa: HfcString[];
+    ia: HfcInt[];
     o: {
-      s1: String;
-      i1: Int;
-      sa1: String[];
-      ia1: Int[];
+      s1: HfcString;
+      i1: HfcInt;
+      sa1: HfcString[];
+      ia1: HfcInt[];
       o1: {
-        s2: String;
-        i2: Int;
-        sa2: String[];
-        ia2: Int[];
+        s2: HfcString;
+        i2: HfcInt;
+        sa2: HfcString[];
+        ia2: HfcInt[];
       }
     },
     o2: {
-      s: String;
+      s: HfcString;
       o3: {
-        s3: String;
+        s3: HfcString;
       }[]
     }[]
   }
   events: {
     e: {
-      s: String;
+      s: HfcString;
     }
   }
   slots: {
     s: {
-      i: Int;
+      i: HfcInt;
     }
   }
 }

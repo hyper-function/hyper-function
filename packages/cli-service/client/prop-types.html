@@ -98,7 +98,7 @@
         async renderPropTypes() {
           const meta = window.hfcMeta;
           const propTypes = await fetch(
-            `/${meta.name}@${meta.version}/hfc.props.json`
+            `/@hyper.fun/${meta.name}@${meta.version}/hfc.props.json`
           ).then((res) => res.json());
 
           this.attrs = this.packTypes(propTypes.attrs, 0, propTypes.types);

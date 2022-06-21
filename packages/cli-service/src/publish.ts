@@ -6,20 +6,16 @@ import tar from "tar";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
 export async function publish({ token }: { token: string }) {
-  const pkgJsonPath = join(
-    process.cwd(),
-    ".hfc",
-    "build",
-    "pkg",
-    "package.json"
-  );
+  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
+
+  const pkgJsonPath = join(context, ".hfc", "build", "pkg", "package.json");
 
   const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
   const { description } = pkgJson;
-  const name = pkgJson.name.replace("@hyper.fun/", "");
-  pkgJson.description = `👉 https://hyper.fun/${name}/${pkgJson.version}${
-    description ? ` - ${description}` : ""
-  }`;
+
+  pkgJson.description = `👉 https://hyper.fun/${pkgJson.hfcName}/${
+    pkgJson.version
+  }${description ? ` - ${description}` : ""}`;
 
   let docTarPath;
   let pkgTarPath;
@@ -31,12 +27,10 @@ export async function publish({ token }: { token: string }) {
   }
 
   const sizeJs = statSync(
-    join(process.cwd(), ".hfc", "build", "pkg", "esm", name + ".js")
+    join(context, ".hfc", "build", "pkg", "esm", pkgJson.hfcName + ".js")
   );
 
-  const sizeCss = statSync(
-    join(process.cwd(), ".hfc", "build", "pkg", "hfc.css")
-  );
+  const sizeCss = statSync(join(context, ".hfc", "build", "pkg", "hfc.css"));
 
   const form = new FormData();
   form.append("token", token!);
@@ -72,11 +66,12 @@ export async function publish({ token }: { token: string }) {
 }
 
 async function packDoc(): Promise<string> {
+  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
   const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar");
 
   await tar.create(
     {
-      cwd: join(process.cwd(), ".hfc", "build", "doc"),
+      cwd: join(context, ".hfc", "build", "doc"),
       file: output,
     },
     ["."]
@@ -86,11 +81,12 @@ async function packDoc(): Promise<string> {
 }
 
 async function packHfcPkg(): Promise<string> {
+  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
   const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar.gz");
 
   await tar.create(
     {
-      cwd: join(process.cwd(), ".hfc", "build"),
+      cwd: join(context, ".hfc", "build"),
       gzip: true,
       file: output,
     },

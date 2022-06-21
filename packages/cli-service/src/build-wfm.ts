@@ -84,10 +84,10 @@ export class WfmBuilder extends EventEmitter {
       },
       plugins: [
         new webpack.container.ModuleFederationPlugin({
-          name: this.hfcConfig.name,
+          name: "@hyper.fun/" + this.hfcConfig.hfcName,
           filename: "entry.js",
           library: {
-            name: `$HFC_WFM_CONTAINERS["${this.hfcConfig.name}"]`,
+            name: `$HFC_WFM_CONTAINERS["@hyper.fun/${this.hfcConfig.hfcName}"]`,
             type: "assign",
           },
           shared,

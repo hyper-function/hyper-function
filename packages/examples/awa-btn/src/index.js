@@ -1,10 +1,7 @@
 export default class HFC {
-  constructor(props) {
-    console.log("con");
-  }
+  constructor(props) {}
   connected(container) {
-    console.log("conn");
-    container.innerHTML = "<button>AWA BTN!</button>";
+    container.innerHTML = "<button>AWA BTN!!!!</button>";
   }
   disconnected() {}
 }

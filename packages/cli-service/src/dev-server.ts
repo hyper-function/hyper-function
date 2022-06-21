@@ -45,14 +45,14 @@ export class DevServer {
 
     app.get("/meta", async (req, res) => {
       res.json({
-        name: this.hfcConfig.name,
+        name: this.hfcConfig.hfcName,
         version: this.hfcConfig.version,
         license: this.hfcConfig.license,
         deps: this.hfcConfig.dependencies,
       });
     });
 
-    const wfmServePath = `/${this.hfcConfig.name}@${this.hfcConfig.version}`;
+    const wfmServePath = `/@hyper.fun/${this.hfcConfig.hfcName}@${this.hfcConfig.version}`;
     app.use(wfmServePath, express.static(this.hfcConfig.pkgOutputPath!));
     app.use("/doc", express.static(this.hfcConfig.docOutputPath!));
 
@@ -69,7 +69,7 @@ export class DevServer {
       const code = kvCache.get("HFZ_TEMPLATE_" + id);
 
       res.json({
-        name: this.hfcConfig.name,
+        name: this.hfcConfig.hfcName,
         version: this.hfcConfig.version,
         code,
       });

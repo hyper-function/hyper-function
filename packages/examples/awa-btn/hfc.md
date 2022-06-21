@@ -1,8 +1,8 @@
-# :package: awa-btn
+# :package: awa-btn2
 
 ```html render
 <template hfz import:awa-btn="dev" :data="{ a: 1, b: 2, c: 'aa' }">
-  bbaawa sawa!!!a{{a}} {{b}} {{c}} 1123
+  bbaawa sawa!!!a{{a}} {{b}} {{c}} 112322a
   <div v-if="a === 2">baba</div>
   <awa-btn></awa-btn>
 </template>

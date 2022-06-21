@@ -22,7 +22,7 @@
             return;
           }
 
-          window[`$HFC_CDN_REWRITE_${res.name}@${res.version}`] =
+          window[`$HFC_CDN_REWRITE_@hyper.fun/${res.name}@${res.version}`] =
             location.protocol + "//" + location.host;
 
           const container = document.getElementById("app");
@@ -33,32 +33,22 @@
           });
 
           if (self === top) {
-            listenEvents();
+            listenBuildEvents((data) => {
+              if (data.action === "update-hfc-markdown") {
+                location.reload();
+              }
+
+              if (data.action === "rebuild-complete") {
+                location.reload();
+              }
+            });
           }
         });
-
-      function listenEvents() {
-        const eventSource = new EventSource("/sse");
-        eventSource.addEventListener("error", (error) => {
-          console.error("connect to dev server failed");
-          console.error(error);
-        });
-
-        eventSource.addEventListener("event", (event) => {
-          const data = JSON.parse(event.data);
-          if (data.action === "update-hfc-markdown") {
-            location.reload();
-          }
-
-          if (data.action === "rebuild-complete") {
-            location.reload();
-          }
-        });
-      }
     </script>
 
     <script src="/js/vue.global.prod.js"></script>
     <script src="/js/hfz-global.js"></script>
+    <script src="/js/listen-build-events.js"></script>
 
     <script>
       window.iFrameResizer = {

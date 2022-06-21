@@ -45,7 +45,7 @@ export class Service extends EventEmitter {
   async run() {
     this.initialized = true;
 
-    const hfcMdFile = path.join(process.cwd(), "hfc.md");
+    const hfcMdFile = path.join(this.context, "hfc.md");
     if (!fs.existsSync(hfcMdFile)) {
       console.log("can not find hfc.md");
       process.exit(1);
@@ -67,7 +67,7 @@ export class Service extends EventEmitter {
     hfcConfig.command = this.command;
     hfcConfig.context = this.context;
     hfcConfig.name = packageJson.name;
-    hfcConfig.hfcName = packageJson.name.replace("@hyper.fun/", "");
+    hfcConfig.hfcName = packageJson.hfcName;
     hfcConfig.version = packageJson.version;
     hfcConfig.license = packageJson.license;
     hfcConfig.dependencies = packageJson.dependencies;
