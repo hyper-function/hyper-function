@@ -158,21 +158,26 @@
 
             if (typeof item.t === "string") {
               if (item.t[0] === "#") {
-                item.type = {
-                  "#s": "String",
-                  "#i": "Int",
-                  "#f": "Float",
-                  "#b": "Boolean",
-                  "#a": "Any",
-                }[item.t];
+                item.type =
+                  {
+                    "#s": "String",
+                    "#i": "Int",
+                    "#f": "Float",
+                    "#b": "Boolean",
+                    "#a": "Any",
+                  }[item.t] + (item.arr ? "[]" : "");
               } else {
                 item.isObject = true;
                 const type = types[item.t];
-                item.type = `${item.t} (${Object.keys(type.t).length})`;
+                item.type = `${item.t}${item.arr ? "[]" : ""} (${
+                  Object.keys(type.t).length
+                })`;
               }
             } else {
               item.isObject = true;
-              item.type = `Object (${Object.keys(item.t).length})`;
+              item.type = `Object${item.arr ? "[]" : ""} (${
+                Object.keys(item.t).length
+              })`;
             }
 
             item.types = types;
