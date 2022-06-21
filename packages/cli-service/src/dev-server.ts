@@ -7,6 +7,7 @@ import { Options } from "./options.js";
 import path from "path";
 import { readFileSync } from "fs";
 import kvCache from "./kv-cache.js";
+import fs from "fs-extra";
 
 export class DevServer {
   server: http.Server | null = null;
@@ -59,9 +60,10 @@ export class DevServer {
     const clientPath = desm.join(import.meta.url, "..", "client");
 
     const renderHtmlFile = path.join(clientPath, "render.html");
-    app.get("/render/:id", (req, res) => {
+    app.get("/render/:id", async (req, res) => {
       res.setHeader("Content-Type", "text/html");
-      res.end(readFileSync(renderHtmlFile, "utf8"));
+      const html = await fs.readFile(renderHtmlFile, "utf-8");
+      res.end(html);
     });
 
     app.get("/hfz/template", (req, res) => {

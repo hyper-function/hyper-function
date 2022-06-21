@@ -122,6 +122,18 @@ body {
   font-family: var(--font-monospace) !important;
 }
 
+.markdown-body > h1:first-of-type {
+  margin-top: 0 !important;
+}
+
+.markdown-body > h2:first-of-type {
+  margin-top: 0 !important;
+}
+
+.markdown-body > h3:first-of-type {
+  margin-top: 0 !important;
+}
+
 .prop-types table {
   font-size: 14px;
   border-collapse: separate;
