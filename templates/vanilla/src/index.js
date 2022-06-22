@@ -3,7 +3,8 @@ export default class AwesomeHfc {
     console.log("get props: " + props);
   }
   connected(container) {
-    container.innerHTML = "<h1>awesome hfc</h1>";
+    container.innerHTML =
+      "<marquee>This component can be used in React, Vue, Angular, Svelte, Solid ...</marquee>";
   }
   changed(type, oldValue, newValue) {}
   disconnected() {}
