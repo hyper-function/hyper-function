@@ -35,6 +35,11 @@ const argv = minimist(process.argv.slice(2));
 const prompt = inquirer.createPromptModule();
 
 async function run() {
+  if (argv.v || argv.version) {
+    console.log(pkg.version);
+    return;
+  }
+
   const answer = await prompt([
     {
       type: "list",
@@ -74,7 +79,11 @@ async function run() {
   }
 
   fs.copySync(path.resolve(__dirname, "templates", template.folder), folder);
-  console.log("Generate success");
+  console.log(chalk.green("Generate success"));
+  console.log(chalk.green(`cd ${folder}`));
+  console.log(chalk.green(`npm install`));
+  console.log(chalk.green(`npm start`));
+
   console.log(
     "Link: " +
       chalk.magenta("https://hyper-function.com/hfc/create-hfc/getting-started")
