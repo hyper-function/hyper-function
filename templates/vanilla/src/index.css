@@ -1,0 +1,99 @@
+h1 {
+  font-family: tahoma;
+  line-height: 48px;
+}
+
+.brand {
+  position: relative;
+  overflow: hidden;
+}
+
+.brand::after {
+  content: "\00a0";
+}
+
+.brand ul {
+  margin: 0;
+  list-style: none;
+  background-color: #5b7b65;
+  color: #fff;
+  font-weight: 900;
+  position: absolute;
+  padding-left: 0.2rem;
+  animation: sliding 9s ease-in-out infinite;
+}
+
+@keyframes sliding {
+  0% {
+    width: 0;
+  }
+  4% {
+    width: 0;
+  }
+  8% {
+    width: 126px;
+  }
+  16% {
+    width: 126px;
+  }
+  20% {
+    top: 0;
+    width: 0;
+  }
+  24% {
+    top: -48px;
+    width: 0;
+  }
+  28% {
+    width: 85px;
+  }
+  36% {
+    width: 85px;
+  }
+  40% {
+    top: -48px;
+    width: 0;
+  }
+  44% {
+    top: -96px;
+    width: 0;
+  }
+  48% {
+    width: 85px;
+  }
+  56% {
+    width: 85px;
+  }
+  60% {
+    top: -96px;
+    width: 0;
+  }
+  64% {
+    top: -144px;
+    width: 0;
+  }
+  68% {
+    width: 172px;
+  }
+  76% {
+    width: 172px;
+  }
+  80% {
+    top: -144px;
+    width: 0;
+  }
+  84% {
+    top: -192px;
+    width: 0;
+  }
+  88% {
+    width: 140px;
+  }
+  96% {
+    width: 140px;
+  }
+  100% {
+    top: -192px;
+    width: 0;
+  }
+}
