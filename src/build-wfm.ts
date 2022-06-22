@@ -103,47 +103,47 @@ export class WfmBuilder extends EventEmitter {
   }
   build() {
     if (this.hfcConfig.command === "build") {
-      this.compiler.run((err, result) => {
+      this.compiler.run((err, stats) => {
         if (err) {
           console.error(err);
           process.exit(-1);
         }
 
-        if (result?.hasErrors()) {
-          console.error(result.compilation.errors);
+        if (stats?.hasErrors()) {
+          console.error(stats.compilation.errors);
         }
 
         const unusedHfcJsPath = path.join(this.wfmPath, "__hfc.js");
         if (fs.existsSync(unusedHfcJsPath)) fs.rmSync(unusedHfcJsPath);
 
-        this.emit("build-complete");
+        this.emit("build-complete", stats);
       });
 
       return;
     }
 
     let isFirstCompile = true;
-    this.compiler.watch({}, (err, result) => {
+    this.compiler.watch({}, (err, stats) => {
       if (err) {
         console.error(err);
         process.exit(-1);
       }
 
-      if (result?.hasErrors()) {
-        console.error(result.compilation.errors);
+      if (stats?.hasErrors()) {
+        console.error(stats.compilation.errors);
       }
 
-      if (result?.hasWarnings()) {
-        console.warn(result.compilation.warnings);
+      if (stats?.hasWarnings()) {
+        console.warn(stats.compilation.warnings);
       }
 
       const unusedHfcJsPath = path.join(this.wfmPath, "__hfc.js");
       if (fs.existsSync(unusedHfcJsPath)) fs.rmSync(unusedHfcJsPath);
 
       if (isFirstCompile) {
-        this.emit("build-complete");
+        this.emit("build-complete", stats);
       } else {
-        this.emit("rebuild-complete");
+        this.emit("rebuild-complete", stats);
       }
 
       isFirstCompile = false;

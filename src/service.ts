@@ -288,6 +288,14 @@ export class Service extends EventEmitter {
     esmBuilder.on("build-complete", () => {
       wfmBuilder.build();
     });
+
+    esmBuilder.on("rebuild-complete", (stats: webpack.Stats) => {
+      if (this.command === "serve") {
+        if (stats.compilation.emittedAssets.has("./hfc.css")) {
+          devServer.sendMessage({ action: "rebuild-complete" });
+        }
+      }
+    });
   }
   configureWebpack(
     fn: (

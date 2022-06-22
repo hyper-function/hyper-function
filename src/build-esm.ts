@@ -71,41 +71,41 @@ export class EsmBuilder extends EventEmitter {
   }
   build() {
     if (this.hfcConfig.command === "build") {
-      this.compiler.run((err, result) => {
+      this.compiler.run((err, stats) => {
         if (err) {
           console.error(err);
           process.exit(-1);
         }
 
-        if (result?.hasErrors()) {
-          console.error(result.compilation.errors);
+        if (stats?.hasErrors()) {
+          console.error(stats.compilation.errors);
         }
 
-        this.emit("build-complete");
+        this.emit("build-complete", stats);
       });
 
       return;
     }
 
     let isFirstCompile = true;
-    this.compiler.watch({}, async (err, result) => {
+    this.compiler.watch({}, async (err, stats) => {
       if (err) {
         console.error(err);
         process.exit(-1);
       }
 
-      if (result?.hasErrors()) {
-        console.error(result.compilation.errors);
+      if (stats?.hasErrors()) {
+        console.error(stats.compilation.errors);
       }
 
-      if (result?.hasWarnings()) {
-        console.warn(result.compilation.warnings);
+      if (stats?.hasWarnings()) {
+        console.warn(stats.compilation.warnings);
       }
 
       if (isFirstCompile) {
-        this.emit("build-complete");
+        this.emit("build-complete", stats);
       } else {
-        this.emit("rebuild-complete");
+        this.emit("rebuild-complete", stats);
       }
 
       isFirstCompile = false;
