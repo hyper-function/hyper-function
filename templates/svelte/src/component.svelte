@@ -35,7 +35,7 @@
     padding-left: 0.2rem;
     list-style: none;
     position: absolute;
-    background-color: rgb(116, 125, 118);
+    background-color: #5b7b65;
     animation: sliding 9s ease-in-out infinite;
   }
 

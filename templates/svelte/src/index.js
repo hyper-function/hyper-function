@@ -1,4 +1,4 @@
 import svelteToHfc from "svelte-to-hfc";
-import Component from "./Component.svelte";
+import Component from "./component.svelte";
 
 export default svelteToHfc(Component);
