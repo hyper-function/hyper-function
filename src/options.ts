@@ -9,8 +9,6 @@ export interface Options {
   command: "serve" | "build";
   entry: string;
   port: number;
-  shared: string[];
-  sharedAlias: Record<string, string>;
   assetExtRegExp: RegExp;
   outputPath: string;
   pkgOutputPath: string;
@@ -27,13 +25,8 @@ export interface Options {
 
     [k: string]: any;
   };
-  swc: {
-    js?: any;
-    ts?: any;
-  };
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
-  dependencyKeys: string[];
   plugins: {
     name: string;
     apply?: (opts: Partial<Options>) => {};
@@ -47,11 +40,10 @@ export interface Options {
 export const defaults = () => ({
   entry: "hfc.js",
   port: 7000,
-  shared: [],
-  sharedAlias: {},
   assetExtRegExp:
     /\.(png|jpe?g|gif|webp|svg|mp4|webm|ogg|mp3|wav|flac|aac|eot|ttf|otf|woff2?)$/i,
   css: {},
-  swc: {},
   plugins: [],
+  dependencies: {},
+  devDependencies: {},
 });

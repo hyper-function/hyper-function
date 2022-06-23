@@ -27,13 +27,7 @@ export class WfmBuilder extends EventEmitter {
 
     this.wfmPath = path.resolve(this.hfcConfig.pkgOutputPath!, "wfm");
 
-    const shared: string[] = [];
-    this.hfcConfig.shared?.forEach((item) => {
-      shared.push(item);
-      if (this.hfcConfig.sharedAlias?.[item]) {
-        shared.push(this.hfcConfig.sharedAlias[item]);
-      }
-    });
+    const shared: string[] = Object.keys(this.hfcConfig.dependencies!);
 
     this.compiler = webpack({
       context: this.wfmPath,

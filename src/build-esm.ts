@@ -38,13 +38,7 @@ export class EsmBuilder extends EventEmitter {
       ].join("\n")
     );
 
-    const externals = this.hfcConfig.shared?.map((item) => {
-      if (this.hfcConfig.sharedAlias?.[item]) {
-        return { [item]: this.hfcConfig.sharedAlias[item] };
-      }
-
-      return item;
-    });
+    const externals = Object.keys(this.hfcConfig.dependencies!);
 
     if (this.hfcConfig.command === "build") {
       Object.assign(this.webpackConfig, {
@@ -62,8 +56,6 @@ export class EsmBuilder extends EventEmitter {
           },
         }),
       ];
-    } else {
-      this.webpackConfig.resolve!.alias = this.hfcConfig.sharedAlias;
     }
 
     this.compiler = webpack(this.webpackConfig);

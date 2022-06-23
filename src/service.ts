@@ -6,7 +6,6 @@ import rm from "rimraf";
 import readPkg from "read-pkg";
 
 import { Options, defaults } from "./options.js";
-import { loadFileConfig } from "./util/loadFileConfig.js";
 import AssetsPlugin from "./assets-plugin.js";
 
 import { DocBuilder } from "./build-doc.js";
@@ -39,8 +38,8 @@ export class Service extends EventEmitter {
     super();
   }
   async loadUserOptions() {
-    const { fileConfig } = await loadFileConfig(this.context);
-    return fileConfig;
+    const config = await import(path.resolve(this.context, "hfc.config.js"));
+    return config.default;
   }
   async run() {
     this.initialized = true;
@@ -72,10 +71,6 @@ export class Service extends EventEmitter {
     hfcConfig.license = packageJson.license;
     hfcConfig.dependencies = packageJson.dependencies;
     hfcConfig.devDependencies = packageJson.devDependencies;
-    hfcConfig.dependencyKeys = Object.keys({
-      ...packageJson.dependencies,
-      ...packageJson.devDependencies,
-    });
     hfcConfig.outputPath = path.resolve(
       this.context,
       ".hfc",
