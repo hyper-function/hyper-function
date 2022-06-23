@@ -23,6 +23,8 @@
   "devDependencies": {
     "@hyper-function/cli-service": "^0.2.2",
     "@types/hyper-function-component": "^1.1.0",
-    "hfc-plugin-react": "^1.0.1"
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "hfc-plugin-typescript": "^1.0.0"
   }
 }

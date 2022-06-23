@@ -7,6 +7,14 @@
     {
       "title": "Vanilla JS - TypeScript",
       "folder": "vanilla-ts"
+    },
+    {
+      "title": "React",
+      "folder": "react"
+    },
+    {
+      "title": "React - TypeScript",
+      "folder": "react-ts"
     }
   ]
 }
