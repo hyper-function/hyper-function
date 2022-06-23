@@ -3,6 +3,10 @@
     {
       "title": "Vanilla JS",
       "folder": "vanilla"
+    },
+    {
+      "title": "Vanilla JS - TypeScript",
+      "folder": "vanilla-ts"
     }
   ]
 }
