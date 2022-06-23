@@ -1,15 +1,19 @@
 {
+  "hfcName": "",
   "name": "awesome-hfc",
   "version": "0.0.1",
   "license": "MIT",
+  "description": "",
+  "keywords": [],
   "scripts": {
     "start": "hfc-cli-service",
+    "build": "hfc-cli-service build",
     "publish": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "stackblitz": {
     "startCommand": "npm start",
-    "compileTrigger": "save"
+    "compileTrigger": "auto"
   },
   "devDependencies": {
     "@hyper-function/cli-service": "^0.2.1",
