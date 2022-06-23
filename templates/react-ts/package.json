@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "",
   "keywords": [],
+  "type": "module",
   "scripts": {
     "start": "hfc-cli-service",
     "build": "hfc-cli-service build",
@@ -21,10 +22,10 @@
     "react-to-hfc": "^0.0.7"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.2",
+    "@hyper-function/cli-service": "^0.2.5",
     "@types/hyper-function-component": "^1.1.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
-    "hfc-plugin-typescript": "^1.0.0"
+    "hfc-plugin-typescript": "^1.0.2"
   }
 }

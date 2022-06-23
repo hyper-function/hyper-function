@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   entry: "./src/index.js",
   plugins: [],
 };

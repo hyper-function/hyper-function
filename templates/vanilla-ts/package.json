@@ -5,6 +5,7 @@
   "license": "MIT",
   "description": "",
   "keywords": [],
+  "type": "module",
   "scripts": {
     "start": "hfc-cli-service",
     "build": "hfc-cli-service build",
@@ -16,8 +17,8 @@
     "compileTrigger": "auto"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.1",
+    "@hyper-function/cli-service": "^0.2.5",
     "@types/hyper-function-component": "^1.1.0",
-    "hfc-plugin-typescript": "^1.0.0"
+    "hfc-plugin-typescript": "^1.0.2"
   }
 }
