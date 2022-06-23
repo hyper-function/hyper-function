@@ -15,7 +15,7 @@ export default function parse(location: string) {
 
   const schema: any = TJS.generateSchema(program, "HfcPropType");
   if (!schema) {
-    throw new Error("parse hfc.props.d.ts fail");
+    throw new Error("parse hfc.d.ts fail");
   }
 
   const typeToId: Record<string, string> = {};
@@ -30,7 +30,7 @@ export default function parse(location: string) {
     }
 
     if (!schema.definitions[key].properties) {
-      throw new Error(`[hfc.props.d.ts] ${key} can not be empty`);
+      throw new Error(`[hfc.d.ts] ${key} can not be empty`);
     }
 
     typeToId[key] = "^" + ++typeId;
@@ -67,7 +67,7 @@ export default function parse(location: string) {
       if (v.default && !min) ret[k].default = v.default;
 
       if (Array.isArray(v.type) || v.anyOf) {
-        throw new Error(`[hfc.props.d.ts] union type is not support: ${k}`);
+        throw new Error(`[hfc.d.ts] union type is not support: ${k}`);
       }
 
       const scalarType = getScalarType(v);
@@ -80,7 +80,7 @@ export default function parse(location: string) {
         if (v.properties && Object.keys(v.properties).length) {
           ret[k].t = transform(v.properties, min);
         } else {
-          if (!min) console.warn(`[hfc.props.d.ts] ${k} is an empty object`);
+          if (!min) console.warn(`[hfc.d.ts] ${k} is an empty object`);
           delete ret[k];
         }
         continue;
@@ -95,7 +95,7 @@ export default function parse(location: string) {
       }
 
       throw new Error(
-        `[hfc.props.d.ts] unkonw type ${
+        `[hfc.d.ts] unkonw type ${
           v.type || v.$ref.replace("#/definitions/", "")
         }`
       );
@@ -128,7 +128,7 @@ export default function parse(location: string) {
     Object.keys(eventsProps).forEach((key) => {
       const props = eventsProps[key].properties;
       if (!props) {
-        throw new Error(`[hfc.props.d.ts] event ${key} param must be object`);
+        throw new Error(`[hfc.d.ts] event ${key} param must be object`);
       }
       result.events[key] = transform(props);
       const desc = eventsProps[key].description;
@@ -142,7 +142,7 @@ export default function parse(location: string) {
     Object.keys(slotsProps).forEach((key) => {
       const props = slotsProps[key].properties;
       if (!props) {
-        throw new Error(`[hfc.props.d.ts] slot ${key} param must be object`);
+        throw new Error(`[hfc.d.ts] slot ${key} param must be object`);
       }
       result.slots[key] = transform(props);
       const desc = slotsProps[key].description;

@@ -4,7 +4,6 @@ import webpack from "webpack";
 import { createRequire } from "module";
 
 import { Options } from "./options.js";
-import { resolveModule } from "./util/module.js";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
@@ -59,7 +58,7 @@ export default (hfcConfig: Partial<Options>) => {
 
     if (loader) {
       (rule.use as any).push({
-        loader: resolveModule(loader, hfcConfig.context!),
+        loader: require.resolve(loader),
         options: Object.assign({}, options),
       });
     }

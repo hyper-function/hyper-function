@@ -10,9 +10,9 @@ export class HfcPropsBuilder extends EventEmitter {
   propsFilePath: string;
   constructor(private hfcConfig: Partial<Options> = {}) {
     super();
-    this.propsFilePath = path.join(hfcConfig.context!, "hfc.props.d.ts");
+    this.propsFilePath = path.join(hfcConfig.context!, "hfc.d.ts");
     if (!existsSync(this.propsFilePath)) {
-      console.log("missing hfc.props.d.ts");
+      console.log("missing hfc.d.ts");
       process.exit(-1);
     }
 
@@ -29,7 +29,7 @@ export class HfcPropsBuilder extends EventEmitter {
     try {
       res = parse(this.propsFilePath);
     } catch (error) {
-      console.log("[hfc.props.d.ts] Parse error");
+      console.log("[hfc.d.ts] Parse error");
       console.log((error as any).message);
       process.exit(-1);
     }

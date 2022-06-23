@@ -68,6 +68,7 @@
           methods: {
             listenEvents() {
               listenBuildEvents((data) => {
+                if (document.hidden) return;
                 if (data.action === "update-hfc-markdown") {
                   this.renderHfcDoc();
                 }

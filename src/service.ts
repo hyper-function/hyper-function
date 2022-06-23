@@ -38,7 +38,7 @@ export class Service extends EventEmitter {
     super();
   }
   async loadUserOptions() {
-    const config = await import(path.resolve(this.context, "hfc.config.js"));
+    const config = await import(path.resolve(this.context, "hfc.js"));
     return config.default;
   }
   async run() {
@@ -69,8 +69,8 @@ export class Service extends EventEmitter {
     hfcConfig.hfcName = packageJson.hfcName;
     hfcConfig.version = packageJson.version;
     hfcConfig.license = packageJson.license;
-    hfcConfig.dependencies = packageJson.dependencies;
-    hfcConfig.devDependencies = packageJson.devDependencies;
+    hfcConfig.dependencies = packageJson.dependencies || {};
+    hfcConfig.devDependencies = packageJson.devDependencies || {};
     hfcConfig.outputPath = path.resolve(
       this.context,
       ".hfc",
@@ -89,7 +89,7 @@ export class Service extends EventEmitter {
     this.configureWebpack((webpackConfig: webpack.Configuration) => {
       const hfcPropsFilePath = path.resolve(
         this.hfcConfig.context!,
-        "hfc.props.d.ts"
+        "hfc.d.ts"
       );
 
       const config: webpack.Configuration = {
