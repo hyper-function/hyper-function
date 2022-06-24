@@ -1,4 +1,5 @@
 {
+  "hfcName": "awa-btn",
   "name": "awesome-hfc",
   "version": "1.1.28",
   "description": "awesome button",
@@ -20,6 +21,5 @@
   "dependencies": {},
   "devDependencies": {
     "@types/hyper-function-component": "^1.0.0"
-  },
-  "hfcName": "awa-btn"
+  }
 }

@@ -206,6 +206,19 @@ async function askForHfcName(context: string) {
   const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
   pkgJson.hfcName = name;
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
+
+  const docPath = path.join(context, "hfc.md");
+  let doc = fs.readFileSync(docPath, "utf-8");
+  if (doc.split("\n").length <= 10) {
+    doc += `
+\`\`\`html render
+<template hfz import:${name}="dev">
+  <${name}></${name}>
+</template>
+\`\`\`
+`;
+    fs.writeFileSync(docPath, doc);
+  }
 }
 
 (async () => {
