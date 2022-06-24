@@ -12,10 +12,6 @@
     "publish": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "stackblitz": {
-    "startCommand": "npm start",
-    "compileTrigger": "auto"
-  },
   "devDependencies": {
     "@hyper-function/cli-service": "^0.2.7",
     "@types/hyper-function-component": "^1.1.0",

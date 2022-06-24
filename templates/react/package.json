@@ -12,10 +12,6 @@
     "publish": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "stackblitz": {
-    "startCommand": "npm start",
-    "compileTrigger": "auto"
-  },
   "dependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
