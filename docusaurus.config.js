@@ -14,7 +14,7 @@ const config = {
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
 
-  organizationName: "hyper-fun", // Usually your GitHub org/user name.
+  organizationName: "hyper-function", // Usually your GitHub org/user name.
   projectName: "docs", // Usually your repo name.
 
   i18n: {
@@ -30,7 +30,7 @@ const config = {
         docs: {
           routeBasePath: "/",
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/hyper-fun/docs",
+          editUrl: "https://github.com/hyper-function/docs",
         },
         blog: false,
         theme: {
@@ -79,7 +79,7 @@ const config = {
             position: "right",
           },
           {
-            href: "https://github.com/hyper-fun/hyper-function",
+            href: "https://github.com/hyper-function/hyper-function",
             label: "GitHub",
             position: "right",
           },
@@ -106,7 +106,7 @@ const config = {
             items: [
               {
                 label: "GitHub",
-                href: "https://github.com/hyper-fun/hyper-function",
+                href: "https://github.com/hyper-function/hyper-function",
               },
             ],
           },
