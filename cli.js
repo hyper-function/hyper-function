@@ -50,6 +50,7 @@ async function run() {
     {
       type: "confirm",
       name: "useCurrentFolder",
+      default: true,
       message: "Generate in current folder?",
     },
   ]);
@@ -79,7 +80,7 @@ async function run() {
   }
 
   fs.copySync(path.resolve(__dirname, "templates", template.folder), folder);
-  console.log(chalk.green("Generate success"));
+  console.log(chalk.green("Generate success!"));
   console.log(chalk.green(`cd ${folder}`));
   console.log(chalk.green(`npm install`));
   console.log(chalk.green(`npm start`));
