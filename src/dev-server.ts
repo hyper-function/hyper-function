@@ -2,10 +2,10 @@ import http from "http";
 import cors from "cors";
 import express, { Response } from "express";
 import portfinder from "portfinder";
+import prettyBytes from "pretty-bytes";
 import * as desm from "desm";
-import { Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 import path from "path";
-import { readFileSync } from "fs";
 import kvCache from "./kv-cache.js";
 import fs from "fs-extra";
 
@@ -14,7 +14,7 @@ export class DevServer {
   eventMessageId = Date.now();
   eventMessages: { id: number; data: any }[] = [];
   eventResponses: Response[] = [];
-  constructor(private hfcConfig: Partial<Options> = {}) {
+  constructor(private hfcConfig: HfcConfig) {
     const app = express();
     app.use(cors());
 
@@ -45,17 +45,36 @@ export class DevServer {
     });
 
     app.get("/meta", async (req, res) => {
+      let sizeJs = 0;
+      let sizeCss = 0;
+      try {
+        const [jsStat, cssStat] = await Promise.all([
+          fs.stat(
+            path.join(
+              this.hfcConfig.pkgOutputPath,
+              "esm",
+              this.hfcConfig.hfcName + ".js"
+            )
+          ),
+          fs.stat(path.join(this.hfcConfig.pkgOutputPath, "hfc.css")),
+        ]);
+        sizeJs = jsStat.size;
+        sizeCss = cssStat.size;
+      } catch (error) {}
+
       res.json({
         name: this.hfcConfig.hfcName,
         version: this.hfcConfig.version,
         license: this.hfcConfig.license,
         deps: this.hfcConfig.dependencies,
+        sizeJs: prettyBytes(sizeJs),
+        sizeCss: prettyBytes(sizeCss),
       });
     });
 
     const wfmServePath = `/@hyper.fun/${this.hfcConfig.hfcName}@${this.hfcConfig.version}`;
-    app.use(wfmServePath, express.static(this.hfcConfig.pkgOutputPath!));
-    app.use("/doc", express.static(this.hfcConfig.docOutputPath!));
+    app.use(wfmServePath, express.static(this.hfcConfig.pkgOutputPath));
+    app.use("/doc", express.static(this.hfcConfig.docOutputPath));
 
     const clientPath = desm.join(import.meta.url, "..", "client");
 
@@ -94,7 +113,7 @@ export class DevServer {
   async listen() {
     if (this.hfcConfig.command === "build") return;
     const port = await portfinder.getPortPromise({
-      port: this.hfcConfig.port!,
+      port: this.hfcConfig.port,
     });
 
     this.server!.listen(port, () => {

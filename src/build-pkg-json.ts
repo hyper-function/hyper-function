@@ -2,14 +2,14 @@ import EventEmitter from "events";
 import path from "path";
 import readPkg from "read-pkg";
 import chokidar from "chokidar";
-import { Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 import { existsSync, writeFileSync } from "fs";
 
 export class HfcPkgJsonBuilder extends EventEmitter {
   pkgJsonFilePath: string;
-  constructor(private hfcConfig: Partial<Options> = {}) {
+  constructor(private hfcConfig: HfcConfig) {
     super();
-    this.pkgJsonFilePath = path.join(hfcConfig.context!, "package.json");
+    this.pkgJsonFilePath = path.join(hfcConfig.context, "package.json");
     if (!existsSync(this.pkgJsonFilePath)) {
       console.error("can not find package.json!");
       process.exit(-1);
@@ -35,16 +35,16 @@ export class HfcPkgJsonBuilder extends EventEmitter {
       keywords: ["hyper-function-component", "hfc", ...(pkg.keywords || [])],
       license: pkg.license,
       repository: pkg.repository,
-      dependencies: pkg.dependencies,
+      dependencies: this.hfcConfig.dependencies,
     };
 
     writeFileSync(
-      path.join(this.hfcConfig.pkgOutputPath!, "package.json"),
+      path.join(this.hfcConfig.pkgOutputPath, "package.json"),
       JSON.stringify(newPkg, null, 2)
     );
 
     writeFileSync(
-      path.join(this.hfcConfig.pkgOutputPath!, "readme.md"),
+      path.join(this.hfcConfig.pkgOutputPath, "readme.md"),
       `👉 ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
     );
 

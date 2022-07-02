@@ -1,16 +1,16 @@
 import path from "path";
-import fs, { ensureDirSync } from "fs-extra";
+import fs from "fs-extra";
 import chokidar from "chokidar";
 import hfcMdParser from "./markdown-parser.js";
 
-import { Options } from "./options.js";
+import { HfcConfig, Options } from "./options.js";
 import EventEmitter from "events";
 
 export class DocBuilder extends EventEmitter {
   mdFilePath: string;
-  constructor(private hfcConfig: Partial<Options> = {}) {
+  constructor(private hfcConfig: HfcConfig) {
     super();
-    this.mdFilePath = path.join(this.hfcConfig.context!, "hfc.md");
+    this.mdFilePath = path.join(this.hfcConfig.context, "hfc.md");
     if (this.hfcConfig.command === "serve") {
       chokidar.watch(this.mdFilePath).on("change", () => this.build());
     }
@@ -24,8 +24,8 @@ export class DocBuilder extends EventEmitter {
     );
 
     await hfcMdParser(content, {
-      outputPath: this.hfcConfig.docOutputPath!,
-      basePath: this.hfcConfig.context!,
+      outputPath: this.hfcConfig.docOutputPath,
+      basePath: this.hfcConfig.context,
       hash: this.hfcConfig.command === "serve" ? "filename" : "content",
     });
 

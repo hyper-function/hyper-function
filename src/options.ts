@@ -37,8 +37,10 @@ export interface Options {
   }[];
 }
 
+export type HfcConfig = Options & {};
+
 export const defaults = () => ({
-  entry: "hfc.js",
+  entry: "src/index.js",
   port: 7000,
   assetExtRegExp:
     /\.(png|jpe?g|gif|webp|svg|mp4|webm|ogg|mp3|wav|flac|aac|eot|ttf|otf|woff2?)$/i,

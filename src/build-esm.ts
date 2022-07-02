@@ -4,19 +4,19 @@ import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
 
-import { Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 
 export class EsmBuilder extends EventEmitter {
   compiler: webpack.Compiler;
   constructor(
-    private hfcConfig: Partial<Options> = {},
+    private hfcConfig: HfcConfig,
     private webpackConfig: webpack.Configuration
   ) {
     super();
 
-    fs.ensureFileSync(path.join(this.hfcConfig.pkgOutputPath!, "hfc.css"));
+    fs.ensureFileSync(path.join(this.hfcConfig.pkgOutputPath, "hfc.css"));
 
-    const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath!, "esm");
+    const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath, "esm");
     fs.ensureDirSync(esmOutputPath);
     fs.writeFileSync(
       path.join(esmOutputPath, "index.js"),
@@ -38,13 +38,29 @@ export class EsmBuilder extends EventEmitter {
       ].join("\n")
     );
 
-    const externals = Object.keys(this.hfcConfig.dependencies!);
+    Object.assign(this.webpackConfig, {
+      externals: [
+        function ({ request }: { request: string }, callback: any) {
+          const firstChar = request[0];
+          if (firstChar === "." || firstChar === "/") {
+            return callback();
+          }
+
+          const parts = request.split("/");
+          const npmName =
+            firstChar === "@" ? parts[0] + "/" + parts[1] : parts[0];
+
+          if (hfcConfig.dependencies[npmName]) {
+            return callback(null, request);
+          }
+
+          callback();
+        },
+      ],
+      externalsType: "module",
+    });
 
     if (this.hfcConfig.command === "build") {
-      Object.assign(this.webpackConfig, {
-        externals,
-        externalsType: "module",
-      });
       this.webpackConfig!.optimization!.minimize = true;
       this.webpackConfig!.optimization!.minimizer = [
         new TerserPlugin({

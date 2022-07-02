@@ -18,8 +18,13 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "react": "^16.8.0",
+    "react-dom": "^16.14.0"
+  },
   "devDependencies": {
-    "@types/hyper-function-component": "^1.0.0"
+    "@types/hyper-function-component": "^1.0.0",
+    "hfc-cli-service": "../../"
   }
 }

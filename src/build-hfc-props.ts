@@ -3,14 +3,14 @@ import path from "path";
 import chokidar from "chokidar";
 import { existsSync, writeFileSync } from "fs";
 
-import { Options } from "./options.js";
+import { HfcConfig, Options } from "./options.js";
 import parse from "./prop-types-parser.js";
 
 export class HfcPropsBuilder extends EventEmitter {
   propsFilePath: string;
-  constructor(private hfcConfig: Partial<Options> = {}) {
+  constructor(private hfcConfig: HfcConfig) {
     super();
-    this.propsFilePath = path.join(hfcConfig.context!, "hfc.d.ts");
+    this.propsFilePath = path.join(hfcConfig.context, "hfc.d.ts");
     if (!existsSync(this.propsFilePath)) {
       console.log("missing hfc.d.ts");
       process.exit(-1);
@@ -35,12 +35,12 @@ export class HfcPropsBuilder extends EventEmitter {
     }
 
     writeFileSync(
-      path.join(this.hfcConfig.pkgOutputPath!, "hfc.props.json"),
+      path.join(this.hfcConfig.pkgOutputPath, "hfc.props.json"),
       JSON.stringify(res.result)
     );
 
     writeFileSync(
-      path.join(this.hfcConfig.pkgOutputPath!, "hfc.props.min.json"),
+      path.join(this.hfcConfig.pkgOutputPath, "hfc.props.min.json"),
       JSON.stringify(res.minResult)
     );
 

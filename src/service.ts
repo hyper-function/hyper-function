@@ -5,7 +5,7 @@ import webpack from "webpack";
 import rm from "rimraf";
 import readPkg from "read-pkg";
 
-import { Options, defaults } from "./options.js";
+import { defaults, HfcConfig } from "./options.js";
 import AssetsPlugin from "./assets-plugin.js";
 
 import { DocBuilder } from "./build-doc.js";
@@ -32,7 +32,7 @@ export class Service extends EventEmitter {
     config: webpack.Configuration,
     opts: { mode: string; webpack: typeof webpack }
   ) => void)[] = [];
-  hfcConfig: Partial<Options> = {};
+  hfcConfig!: HfcConfig;
 
   constructor(public context: string, public command: "serve" | "build") {
     super();
@@ -62,35 +62,40 @@ export class Service extends EventEmitter {
     const packageJson = await readPkg({ cwd: this.context });
 
     const options = await this.loadUserOptions();
-    const hfcConfig: Partial<Options> = defaultsDeep(options, defaults());
-    hfcConfig.command = this.command;
-    hfcConfig.context = this.context;
-    hfcConfig.name = packageJson.name;
-    hfcConfig.hfcName = packageJson.hfcName;
-    hfcConfig.version = packageJson.version;
-    hfcConfig.license = packageJson.license;
-    hfcConfig.dependencies = packageJson.dependencies || {};
-    hfcConfig.devDependencies = packageJson.devDependencies || {};
-    hfcConfig.outputPath = path.resolve(
+    this.hfcConfig = defaultsDeep(options, defaults(), {
+      externalObject: {},
+    });
+
+    this.hfcConfig.command = this.command;
+    this.hfcConfig.context = this.context;
+    this.hfcConfig.name = packageJson.name;
+    this.hfcConfig.hfcName = packageJson.hfcName;
+    this.hfcConfig.version = packageJson.version;
+    this.hfcConfig.license = packageJson.license || "";
+    this.hfcConfig.dependencies = packageJson.dependencies || {};
+    this.hfcConfig.devDependencies = packageJson.devDependencies || {};
+    this.hfcConfig.outputPath = path.resolve(
       this.context,
       ".hfc",
-      hfcConfig.command
+      this.hfcConfig.command
     );
-    fs.ensureDirSync(hfcConfig.outputPath);
 
-    hfcConfig.pkgOutputPath = path.resolve(hfcConfig.outputPath, "pkg");
-    fs.ensureDirSync(hfcConfig.pkgOutputPath);
+    fs.ensureDirSync(this.hfcConfig.outputPath);
 
-    hfcConfig.docOutputPath = path.resolve(hfcConfig.outputPath, "doc");
-    fs.ensureDirSync(hfcConfig.docOutputPath);
+    this.hfcConfig.pkgOutputPath = path.resolve(
+      this.hfcConfig.outputPath,
+      "pkg"
+    );
+    fs.ensureDirSync(this.hfcConfig.pkgOutputPath);
 
-    this.hfcConfig = hfcConfig;
+    this.hfcConfig.docOutputPath = path.resolve(
+      this.hfcConfig.outputPath,
+      "doc"
+    );
+    fs.ensureDirSync(this.hfcConfig.docOutputPath);
 
     this.configureWebpack((webpackConfig: webpack.Configuration) => {
-      const hfcPropsFilePath = path.resolve(
-        this.hfcConfig.context!,
-        "hfc.d.ts"
-      );
+      const hfcPropsFilePath = path.resolve(this.hfcConfig.context, "hfc.d.ts");
 
       const config: webpack.Configuration = {
         mode: this.hfcConfig.command === "serve" ? "development" : "production",
@@ -98,7 +103,7 @@ export class Service extends EventEmitter {
         entry: this.hfcConfig.entry,
         devtool: false,
         resolve: {
-          extensions: ["ts", "tsx", "js", "jsx", "..."],
+          extensions: ["..."],
         },
         module: {
           generator: {
@@ -116,6 +121,12 @@ export class Service extends EventEmitter {
               test: this.hfcConfig.assetExtRegExp,
               exclude: /(node_modules)/,
               type: "asset/resource",
+            },
+            {
+              test: /\.js$/,
+              resolve: {
+                fullySpecified: false,
+              },
             },
             // {
             //   test: /\.jsx?$/,
@@ -192,7 +203,7 @@ export class Service extends EventEmitter {
         },
         output: {
           path: this.hfcConfig.pkgOutputPath,
-          filename: `esm/${hfcConfig.hfcName}.js`,
+          filename: `esm/${this.hfcConfig.hfcName}.js`,
           library: {
             type: "module",
           },
@@ -209,14 +220,14 @@ export class Service extends EventEmitter {
           new AssetsPlugin({}),
           new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify(
-              hfcConfig.command === "serve" ? "development" : "production"
+              this.hfcConfig.command === "serve" ? "development" : "production"
             ),
           }),
         ],
       };
       webpackConfig = Object.assign(webpackConfig, config);
 
-      const cssRules = resolveCssRules(hfcConfig);
+      const cssRules = resolveCssRules(this.hfcConfig);
       webpackConfig.module!.rules = [
         ...webpackConfig.module!.rules!,
         ...cssRules,
@@ -226,13 +237,13 @@ export class Service extends EventEmitter {
     });
 
     this.hfcConfig.plugins?.forEach((plugin) => {
-      plugin.apply?.(hfcConfig);
+      plugin.apply?.(this.hfcConfig);
       if (plugin.configureWebpack) {
         this.configureWebpack(plugin.configureWebpack);
       }
     });
 
-    const devServer = new DevServer(hfcConfig);
+    const devServer = new DevServer(this.hfcConfig);
 
     const docBuilder = new DocBuilder(this.hfcConfig);
     docBuilder.on("build-complete", () => {

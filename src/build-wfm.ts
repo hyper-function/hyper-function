@@ -4,20 +4,20 @@ import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
 
-import { Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 
 export class WfmBuilder extends EventEmitter {
   compiler: webpack.Compiler;
   wfmPath: string;
-  constructor(private hfcConfig: Partial<Options> = {}) {
+  constructor(private hfcConfig: HfcConfig) {
     super();
-    const wfmEntry = path.join(this.hfcConfig.context!, ".hfc", "wfm-entry.js");
+    const wfmEntry = path.join(this.hfcConfig.context, ".hfc", "wfm-entry.js");
 
     fs.writeFileSync(
       wfmEntry,
       [
         `import HFC from "${path.resolve(
-          this.hfcConfig.pkgOutputPath!,
+          this.hfcConfig.pkgOutputPath,
           "esm",
           "index.js"
         )}";`,
@@ -25,9 +25,7 @@ export class WfmBuilder extends EventEmitter {
       ].join("\n")
     );
 
-    this.wfmPath = path.resolve(this.hfcConfig.pkgOutputPath!, "wfm");
-
-    const shared: string[] = Object.keys(this.hfcConfig.dependencies!);
+    this.wfmPath = path.resolve(this.hfcConfig.pkgOutputPath, "wfm");
 
     this.compiler = webpack({
       context: this.wfmPath,
@@ -42,7 +40,7 @@ export class WfmBuilder extends EventEmitter {
       },
       resolve: {
         alias: {
-          [path.resolve(this.hfcConfig.pkgOutputPath!, "hfc.css")]: false,
+          [path.resolve(this.hfcConfig.pkgOutputPath, "hfc.css")]: false,
         },
       },
       optimization:
@@ -84,13 +82,18 @@ export class WfmBuilder extends EventEmitter {
             name: `$HFC_WFM_CONTAINERS["@hyper.fun/${this.hfcConfig.hfcName}"]`,
             type: "assign",
           },
-          shared,
+          shared: this.hfcConfig.dependencies,
           exposes: {
             "./hfc": wfmEntry,
           },
         }),
         new webpack.ids.DeterministicChunkIdsPlugin({
           maxLength: 8,
+        }),
+        new webpack.DefinePlugin({
+          "process.env.NODE_ENV": JSON.stringify(
+            this.hfcConfig.command === "serve" ? "development" : "production"
+          ),
         }),
       ],
     });
