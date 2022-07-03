@@ -1,6 +1,6 @@
 {
   "name": "create-hfc",
-  "version": "0.1.9",
+  "version": "0.1.11",
   "description": "",
   "main": "cli.js",
   "bin": "./cli.js",
