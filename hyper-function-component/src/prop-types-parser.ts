@@ -64,7 +64,7 @@ export default function parse(location: string) {
       }
 
       if (v.description && !min) ret[k].desc = v.description;
-      if (v.default && !min) ret[k].default = v.default;
+      if (typeof v.default !== "undefined" && !min) ret[k].default = v.default;
 
       if (Array.isArray(v.type) || v.anyOf) {
         throw new Error(`[hfc.d.ts] union type is not support: ${k}`);
