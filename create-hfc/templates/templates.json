@@ -15,6 +15,10 @@
     {
       "title": "React - TypeScript",
       "folder": "react-ts"
+    },
+    {
+      "title": "Svelte",
+      "folder": "svelte"
     }
   ]
 }

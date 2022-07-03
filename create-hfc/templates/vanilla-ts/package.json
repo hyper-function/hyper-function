@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.8",
+    "@hyper-function/cli-service": "^0.2.11",
     "@types/hyper-function-component": "^1.1.0",
     "hfc-plugin-typescript": "^1.0.2"
   }
