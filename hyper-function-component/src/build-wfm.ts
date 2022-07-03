@@ -3,8 +3,11 @@ import fs from "fs-extra";
 import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
+import { createRequire } from "module";
 
 import { HfcConfig } from "./options.js";
+
+const require = createRequire(import.meta.url);
 
 export class WfmBuilder extends EventEmitter {
   compiler: webpack.Compiler;
@@ -38,11 +41,6 @@ export class WfmBuilder extends EventEmitter {
         chunkFilename:
           this.hfcConfig.command === "serve" ? undefined : "[chunkhash].js",
       },
-      resolve: {
-        alias: {
-          [path.resolve(this.hfcConfig.pkgOutputPath, "hfc.css")]: false,
-        },
-      },
       optimization:
         this.hfcConfig.command === "serve"
           ? undefined
@@ -71,6 +69,13 @@ export class WfmBuilder extends EventEmitter {
           {
             test: this.hfcConfig.assetExtRegExp,
             type: "asset/resource",
+          },
+          {
+            test: /\.css$/,
+            use: [
+              { loader: require.resolve("style-loader") },
+              { loader: require.resolve("css-loader") },
+            ],
           },
         ],
       },
