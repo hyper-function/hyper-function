@@ -1,0 +1,23 @@
+name: MergeBot
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run Merge Bot
+        run: |
+          git config --global user.email "i@terryfei.com"
+          git config --global user.name "Terry Fei"
+          node merge-bot.js
