@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -49,6 +49,7 @@
     "remark-parse": "^10.0.1",
     "remark-rehype": "^10.1.0",
     "rimraf": "^3.0.2",
+    "style-loader": "^3.3.1",
     "tar": "^6.1.11",
     "terser-webpack-plugin": "^5.3.1",
     "typescript-json-schema": "^0.53",
