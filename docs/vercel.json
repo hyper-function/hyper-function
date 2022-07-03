@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/region.js": {
+      "memory": 128,
+      "maxDuration": 1
+    }
+  },
+  "regions": [
+    "hkg1"
+  ]
+}

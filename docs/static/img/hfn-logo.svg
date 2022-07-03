@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="77px" height="77px" viewBox="0 0 77 77" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>编组 3</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0.000000 0 0 0 0 0.000000 0 0 0 0 0.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g filter="url(#filter-1)" id="编组-3">
+            <g>
+                <g id="编组-2" transform="translate(0.000000, 11.000000)" fill="#000000">
+                    <rect id="矩形" transform="translate(22.146447, 13.853553) rotate(45.000000) translate(-22.146447, -13.853553) " x="16.6464466" y="0.853553391" width="11" height="26"></rect>
+                    <path d="M17.2218254,15.5147186 L23.2218254,15.5147186 C27.0878187,15.5147186 30.2218254,18.6487254 30.2218254,22.5147186 L30.2218254,61.5147186 C30.2218254,65.3807119 27.0878187,68.5147186 23.2218254,68.5147186 L17.2218254,68.5147186 L17.2218254,68.5147186 L17.2218254,15.5147186 Z" id="矩形" transform="translate(23.721825, 42.014719) rotate(135.000000) translate(-23.721825, -42.014719) "></path>
+                    <rect id="矩形" transform="translate(31.136039, 34.863961) rotate(45.000000) translate(-31.136039, -34.863961) " x="25.636039" y="30.363961" width="11" height="9"></rect>
+                </g>
+                <g id="编组-2" transform="translate(53.000000, 33.000000) rotate(180.000000) translate(-53.000000, -33.000000) translate(29.000000, -0.000000)" fill="#000000">
+                    <rect id="矩形" transform="translate(22.146447, 13.853553) rotate(45.000000) translate(-22.146447, -13.853553) " x="16.6464466" y="0.853553391" width="11" height="26"></rect>
+                    <path d="M17.2846411,16.1914953 L23.1005158,15.8822562 C26.9610556,15.6769853 30.2570465,18.6401662 30.4623174,22.500706 C30.469401,22.6339279 30.4726746,22.7673251 30.4721343,22.900734 L30.3128786,62.2198474 C30.297265,66.0747415 27.1678617,69.1914953 23.312936,69.1914953 L17.2846411,69.1914953 L17.2846411,69.1914953 L17.2846411,16.1914953 Z" id="矩形" transform="translate(23.893398, 42.340097) rotate(135.000000) translate(-23.893398, -42.340097) "></path>
+                    <rect id="矩形" transform="translate(31.136039, 34.863961) rotate(45.000000) translate(-31.136039, -34.863961) " x="25.636039" y="30.363961" width="11" height="9"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
