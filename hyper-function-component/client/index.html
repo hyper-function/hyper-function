@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <template
+      hfz
+      import:side-bar="/side-bar.html"
+      import:prop-types="/prop-types.html"
+    >
+      <div class="main">
+        <div class="nav">
+          <ul class="list">
+            <li
+              v-for="item in ['Readme', 'PropTypes']"
+              @click="activeTab = item"
+            >
+              <div :class="{tab: true, active: item === activeTab}">
+                {{item}}
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="container">
+          <div
+            v-if="activeTab === 'Readme'"
+            id="hfc-doc"
+            class="content"
+            ref="content"
+          >
+            <block @mounted="renderHfcDoc">
+              <div class="docs markdown-body" v-html="mdHtml"></div>
+            </block>
+          </div>
+          <div v-else-if="activeTab === 'PropTypes'" class="content">
+            <block @mounted="renderPropTypes"
+              ><Transition name="fade">
+                <div class="prop-types">
+                  <prop-types />
+                </div> </Transition
+            ></block>
+          </div>
+
+          <div class="side-bar">
+            <side-bar />
+          </div>
+        </div>
+      </div>
+      <script>
+        export default {
+          data: {
+            mdHtml: "",
+            activeTab: "Readme",
+          },
+          async created() {
+            const meta = await fetch("/meta")
+              .then((res) => res.json())
+              .then((meta) => meta);
+            window.hfcMeta = meta;
+
+            this.listenEvents();
+          },
+          methods: {
+            listenEvents() {
+              listenBuildEvents((data) => {
+                if (document.hidden) return;
+                if (data.action === "update-hfc-markdown") {
+                  this.renderHfcDoc();
+                }
+
+                if (data.action === "rebuild-complete") {
+                  this.renderHfcDoc();
+                }
+              });
+            },
+            async renderHfcDoc() {
+              const html = await fetch("/doc/index.html").then((res) =>
+                res.text()
+              );
+
+              this.$refs.content.style.minHeight =
+                this.$refs.content.clientHeight + "px";
+
+              this.mdHtml = "";
+
+              setTimeout(() => {
+                this.mdHtml = html;
+                setTimeout(() => {
+                  this.renderHfcMdImgs();
+                  this.renderCodeBlock();
+                  this.renderHfcPreview();
+                });
+              });
+            },
+
+            renderCodeBlock() {
+              if (window.Prism) window.Prism.highlightAll();
+            },
+
+            renderHfcMdImgs() {
+              document.querySelectorAll("#hfc-doc img").forEach((imgElem) => {
+                if (imgElem.dataset.src) {
+                  imgElem.src = `/doc/imgs/${imgElem.dataset.src}`;
+                }
+              });
+            },
+
+            renderHfcPreview() {
+              const containers = document.querySelectorAll("[data-hfz]");
+              containers.forEach((container) => {
+                const id = container.dataset.hfzId;
+
+                let code = container.dataset.hfz;
+                container.setAttribute("data-hfz", "");
+                container.classList.add("hfz-preview");
+
+                const sandbox = document.createElement("iframe");
+                sandbox.setAttribute(
+                  "sandbox",
+                  [
+                    "allow-same-origin",
+                    "allow-popups",
+                    "allow-modals",
+                    "allow-forms",
+                    "allow-pointer-lock",
+                    "allow-scripts",
+                    "allow-top-navigation-by-user-activation",
+                  ].join(" ")
+                );
+
+                sandbox.src = "/render/" + id;
+                container.appendChild(sandbox);
+
+                const actions = document.createElement("div");
+                actions.style.position = "relative";
+
+                actions.style.visibility = "hidden";
+                actions.classList.add("hfz-preview-actions");
+
+                const openBtn = document.createElement("button");
+                openBtn.innerText = "OPEN";
+                openBtn.addEventListener("click", () => {
+                  window.open("/render/" + id, "_blank");
+                });
+
+                const refreshBtn = document.createElement("button");
+                refreshBtn.innerText = "REFRESH";
+                refreshBtn.addEventListener("click", () => {
+                  sandbox.iFrameResizer.sendMessage({ action: "refresh" });
+                });
+
+                actions.appendChild(openBtn);
+                actions.appendChild(refreshBtn);
+
+                container.appendChild(actions);
+                container.addEventListener("mouseenter", () => {
+                  actions.style.visibility = "visible";
+                });
+                container.addEventListener("mouseleave", () => {
+                  actions.style.visibility = "hidden";
+                });
+
+                window.iFrameResize(
+                  {
+                    sizeHeight: false,
+                    checkOrigin: false,
+                    heightCalculationMethod: "max",
+                    onInit() {},
+                    onResized(res) {
+                      if (res.height <= 16) return;
+                      sandbox.style.height = res.height + "px";
+                    },
+                  },
+                  sandbox
+                );
+              });
+            },
+          },
+        };
+      </script>
+    </template>
+
+    <script src="/js/vue.global.prod.js"></script>
+    <script src="/js/hfz-global.js"></script>
+    <script src="/js/iframeSizer.min.js"></script>
+    <script src="/js/listen-build-events.js"></script>
+
+    <script>
+      window.addEventListener("load", () => {
+        let link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.type = "text/css";
+        link.href =
+          "https://cdn.jsdelivr.net/npm/prismjs@1.27.0/themes/prism.min.css";
+        document.head.appendChild(link);
+      });
+    </script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/components/prism-core.min.js"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/prismjs@1.27.0/plugins/autoloader/prism-autoloader.min.js"
+    ></script>
+  </body>
+</html>

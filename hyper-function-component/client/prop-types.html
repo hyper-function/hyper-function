@@ -1,0 +1,192 @@
+<template hfz>
+  <div class="prop-types-title">Attrs</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item, index) in attrs">
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(attrs, item, index)"
+        >
+          <span :style="{paddingLeft: item.level + 'em'}">{{item.name}}</span>
+        </td>
+        <td>{{item.desc}}</td>
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(attrs, item, index)"
+        >
+          {{item.type}}
+        </td>
+        <td>{{item.default}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="prop-types-title">Events</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item, index) in events">
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(events, item, index)"
+        >
+          <span :style="{paddingLeft: item.level + 'em'}">{{item.name}}</span>
+        </td>
+        <td>{{item.desc}}</td>
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(events, item, index)"
+        >
+          {{item.type}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="prop-types-title">Slots</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="(item, index) in slots">
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(slots, item, index)"
+        >
+          <span :style="{paddingLeft: item.level + 'em'}">{{item.name}}</span>
+        </td>
+        <td>{{item.desc}}</td>
+        <td
+          :style="{cursor: item.isObject ? 'pointer': ''}"
+          @click="renderSubType(slots, item, index)"
+        >
+          {{item.type}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <script>
+    export default {
+      data: {
+        attrs: [],
+        events: [],
+        slots: [],
+      },
+      created() {
+        this.renderPropTypes();
+      },
+      methods: {
+        async renderPropTypes() {
+          const meta = window.hfcMeta;
+          const propTypes = await fetch(
+            `/@hyper.fun/${meta.name}@${meta.version}/hfc.props.json`
+          ).then((res) => res.json());
+
+          this.attrs = this.packTypes(propTypes.attrs, 0, propTypes.types);
+
+          this.events = Object.keys(propTypes.events).map((name) => {
+            const event = propTypes.events[name];
+            return {
+              name,
+              desc: propTypes.desc.events[name] || "",
+              t: event,
+              type: `Function (${Object.keys(event).length})`,
+              types: propTypes.types,
+              isObject: true,
+              level: 0,
+            };
+          });
+
+          this.slots = Object.keys(propTypes.slots).map((name) => {
+            const slot = propTypes.slots[name];
+            return {
+              name,
+              desc: propTypes.desc.slots[name] || "",
+              t: slot,
+              type: `Slot (${Object.keys(slot).length})`,
+              types: propTypes.types,
+              isObject: true,
+              level: 0,
+            };
+          });
+        },
+
+        async renderSubType(arr, item, index) {
+          if (!item.isObject) return;
+          if (item.expanded) return;
+
+          let items = [];
+          if (
+            item.type.startsWith("Object") ||
+            item.type.startsWith("Function") ||
+            item.type.startsWith("Slot")
+          ) {
+            items = this.packTypes(item.t, item.level + 1, item.types);
+          } else {
+            const type = item.types[item.t];
+            items = this.packTypes(type.t, item.level + 1, item.types);
+          }
+
+          if (items.length) {
+            arr.splice(index + 1, 0, ...items);
+          }
+
+          item.expanded = true;
+        },
+        packTypes(obj, level, types) {
+          return Object.keys(obj).map((name) => {
+            const item = obj[name];
+
+            if (typeof item.t === "string") {
+              if (item.t[0] === "#") {
+                item.type =
+                  {
+                    "#s": "String",
+                    "#i": "Int",
+                    "#f": "Float",
+                    "#b": "Boolean",
+                    "#a": "Any",
+                  }[item.t] + (item.arr ? "[]" : "");
+              } else {
+                item.isObject = true;
+                const type = types[item.t];
+                item.type = `${item.t}${item.arr ? "[]" : ""} (${
+                  Object.keys(type.t).length
+                })`;
+              }
+            } else {
+              item.isObject = true;
+              item.type = `Object${item.arr ? "[]" : ""} (${
+                Object.keys(item.t).length
+              })`;
+            }
+
+            item.types = types;
+            item.level = level || 0;
+            item.name = name;
+            return item;
+          });
+        },
+      },
+    };
+  </script>
+</template>
