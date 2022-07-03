@@ -1,0 +1,27 @@
+{
+  "hfcName": "",
+  "name": "awesome-hfc",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "",
+  "keywords": [],
+  "type": "module",
+  "scripts": {
+    "start": "hfc-cli-service",
+    "build": "hfc-cli-service build",
+    "publish": "hfc-cli-service publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-to-hfc": "^0.0.7"
+  },
+  "devDependencies": {
+    "@hyper-function/cli-service": "^0.2.8",
+    "@types/hyper-function-component": "^1.1.0",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "hfc-plugin-typescript": "^1.0.2"
+  }
+}
