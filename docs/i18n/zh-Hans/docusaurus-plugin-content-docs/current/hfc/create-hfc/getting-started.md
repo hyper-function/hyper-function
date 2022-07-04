@@ -53,4 +53,4 @@ awesome-hfc
 
 ## 发布
 
-运行 `npm run publish` 即可将组件发布到 [hyper.fun](https://hyper.fun)
+运行 `npm run publish-hfc` 即可将组件发布到 [hyper.fun](https://hyper.fun)
