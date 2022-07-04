@@ -9,7 +9,7 @@
   "scripts": {
     "start": "hfc-cli-service",
     "build": "hfc-cli-service build",
-    "publish": "hfc-cli-service publish",
+    "publish-hfc": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -18,7 +18,7 @@
     "react-to-hfc": "^1.0.1"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.11",
+    "@hyper-function/cli-service": "^0.2.15",
     "@types/hyper-function-component": "^1.1.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",
