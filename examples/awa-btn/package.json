@@ -1,7 +1,7 @@
 {
   "hfcName": "awa-btn",
   "name": "awesome-hfc",
-  "version": "1.1.28",
+  "version": "1.1.29",
   "description": "awesome button",
   "homepage": "",
   "type": "module",
@@ -18,11 +18,7 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.21",
-    "react": "^16.8.0",
-    "react-dom": "^16.14.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/hyper-function-component": "^1.0.0",
     "hfc-cli-service": "../../"

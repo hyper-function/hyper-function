@@ -42,9 +42,9 @@ export async function publish({ token }: { token: string }) {
   form.append("pkg", fileFromSync(pkgTarPath));
 
   const publishUrl =
-    process.env.NODE_ENV === "production"
-      ? "https://api.hyper.fun/hfc/publish"
-      : "http://localhost:3000/hfc/publish";
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000/hfc/publish"
+      : "https://api.hyper.fun/hfc/publish";
 
   try {
     await fetch(publishUrl, {
@@ -62,6 +62,7 @@ export async function publish({ token }: { token: string }) {
       });
   } catch (error) {
     console.log("failed to publish, network error");
+    console.error(error);
   }
 }
 
