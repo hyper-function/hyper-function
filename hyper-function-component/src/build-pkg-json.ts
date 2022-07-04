@@ -26,8 +26,8 @@ export class HfcPkgJsonBuilder extends EventEmitter {
     const hfcPage = `https://hyper.fun/${this.hfcConfig.hfcName}/${pkg.version}`;
 
     const newPkg = {
-      hfcName: pkg.name,
-      name: "@hyper.fun/" + pkg.name,
+      hfcName: this.hfcConfig.hfcName,
+      name: "@hyper.fun/" + this.hfcConfig.hfcName,
       version: pkg.version,
       main: "esm/index.js",
       module: "esm/index.js",
