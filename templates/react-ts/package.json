@@ -13,15 +13,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "react-to-hfc": "^1.0.1"
+    "react": "17",
+    "react-dom": "17",
+    "react-to-hfc": "^1.0.3"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.15",
+    "@hyper-function/cli-service": "^0.2.16",
     "@types/hyper-function-component": "^1.1.0",
-    "@types/react": "^18.0.14",
-    "@types/react-dom": "^18.0.5",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
     "hfc-plugin-typescript": "^1.0.2"
   }
 }
