@@ -23,7 +23,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
   async build() {
     const pkg = await readPkg({ cwd: this.hfcConfig.context });
 
-    const hfcPage = `https://hyper.fun/${this.hfcConfig.hfcName}/${pkg.version}`;
+    const hfcPage = `https://hyper.fun/c/${this.hfcConfig.hfcName}/${pkg.version}`;
 
     const newPkg = {
       hfcName: this.hfcConfig.hfcName,
@@ -46,7 +46,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
 
     writeFileSync(
       path.join(this.hfcConfig.pkgOutputPath, "readme.md"),
-      `👉 ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
+      `👉  ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
     );
 
     this.emit("build-complete");

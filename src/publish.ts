@@ -13,7 +13,7 @@ export async function publish({ token }: { token: string }) {
   const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
   const { description } = pkgJson;
 
-  pkgJson.description = `👉 https://hyper.fun/${pkgJson.hfcName}/${
+  pkgJson.description = `👉  https://hyper.fun/c/${pkgJson.hfcName}/${
     pkgJson.version
   }${description ? ` - ${description}` : ""}`;
 
