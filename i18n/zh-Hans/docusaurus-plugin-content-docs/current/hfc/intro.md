@@ -24,10 +24,11 @@ Hyper Function Component (HFC) 定义了 UI 组件的接口规范，灵感来自
 
 ```ts
 declare class HyperFunctionComponent {
+  static tag?: string;
   static propTypes?: HfcPropTypes;
   constructor(props: HfcProps);
 
-  connected(container: HTMLDivElement): void;
+  connected(container: HTMLElement): void;
   changed?(
     type: "attr" | "event" | "slot",
     name: string,

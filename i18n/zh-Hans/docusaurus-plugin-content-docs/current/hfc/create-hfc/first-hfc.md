@@ -54,7 +54,7 @@ export default class {
 可以看到，接口定义非常类似 [CustomElement](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_custom_elements#using_the_lifecycle_callbacks)。
 
 - constructor: 获得 props 对象，里面包含了 attrs, events, slots 属性。
-- connected: 获得 container 对象，这个对象永远是 div 实例。
+- connected: 获得 container 对象，这个对象默认是 div 实例。
 - changed: 当 props 里面的值变化时，会传进来最新的值。
 - disconnected: 当组件被销毁时调用。
 
@@ -102,11 +102,11 @@ export default class AwesomeHfc {
 
 修改 `hfc.d.ts` 文件：
 
-```js
+```ts
 interface HfcPropType {
   attrs: {
     // highlight-next-line
-    text: HfcString,
+    text: HfcString;
   };
   events: {};
   slots: {};
@@ -156,14 +156,14 @@ export default class AwesomeHfc {
 
 修改 `hfc.d.ts` 文件：
 
-```js
+```ts
 interface HfcPropType {
   attrs: {
-    text: HfcString,
+    text: HfcString;
   };
   events: {
     // highlight-next-line
-    click: {},
+    click: {};
   };
   slots: {};
 }
@@ -217,22 +217,22 @@ export default class AwesomeHfc {
 
 修改 `hfc.d.ts` 文件：
 
-```js
+```ts
 interface HfcPropType {
   attrs: {
-    text: HfcString,
+    text: HfcString;
   };
   events: {
-    click: {},
+    click: {};
   };
   slots: {
     // highlight-next-line
-    icon: {},
+    icon: {};
   };
 }
 ```
 
-接着修改 `hfc.md` 传递一个 `icon` 插槽进去
+接着修改 `hfc.md` 传递一个 `icon` 插槽进去，我们使用了 `<template #icon><svg>...</svg></template>` 这种写法，将 `svg` 插入到了 `mui-button` 中的 icon 插槽中。
 
 ````html
 ```html render
@@ -295,6 +295,91 @@ export default class AwesomeHfc {
 ```
 
 <iframe width="100%" height="500px" src="https://stackblitz.com/edit/hyper-function-create-hfc-bxu9ji?embed=1&file=hfc.md,hfc.d.ts,src/index.js&hideNavigation=1&ctl=1"></iframe>
+
+点击 `RUN PROJECT` 查看。
+
+### Default Slot
+
+我们有一个特殊的插槽叫做 `default`，当组件中有叫这个名字的插槽时，在写文档中的模板时可以忽略 `template` 标签。
+
+假如 `mui-button` 组件接收一个 `default` 的插槽，来展示内部内容。
+
+首先修改 `hfc.d.ts` 文件：
+
+```ts
+interface HfcPropType {
+  attrs: {
+    text: HfcString;
+  };
+  events: {
+    click: {};
+  };
+  slots: {
+    icon: {};
+    // highlight-next-line
+    default: {};
+  };
+}
+```
+
+接着修改 `hfc.md` 传递一个 `default` 插槽进去，注意这里没有使用 `template` 标签。
+
+````html
+```html render
+<template hfz import:mui-button="dev">
+  <mui-button text="LIKE">
+    // highlight-next-line
+    <em>I AM BUTTON</em>
+  </mui-button>
+</template>
+```
+````
+
+最后修改 `src/index.js` 渲染 `default` 插槽
+
+```js
+import "./index.css";
+
+export default class AwesomeHfc {
+  constructor(props) {
+    this.attrs = props.attrs || {};
+    this.events = props.events || {};
+    this.slots = props.slots || {};
+  }
+  connected(container) {
+    const button = document.createElement("button");
+
+    if (this.slots.icon) {
+      const iconSlot = document.createElement("span");
+      iconSlot.style.marginRight = "6px";
+      this.slots.icon(iconSlot);
+
+      button.appendChild(iconSlot);
+    }
+
+    const textSlot = document.createElement("span");
+    // highlight-next-line
+    if (this.slots.default) {
+      // highlight-next-line
+      this.slots.default(textSlot);
+    } else {
+      textSlot.innerText = this.attrs.text || "BUTTON";
+    }
+
+    button.appendChild(textSlot);
+
+    button.onclick = () => {
+      if (this.events.click) this.events.click();
+    };
+
+    container.appendChild(button);
+  }
+  changed(type, oldValue, newValue) {}
+  disconnected() {}
+}
+```
+
+<iframe width="100%" height="500px" src="https://stackblitz.com/edit/hyper-function-create-hfc-egsgcm?embed=1&file=hfc.md,hfc.d.ts,src/index.js&hideNavigation=1&ctl=1"></iframe>
 
 点击 `RUN PROJECT` 查看。
 
