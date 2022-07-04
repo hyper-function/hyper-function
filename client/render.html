@@ -10,6 +10,11 @@
   <body>
     <div id="app"></div>
 
+    <script src="/js/vue.global.prod.js"></script>
+    <script src="/js/hfz-global.js"></script>
+    <script src="/js/listen-build-events.js"></script>
+    <script src="/js/iframeSizer.contentWindow.min.js"></script>
+
     <script>
       window.$HFC_NPM_CDN_URL = "https://cdn.jsdelivr.net/npm";
 
@@ -46,10 +51,6 @@
         });
     </script>
 
-    <script src="/js/vue.global.prod.js"></script>
-    <script src="/js/hfz-global.js"></script>
-    <script src="/js/listen-build-events.js"></script>
-
     <script>
       window.iFrameResizer = {
         onMessage(msg) {
@@ -59,6 +60,5 @@
         },
       };
     </script>
-    <script src="/js/iframeSizer.contentWindow.min.js"></script>
   </body>
 </html>
