@@ -8,7 +8,7 @@ module.exports = function (source: string) {
   const location = path.resolve(context, "hfc.d.ts");
   const res = parser(location);
 
-  const value = JSON.stringify(res.minResult)
+  const value = JSON.stringify(res.result)
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
 

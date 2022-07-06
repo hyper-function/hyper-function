@@ -18,21 +18,23 @@ export class EsmBuilder extends EventEmitter {
 
     const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath, "esm");
     fs.ensureDirSync(esmOutputPath);
+
+    fs.writeFileSync(
+      path.join(esmOutputPath, "hfc.js"),
+      [
+        `import Component from "./${this.hfcConfig.hfcName}";`,
+        `import propNames from "../hfc.propnames.json";`,
+        `Component.propNames = propNames;`,
+        `export default Component;`,
+        ``,
+      ].join("\n")
+    );
+
     fs.writeFileSync(
       path.join(esmOutputPath, "index.js"),
       [
         `import "../hfc.css";`,
-        `import HFC from "./${this.hfcConfig.hfcName}";`,
-        `import propTypes from "../hfc.props.min.json";`,
-        `HFC.propTypes = propTypes;`,
-        `export default HFC;`,
-        ``,
-      ].join("\n")
-    );
-    fs.writeFileSync(
-      path.join(esmOutputPath, "hfc.js"),
-      [
-        `import HFC from "./${this.hfcConfig.hfcName}";`,
+        `import HFC from "./hfc";`,
         `export default HFC;`,
         ``,
       ].join("\n")

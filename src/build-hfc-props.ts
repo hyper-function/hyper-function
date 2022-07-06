@@ -3,7 +3,7 @@ import path from "path";
 import chokidar from "chokidar";
 import { existsSync, writeFileSync } from "fs";
 
-import { HfcConfig, Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 import parse from "./prop-types-parser.js";
 
 export class HfcPropsBuilder extends EventEmitter {
@@ -39,10 +39,23 @@ export class HfcPropsBuilder extends EventEmitter {
       JSON.stringify(res.result)
     );
 
+    const attrKeys = Object.keys(res.result.attrs);
+    const eventKeys = Object.keys(res.result.events);
+    const slotKeys = Object.keys(res.result.slots);
+
     writeFileSync(
-      path.join(this.hfcConfig.pkgOutputPath, "hfc.props.min.json"),
-      JSON.stringify(res.minResult)
+      path.join(this.hfcConfig.pkgOutputPath, "hfc.propnames.json"),
+      JSON.stringify({
+        attrs: attrKeys,
+        events: eventKeys,
+        slots: slotKeys,
+      })
     );
+
+    // writeFileSync(
+    //   path.join(this.hfcConfig.pkgOutputPath, "hfc.props.min.json"),
+    //   JSON.stringify(res.minResult)
+    // );
 
     this.emit("build-complete");
   }

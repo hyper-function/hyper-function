@@ -1,7 +1,7 @@
 import * as TJS from "typescript-json-schema";
 import * as desm from "desm";
 
-const hfcDTS = desm.join(import.meta.url, "..", "definition", "index.d.ts");
+const hfcDTS = desm.join(import.meta.url, "..", "definition", "hfc.d.ts");
 
 export default function parse(location: string) {
   const compilerOptions: TJS.CompilerOptions = {
@@ -18,8 +18,8 @@ export default function parse(location: string) {
     throw new Error("parse hfc.d.ts fail");
   }
 
-  const typeToId: Record<string, string> = {};
-  let typeId = 0;
+  // const typeToId: Record<string, string> = {};
+  // let typeId = 0;
 
   Object.keys(schema.definitions || {}).forEach((key) => {
     if (
@@ -33,7 +33,7 @@ export default function parse(location: string) {
       throw new Error(`[hfc.d.ts] ${key} can not be empty`);
     }
 
-    typeToId[key] = "^" + ++typeId;
+    // typeToId[key] = "^" + ++typeId;
   });
 
   function getScalarType(v: any) {
@@ -89,7 +89,8 @@ export default function parse(location: string) {
       if (v.$ref) {
         const commonType = v.$ref.replace("#/definitions/", "");
         if (schema.definitions[commonType]) {
-          ret[k].t = min ? typeToId[commonType] : commonType;
+          // ret[k].t = min ? typeToId[commonType] : commonType;
+          ret[k].t = commonType;
           continue;
         }
       }
@@ -112,15 +113,15 @@ export default function parse(location: string) {
       slots: {},
     },
   };
-  const minResult: any = {
-    attrs: {},
-    events: {},
-    slots: {},
-  };
+  // const minResult: any = {
+  //   attrs: {},
+  //   events: {},
+  //   slots: {},
+  // };
 
   if (schema.properties.attrs) {
     result.attrs = transform(schema.properties.attrs.properties);
-    minResult.attrs = transform(schema.properties.attrs.properties, true);
+    // minResult.attrs = transform(schema.properties.attrs.properties, true);
   }
 
   if (schema.properties.events) {
@@ -133,7 +134,7 @@ export default function parse(location: string) {
       result.events[key] = transform(props);
       const desc = eventsProps[key].description;
       if (desc) result.desc.events[key] = desc;
-      minResult.events[key] = transform(props, true);
+      // minResult.events[key] = transform(props, true);
     });
   }
 
@@ -147,18 +148,18 @@ export default function parse(location: string) {
       result.slots[key] = transform(props);
       const desc = slotsProps[key].description;
       if (desc) result.desc.slots[key] = desc;
-      minResult.slots[key] = transform(props, true);
+      // minResult.slots[key] = transform(props, true);
     });
   }
 
   if (schema.definitions) {
     result.types = transform(schema.definitions);
-    minResult._t = transform(schema.definitions, true);
-    Object.keys(minResult._t).forEach((key) => {
-      minResult._t[typeToId[key]] = minResult._t[key];
-      delete minResult._t[key];
-    });
+    // minResult._t = transform(schema.definitions, true);
+    // Object.keys(minResult._t).forEach((key) => {
+    //   minResult._t[typeToId[key]] = minResult._t[key];
+    //   delete minResult._t[key];
+    // });
   }
 
-  return { result, minResult };
+  return { result };
 }
