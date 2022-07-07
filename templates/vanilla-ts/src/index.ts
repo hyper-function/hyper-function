@@ -1,10 +1,8 @@
 import "./index.css";
 
 export default class AwesomeHfc {
-  constructor(props: HfcProps) {
-    console.log("get props: " + props);
-  }
-  connected(container: HTMLDivElement) {
+  static tag = "div";
+  constructor(container: HTMLElement, props: HfcProps) {
     container.innerHTML = `
       <h1>
         <div>THIS COMPONENT</div>
@@ -20,6 +18,6 @@ export default class AwesomeHfc {
         </div>
       </h1>`;
   }
-  changed(type: "attr" | "event" | "slot", oldValue: any, newValue: any) {}
+  changed(props: HfcProps) {}
   disconnected() {}
 }

@@ -16,7 +16,7 @@
     "svelte-to-hfc": "^1.0.1"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^0.2.16",
+    "@hyper-function/cli-service": "^1.0.0",
     "@types/hyper-function-component": "^1.1.0",
     "hfc-plugin-svelte": "^1.0.1"
   }

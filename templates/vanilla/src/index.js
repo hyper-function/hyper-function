@@ -1,10 +1,7 @@
 import "./index.css";
 
-export default class AwesomeHfc {
-  constructor(props) {
-    console.log("get props: " + props);
-  }
-  connected(container) {
+class AwesomeHfc {
+  constructor(container, props) {
     container.innerHTML = `
       <h1>
         <div>THIS COMPONENT</div>
@@ -20,6 +17,10 @@ export default class AwesomeHfc {
         </div>
       </h1>`;
   }
-  changed(type, oldValue, newValue) {}
+  changed(props) {}
   disconnected() {}
 }
+
+AwesomeHfc.tag = "div";
+
+export default AwesomeHfc;
