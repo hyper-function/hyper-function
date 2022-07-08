@@ -1,5 +1,4 @@
 {
-  "hfcName": "",
   "name": "awesome-hfc",
   "version": "1.0.0",
   "license": "MIT",
@@ -12,16 +11,12 @@
     "publish-hfc": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "react-to-hfc": "^1.1.0"
-  },
   "devDependencies": {
     "@hyper-function/cli-service": "^1.0.1",
     "@types/hyper-function-component": "^1.1.0",
-    "@types/react": "^17.0.39",
-    "@types/react-dom": "^17.0.11",
-    "hfc-plugin-typescript": "^1.0.2"
+    "hfc-plugin-vue": "^1.0.1"
+  },
+  "dependencies": {
+    "vue-to-hfc": "^1.0.1"
   }
 }

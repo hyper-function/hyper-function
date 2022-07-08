@@ -13,10 +13,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "svelte-to-hfc": "^1.0.2"
+    "svelte-to-hfc": "^1.0.3"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.0.0",
+    "@hyper-function/cli-service": "^1.0.1",
     "@types/hyper-function-component": "^1.1.0",
     "hfc-plugin-svelte": "^1.0.1"
   }
