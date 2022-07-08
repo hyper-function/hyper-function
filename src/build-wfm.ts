@@ -99,6 +99,8 @@ export class WfmBuilder extends EventEmitter {
           "process.env.NODE_ENV": JSON.stringify(
             this.hfcConfig.command === "serve" ? "development" : "production"
           ),
+          __VUE_OPTIONS_API__: JSON.stringify(true),
+          __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
         }),
       ],
     });
