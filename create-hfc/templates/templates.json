@@ -17,6 +17,10 @@
       "folder": "react-ts"
     },
     {
+      "title": "Vue",
+      "folder": "vue"
+    },
+    {
       "title": "Svelte",
       "folder": "svelte"
     }
