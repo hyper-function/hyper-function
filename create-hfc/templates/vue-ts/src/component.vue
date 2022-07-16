@@ -1,12 +1,8 @@
-<script>
-export default {
-  props: [],
-  data() {
-    return {
-      attrs: this.$attrs,
-    };
-  },
-};
+<script setup lang="ts">
+import { useAttrs } from "vue";
+
+const props = defineProps(["name"]);
+const attrs = useAttrs();
 </script>
 <template>
   <h1>

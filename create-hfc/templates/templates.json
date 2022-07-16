@@ -21,6 +21,10 @@
       "folder": "vue"
     },
     {
+      "title": "Vue - TypeScript",
+      "folder": "vue-ts"
+    },
+    {
       "title": "Svelte",
       "folder": "svelte"
     }
