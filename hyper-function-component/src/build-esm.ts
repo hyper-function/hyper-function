@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 import webpack from "webpack";
 import EventEmitter from "events";
-import TerserPlugin from "terser-webpack-plugin";
+// import TerserPlugin from "terser-webpack-plugin";
 
 import { HfcConfig } from "./options.js";
 
@@ -18,21 +18,12 @@ export class EsmBuilder extends EventEmitter {
 
     const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath, "esm");
     fs.ensureDirSync(esmOutputPath);
+
     fs.writeFileSync(
       path.join(esmOutputPath, "index.js"),
       [
         `import "../hfc.css";`,
-        `import HFC from "./${this.hfcConfig.hfcName}";`,
-        `import propTypes from "../hfc.props.min.json";`,
-        `HFC.propTypes = propTypes;`,
-        `export default HFC;`,
-        ``,
-      ].join("\n")
-    );
-    fs.writeFileSync(
-      path.join(esmOutputPath, "hfc.js"),
-      [
-        `import HFC from "./${this.hfcConfig.hfcName}";`,
+        `import HFC from "./hfc";`,
         `export default HFC;`,
         ``,
       ].join("\n")
@@ -60,19 +51,20 @@ export class EsmBuilder extends EventEmitter {
       externalsType: "module",
     });
 
-    if (this.hfcConfig.command === "build") {
-      this.webpackConfig!.optimization!.minimize = true;
-      this.webpackConfig!.optimization!.minimizer = [
-        new TerserPlugin({
-          extractComments: false,
-          terserOptions: {
-            format: {
-              comments: false,
-            },
-          },
-        }),
-      ];
-    }
+    this.webpackConfig!.optimization!.minimize = false;
+    // if (this.hfcConfig.command === "build") {
+    //   this.webpackConfig!.optimization!.minimize = true;
+    //   this.webpackConfig!.optimization!.minimizer = [
+    //     new TerserPlugin({
+    //       extractComments: false,
+    //       terserOptions: {
+    //         format: {
+    //           comments: false,
+    //         },
+    //       },
+    //     }),
+    //   ];
+    // }
 
     this.compiler = webpack(this.webpackConfig);
     this.build();

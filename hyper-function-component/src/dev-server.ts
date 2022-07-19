@@ -1,13 +1,18 @@
 import http from "http";
 import cors from "cors";
+import path from "path";
+import { dirname } from "desm";
 import express, { Response } from "express";
+// @ts-ignore
+import fallback from "express-history-api-fallback";
 import portfinder from "portfinder";
 import prettyBytes from "pretty-bytes";
-import * as desm from "desm";
 import { HfcConfig } from "./options.js";
-import path from "path";
+
 import kvCache from "./kv-cache.js";
 import fs from "fs-extra";
+
+const __dirname = dirname(import.meta.url);
 
 export class DevServer {
   server: http.Server | null = null;
@@ -76,15 +81,6 @@ export class DevServer {
     app.use(wfmServePath, express.static(this.hfcConfig.pkgOutputPath));
     app.use("/doc", express.static(this.hfcConfig.docOutputPath));
 
-    const clientPath = desm.join(import.meta.url, "..", "client");
-
-    const renderHtmlFile = path.join(clientPath, "render.html");
-    app.get("/render/:id", async (req, res) => {
-      res.setHeader("Content-Type", "text/html");
-      const html = await fs.readFile(renderHtmlFile, "utf-8");
-      res.end(html);
-    });
-
     app.get("/hfz/template", (req, res) => {
       const { id } = req.query;
       const code = kvCache.get("HFZ_TEMPLATE_" + id);
@@ -96,7 +92,27 @@ export class DevServer {
       });
     });
 
+    const npmStatics = ["prismjs", "iframe-resizer"];
+    npmStatics.forEach((name) => {
+      app.use(
+        `/npm/${name}`,
+        express.static(path.join(__dirname, "..", "node_modules", name))
+      );
+    });
+
+    const clientPath = path.join(__dirname, "client");
+
+    app.use("/render/*", (req, res) => {
+      const renderHtml = fs.readFileSync(
+        path.join(clientPath, "render.html"),
+        "utf8"
+      );
+      res.setHeader("Content-Type", "text/html");
+      res.send(renderHtml);
+    });
+
     app.use(express.static(clientPath));
+    app.use(fallback("index.html", { root: clientPath }));
   }
   sendMessage(msg: any) {
     const id = this.eventMessageId++;

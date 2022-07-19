@@ -1,4 +1,4 @@
-<template hfz>
+<template>
   <div class="multi-column">
     <div>
       <h3 class="side-bar-title">Version</h3>
@@ -13,7 +13,7 @@
             d="M416,160a64,64,0,1,0-96.27,55.24c-2.29,29.08-20.08,37-75,48.42-17.76,3.68-35.93,7.45-52.71,13.93V151.39a64,64,0,1,0-64,0V360.61a64,64,0,1,0,64.42.24c2.39-18,16-24.33,65.26-34.52,27.43-5.67,55.78-11.54,79.78-26.95,29-18.58,44.53-46.78,46.36-83.89A64,64,0,0,0,416,160ZM160,64a32,32,0,1,1-32,32A32,32,0,0,1,160,64Zm0,384a32,32,0,1,1,32-32A32,32,0,0,1,160,448ZM352,192a32,32,0,1,1,32-32A32,32,0,0,1,352,192Z"
           />
         </svg>
-        {{version}}
+        {{ meta.version }}
       </div>
     </div>
     <div>
@@ -27,7 +27,7 @@
             style="stroke-width: 0.15625"
           />
         </svg>
-        {{license}}
+        {{ meta.license }}
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@
             style="stroke-width: 0.15625"
           />
         </svg>
-        {{sizeJs}}
+        {{ meta.sizeJs }}
       </div>
     </div>
     <div>
@@ -58,53 +58,39 @@
             style="stroke-width: 0.15625"
           />
         </svg>
-        {{sizeCss}}
+        {{ meta.sizeCss }}
       </div>
     </div>
   </div>
   <div class="hr-line"></div>
   <div>
     <h3 class="side-bar-title">Dependencies</h3>
-    <div class="side-bar-no-dep" v-if="deps.length===0">No Dependency</div>
+    <div class="side-bar-no-dep" v-if="deps.length === 0">No Dependency</div>
     <div
       v-for="dep in deps"
       :key="dep.name"
       class="side-bar-dep-item"
       @click="goNpm(dep.name)"
     >
-      <span>{{dep.name}}</span>
-      <span>{{dep.version}}</span>
+      <span>{{ dep.name }}</span>
+      <span>{{ dep.version }}</span>
     </div>
   </div>
-  <script>
-    export default {
-      data() {
-        return {
-          version: "",
-          license: "",
-          sizeJs: 0,
-          siezCss: 0,
-          deps: [],
-        };
-      },
-      mounted() {
-        setTimeout(() => {
-          this.version = window.hfcMeta.version;
-          this.license = window.hfcMeta.license;
-          this.sizeJs = window.hfcMeta.sizeJs;
-          this.sizeCss = window.hfcMeta.sizeCss;
-
-          this.deps = Object.keys(window.hfcMeta.deps).map((name) => ({
-            name,
-            version: window.hfcMeta.deps[name],
-          }));
-        }, 20);
-      },
-      methods: {
-        goNpm(dep) {
-          window.open(`https://www.npmjs.com/package/${dep}`);
-        },
-      },
-    };
-  </script>
 </template>
+<script setup lang="ts">
+import { computed } from "@vue/reactivity";
+import { inject } from "vue";
+
+const meta = inject<any>("meta");
+const deps = computed(() => {
+  const depObj = meta.value.deps || {};
+  return Object.keys(depObj).map((name) => ({
+    name,
+    version: depObj[name],
+  }));
+});
+
+function goNpm(dep: string) {
+  window.open(`https://www.npmjs.com/package/${dep}`);
+}
+</script>

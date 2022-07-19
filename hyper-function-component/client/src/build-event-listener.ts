@@ -1,4 +1,6 @@
-function listenBuildEvents(handler) {
+export function listenBuildEvents(
+  callback: (data: { action: string; payload: any }) => void
+) {
   let msgId = 0;
   let retryTimes = 0;
 
@@ -10,7 +12,7 @@ function listenBuildEvents(handler) {
         msgId = event.id;
         fetchEvent();
 
-        handler(event.data);
+        callback(event.data);
       })
       .catch((err) => {
         console.error("fetch event error", err);

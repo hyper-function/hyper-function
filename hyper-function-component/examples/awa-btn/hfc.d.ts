@@ -38,6 +38,7 @@ interface HfcPropType {
       a: HD;
     };
     n: {};
+    click: {};
   };
   slots: {
     /**

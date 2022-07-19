@@ -18,9 +18,12 @@
   ],
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "lodash.defaultsdeep": "^4.6.1"
+  },
   "devDependencies": {
     "@types/hyper-function-component": "^1.0.0",
-    "hfc-cli-service": "../../"
+    "hfc-cli-service": "../../",
+    "hfc-prop-names": "^1.0.1"
   }
 }
