@@ -62,7 +62,7 @@ export class WfmBuilder extends EventEmitter {
         generator: {
           asset: {
             emit: false,
-            filename: "../assets/[hash:16][ext]",
+            filename: "../assets/[hash:12][ext]",
           },
         },
         rules: [
@@ -106,6 +106,8 @@ export class WfmBuilder extends EventEmitter {
     });
   }
   build() {
+    const invalidHfcJsPath = path.join(this.wfmPath, "__hfc.js");
+
     if (this.hfcConfig.command === "build") {
       this.compiler.run((err, stats) => {
         if (err) {
@@ -117,8 +119,7 @@ export class WfmBuilder extends EventEmitter {
           console.error(stats.compilation.errors);
         }
 
-        const unusedHfcJsPath = path.join(this.wfmPath, "__hfc.js");
-        if (fs.existsSync(unusedHfcJsPath)) fs.rmSync(unusedHfcJsPath);
+        fs.rm(invalidHfcJsPath);
 
         this.emit("build-complete", stats);
       });
@@ -140,9 +141,6 @@ export class WfmBuilder extends EventEmitter {
       if (stats?.hasWarnings()) {
         console.warn(stats.compilation.warnings);
       }
-
-      const unusedHfcJsPath = path.join(this.wfmPath, "__hfc.js");
-      if (fs.existsSync(unusedHfcJsPath)) fs.rmSync(unusedHfcJsPath);
 
       if (isFirstCompile) {
         this.emit("build-complete", stats);

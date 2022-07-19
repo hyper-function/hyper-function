@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs-extra";
 import webpack from "webpack";
 import EventEmitter from "events";
-import TerserPlugin from "terser-webpack-plugin";
+// import TerserPlugin from "terser-webpack-plugin";
 
 import { HfcConfig } from "./options.js";
 
@@ -18,17 +18,6 @@ export class EsmBuilder extends EventEmitter {
 
     const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath, "esm");
     fs.ensureDirSync(esmOutputPath);
-
-    fs.writeFileSync(
-      path.join(esmOutputPath, "hfc.js"),
-      [
-        `import Component from "./${this.hfcConfig.hfcName}";`,
-        `import propNames from "../hfc.propnames.json";`,
-        `Component.propNames = propNames;`,
-        `export default Component;`,
-        ``,
-      ].join("\n")
-    );
 
     fs.writeFileSync(
       path.join(esmOutputPath, "index.js"),
@@ -62,19 +51,20 @@ export class EsmBuilder extends EventEmitter {
       externalsType: "module",
     });
 
-    if (this.hfcConfig.command === "build") {
-      this.webpackConfig!.optimization!.minimize = true;
-      this.webpackConfig!.optimization!.minimizer = [
-        new TerserPlugin({
-          extractComments: false,
-          terserOptions: {
-            format: {
-              comments: false,
-            },
-          },
-        }),
-      ];
-    }
+    this.webpackConfig!.optimization!.minimize = false;
+    // if (this.hfcConfig.command === "build") {
+    //   this.webpackConfig!.optimization!.minimize = true;
+    //   this.webpackConfig!.optimization!.minimizer = [
+    //     new TerserPlugin({
+    //       extractComments: false,
+    //       terserOptions: {
+    //         format: {
+    //           comments: false,
+    //         },
+    //       },
+    //     }),
+    //   ];
+    // }
 
     this.compiler = webpack(this.webpackConfig);
     this.build();

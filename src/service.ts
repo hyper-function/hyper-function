@@ -1,9 +1,14 @@
-import fs from "fs-extra";
 import path from "path";
-import webpack from "webpack";
-
 import rm from "rimraf";
+import fs from "fs-extra";
+import webpack from "webpack";
 import readPkg from "read-pkg";
+import EventEmitter from "events";
+import { dirname } from "desm";
+// import { createRequire } from "module";
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
+// @ts-ignore
+import defaultsDeep from "lodash.defaultsdeep";
 
 import { defaults, HfcConfig } from "./options.js";
 import AssetsPlugin from "./assets-plugin.js";
@@ -16,15 +21,9 @@ import { HfcPkgJsonBuilder } from "./build-pkg-json.js";
 
 import resolveCssRules from "./resolve-css-rules.js";
 import { DevServer } from "./dev-server.js";
-import EventEmitter from "events";
-import * as desm from "desm";
-import { createRequire } from "module";
 
-// @ts-ignore
-import defaultsDeep from "lodash.defaultsdeep";
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-
-const require = createRequire(import.meta.url);
+// const require = createRequire(import.meta.url);
+const __dirname = dirname(import.meta.url);
 
 export class Service extends EventEmitter {
   initialized: boolean = false;
@@ -95,12 +94,20 @@ export class Service extends EventEmitter {
     fs.ensureDirSync(this.hfcConfig.docOutputPath);
 
     this.configureWebpack((webpackConfig: webpack.Configuration) => {
-      const hfcPropsFilePath = path.resolve(this.hfcConfig.context, "hfc.d.ts");
-
       const config: webpack.Configuration = {
         mode: this.hfcConfig.command === "serve" ? "development" : "production",
         context: this.context,
-        entry: this.hfcConfig.entry,
+        entry: {
+          main: this.hfcConfig.entry,
+        },
+        output: {
+          path: this.hfcConfig.pkgOutputPath,
+          filename: `esm/hfc.js`,
+          library: {
+            type: "module",
+          },
+          environment: { module: true },
+        },
         devtool: false,
         resolve: {
           extensions: ["..."],
@@ -108,18 +115,14 @@ export class Service extends EventEmitter {
         module: {
           generator: {
             asset: {
-              filename: "./assets/[hash:16][ext]",
+              outputPath: "assets",
+              publicPath: "##HFC_ASSETS_MARK##",
+              filename: "[hash:12][ext]",
             },
           },
           rules: [
             {
-              test: hfcPropsFilePath,
-              exclude: /(node_modules)/,
-              use: desm.join(import.meta.url, "..", "prop-types-loader"),
-            },
-            {
               test: this.hfcConfig.assetExtRegExp,
-              exclude: /(node_modules)/,
               type: "asset/resource",
             },
             {
@@ -129,64 +132,16 @@ export class Service extends EventEmitter {
               },
             },
             // {
-            //   test: /\.jsx?$/,
-            //   exclude: /(node_modules)/,
+            //   test: path.resolve(this.hfcConfig.context, "hfc.d.ts"),
             //   use: {
-            //     loader: require.resolve("swc-loader"),
-            //     options: {
-            //       jsc: Object.assign(
-            //         {
-            //           parser: {
-            //             syntax: "ecmascript",
-            //             jsx: true,
-            //             dynamicImport: false,
-            //             privateMethod: false,
-            //             functionBind: false,
-            //             exportDefaultFrom: false,
-            //             exportNamespaceFrom: false,
-            //             decorators: false,
-            //             decoratorsBeforeExport: false,
-            //             topLevelAwait: false,
-            //             importMeta: false,
-            //             preserveAllComments: false,
-            //           },
-            //           target: "es2022",
-            //           experimental: {
-            //             cacheRoot: path.resolve(this.context, ".hfc", "swc"),
-            //           },
-            //         },
-            //         this.hfcConfig.swc?.js
-            //       ),
-            //     },
-            //   },
-            // },
-            // {
-            //   test: /\.tsx?$/,
-            //   exclude: /(node_modules)/,
-            //   use: {
-            //     loader: require.resolve("swc-loader"),
-            //     options: {
-            //       jsc: Object.assign(
-            //         {
-            //           parser: {
-            //             syntax: "typescript",
-            //             tsx: true,
-            //             decorators: false,
-            //             dynamicImport: false,
-            //           },
-            //           target: "es2022",
-            //           experimental: {
-            //             cacheRoot: path.resolve(this.context, ".hfc", "swc"),
-            //           },
-            //         },
-            //         this.hfcConfig.swc?.ts
-            //       ),
-            //     },
+            //     loader: path.join(__dirname, "prop-types-loader.cjs"),
             //   },
             // },
           ],
         },
         optimization: {
+          usedExports: true,
+          concatenateModules: true,
           splitChunks: {
             cacheGroups: {
               styles: {
@@ -201,14 +156,7 @@ export class Service extends EventEmitter {
         experiments: {
           outputModule: true,
         },
-        output: {
-          path: this.hfcConfig.pkgOutputPath,
-          filename: `esm/${this.hfcConfig.hfcName}.js`,
-          library: {
-            type: "module",
-          },
-          environment: { module: true },
-        },
+
         plugins: [
           new MiniCssExtractPlugin({
             filename: "./hfc.css",
@@ -217,7 +165,7 @@ export class Service extends EventEmitter {
           new webpack.optimize.LimitChunkCountPlugin({
             maxChunks: 1,
           }),
-          new AssetsPlugin({}),
+          new AssetsPlugin(),
           new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify(
               this.hfcConfig.command === "serve" ? "development" : "production"
@@ -270,9 +218,6 @@ export class Service extends EventEmitter {
       }
     });
 
-    const webpackConfig = this.resolveWebpackConfig();
-    // console.log(JSON.stringify(webpackConfig, null, 2));
-
     const wfmBuilder = new WfmBuilder(this.hfcConfig);
     wfmBuilder.on("build-complete", async () => {
       console.log("hfc build complete");
@@ -290,17 +235,20 @@ export class Service extends EventEmitter {
       }
     });
 
+    const webpackConfig = this.resolveWebpackConfig();
+    // console.log(JSON.stringify(webpackConfig, null, 2));
+
     const esmBuilder = new EsmBuilder(this.hfcConfig, webpackConfig);
     esmBuilder.on("build-complete", () => {
       wfmBuilder.build();
     });
 
     esmBuilder.on("rebuild-complete", (stats: webpack.Stats) => {
-      if (this.command === "serve") {
-        if (stats.compilation.emittedAssets.has("./hfc.css")) {
-          devServer.sendMessage({ action: "rebuild-complete" });
-        }
-      }
+      // if (this.command === "serve") {
+      //   if (stats.compilation.emittedAssets.has("./hfc.css")) {
+      //     devServer.sendMessage({ action: "rebuild-complete" });
+      //   }
+      // }
     });
   }
   configureWebpack(

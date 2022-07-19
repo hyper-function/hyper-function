@@ -3,7 +3,7 @@ import fs from "fs-extra";
 import chokidar from "chokidar";
 import hfcMdParser from "./markdown-parser.js";
 
-import { HfcConfig, Options } from "./options.js";
+import { HfcConfig } from "./options.js";
 import EventEmitter from "events";
 
 export class DocBuilder extends EventEmitter {
