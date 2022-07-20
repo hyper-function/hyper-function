@@ -37,10 +37,9 @@ export class HfcPropsBuilder extends EventEmitter {
     this.propsFilePath = path.join(hfcConfig.context, "hfc.d.ts");
 
     this.propNamesPath = path.join(
-      hfcConfig.context,
-      "node_modules",
-      "hfc-prop-names",
-      "index.js"
+      this.hfcConfig.context,
+      ".hfc",
+      "propnames.js"
     );
 
     this.propTypesPath = path.join(
@@ -84,7 +83,7 @@ export class HfcPropsBuilder extends EventEmitter {
       Object.keys(res.result.slots),
     ];
 
-    writeFile(
+    await writeFile(
       this.propNamesPath,
       `export default ${JSON.stringify(this.propNames)}`
     );
