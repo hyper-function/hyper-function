@@ -1,14 +1,14 @@
 {
   "hfcName": "awa-btn",
   "name": "awesome-hfc",
-  "version": "1.1.30",
+  "version": "1.1.31",
   "description": "awesome button",
   "homepage": "",
   "type": "module",
   "scripts": {
     "start": "hfc-cli-service",
     "build": "hfc-cli-service build",
-    "publish": "hfc-cli-service publish --skip-build",
+    "publish-hfc": "hfc-cli-service publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -24,6 +24,6 @@
   "devDependencies": {
     "@types/hyper-function-component": "^1.0.0",
     "hfc-cli-service": "../../",
-    "hfc-prop-names": "^1.0.1"
+    "hfc-prop-names": "^1.0.2"
   }
 }
