@@ -1,10 +1,10 @@
-import propNames from "hfc-prop-names";
+import props from "hfc-prop-names";
 import "./index.css";
 
 export default class AwesomeHfc {
   static tag = "div";
-  static propNames = propNames;
-  constructor(container: HTMLElement, props: HfcProps) {
+  static props = props;
+  constructor(container: Element, props: HfcProps) {
     container.innerHTML = `
       <h1>
         <div>THIS COMPONENT</div>
