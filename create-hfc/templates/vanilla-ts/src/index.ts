@@ -1,7 +1,9 @@
+import propNames from "hfc-prop-names";
 import "./index.css";
 
 export default class AwesomeHfc {
   static tag = "div";
+  static propNames = propNames;
   constructor(container: HTMLElement, props: HfcProps) {
     container.innerHTML = `
       <h1>
