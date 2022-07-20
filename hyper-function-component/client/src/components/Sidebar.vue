@@ -35,7 +35,7 @@
   <div class="multi-column">
     <div>
       <h3 class="side-bar-title">SizeJs</h3>
-      <div class="side-bar-desc">
+      <div class="side-bar-desc" @mouseenter="getSize">
         <svg fill="currentColor" viewBox="0 0 100 100" width="100" height="100">
           <path
             fill="currentColor"
@@ -44,12 +44,12 @@
             style="stroke-width: 0.15625"
           />
         </svg>
-        {{ meta.sizeJs }}
+        {{ sizeJs }}
       </div>
     </div>
     <div>
       <h3 class="side-bar-title">SizeCss</h3>
-      <div class="side-bar-desc">
+      <div class="side-bar-desc" @mouseenter="getSize">
         <svg fill="currentColor" viewBox="0 0 100 100" width="100" height="100">
           <path
             fill="currentColor"
@@ -58,7 +58,7 @@
             style="stroke-width: 0.15625"
           />
         </svg>
-        {{ meta.sizeCss }}
+        {{ sizeCss }}
       </div>
     </div>
   </div>
@@ -79,7 +79,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from "@vue/reactivity";
-import { inject } from "vue";
+import { inject, ref } from "vue";
 
 const meta = inject<any>("meta");
 const deps = computed(() => {
@@ -89,6 +89,24 @@ const deps = computed(() => {
     version: depObj[name],
   }));
 });
+
+const sizeJs = ref("--");
+const sizeCss = ref("--");
+const loadingSize = ref(false);
+
+function getSize() {
+  if (loadingSize.value) return;
+  loadingSize.value = true;
+  sizeJs.value = "--";
+  sizeCss.value = "--";
+  fetch(`/size`)
+    .then((res) => res.json())
+    .then((res) => {
+      loadingSize.value = false;
+      sizeJs.value = res.sizeJs;
+      sizeCss.value = res.sizeCss;
+    });
+}
 
 function goNpm(dep: string) {
   window.open(`https://www.npmjs.com/package/${dep}`);

@@ -11,6 +11,7 @@ import { HfcConfig } from "./options.js";
 
 import kvCache from "./kv-cache.js";
 import fs from "fs-extra";
+import { miniCss, miniJs } from "./minify.js";
 
 const __dirname = dirname(import.meta.url);
 
@@ -50,30 +51,34 @@ export class DevServer {
     });
 
     app.get("/meta", async (req, res) => {
-      let sizeJs = 0;
-      let sizeCss = 0;
-      try {
-        const [jsStat, cssStat] = await Promise.all([
-          fs.stat(
-            path.join(
-              this.hfcConfig.pkgOutputPath,
-              "esm",
-              this.hfcConfig.hfcName + ".js"
-            )
-          ),
-          fs.stat(path.join(this.hfcConfig.pkgOutputPath, "hfc.css")),
-        ]);
-        sizeJs = jsStat.size;
-        sizeCss = cssStat.size;
-      } catch (error) {}
-
       res.json({
         name: this.hfcConfig.hfcName,
         version: this.hfcConfig.version,
         license: this.hfcConfig.license,
         deps: this.hfcConfig.dependencies,
-        sizeJs: prettyBytes(sizeJs),
-        sizeCss: prettyBytes(sizeCss),
+      });
+    });
+
+    app.get("/size", async (req, res) => {
+      const [contentJs, contentCss] = await Promise.all([
+        await fs.readFile(
+          path.join(hfcConfig.pkgOutputPath, "esm", "hfc.js"),
+          "utf-8"
+        ),
+        await fs.readFile(
+          path.join(hfcConfig.pkgOutputPath, "hfc.css"),
+          "utf-8"
+        ),
+      ]);
+
+      const js = await miniJs(contentJs);
+      const css = await miniCss(contentCss);
+
+      const sizeJs = prettyBytes(Buffer.from(js || "").byteLength);
+      const sizeCss = prettyBytes(Buffer.from(css).byteLength);
+      res.json({
+        sizeJs,
+        sizeCss,
       });
     });
 
@@ -90,14 +95,6 @@ export class DevServer {
         version: this.hfcConfig.version,
         code,
       });
-    });
-
-    const npmStatics = ["prismjs", "iframe-resizer"];
-    npmStatics.forEach((name) => {
-      app.use(
-        `/npm/${name}`,
-        express.static(path.join(__dirname, "..", "node_modules", name))
-      );
     });
 
     const clientPath = path.join(__dirname, "client");
