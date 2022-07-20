@@ -1,3 +1,4 @@
+import props from "hfc-prop-names";
 import "./index.css";
 
 class AwesomeHfc {
@@ -22,5 +23,6 @@ class AwesomeHfc {
 }
 
 AwesomeHfc.tag = "div";
+AwesomeHfc.props = props;
 
 export default AwesomeHfc;
