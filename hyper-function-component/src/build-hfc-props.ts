@@ -28,11 +28,7 @@ export class HfcPropsBuilder extends EventEmitter {
     desc: {},
   };
 
-  propNames: { attrs: string[]; events: string[]; slots: string[] } = {
-    attrs: [],
-    events: [],
-    slots: [],
-  };
+  propNames: [string[], string[], string[]] = [[], [], []];
 
   constructor(private hfcConfig: HfcConfig) {
     super();
@@ -42,7 +38,7 @@ export class HfcPropsBuilder extends EventEmitter {
       hfcConfig.context,
       "node_modules",
       "hfc-prop-names",
-      "index.json"
+      "index.js"
     );
 
     this.propTypesPath = path.join(
@@ -80,13 +76,16 @@ export class HfcPropsBuilder extends EventEmitter {
     //   JSON.stringify(res.minResult)
     // );
 
-    this.propNames = {
-      attrs: Object.keys(res.result.attrs),
-      events: Object.keys(res.result.events),
-      slots: Object.keys(res.result.slots),
-    };
+    this.propNames = [
+      Object.keys(res.result.attrs),
+      Object.keys(res.result.events),
+      Object.keys(res.result.slots),
+    ];
 
-    writeFileSync(this.propNamesPath, JSON.stringify(this.propNames));
+    writeFileSync(
+      this.propNamesPath,
+      `export default ${JSON.stringify(this.propNames)}`
+    );
 
     this.emit("build-complete");
   }
