@@ -1,17 +1,17 @@
 import http from "http";
 import cors from "cors";
 import path from "path";
+import fs from "fs-extra";
 import { dirname } from "desm";
 import express, { Response } from "express";
 // @ts-ignore
 import fallback from "express-history-api-fallback";
 import portfinder from "portfinder";
 import prettyBytes from "pretty-bytes";
-import { HfcConfig } from "./options.js";
 
 import kvCache from "./kv-cache.js";
-import fs from "fs-extra";
-import { miniCss, miniJs } from "./minify.js";
+import { HfcConfig } from "./options.js";
+import bundleSize from "./bundle-size.js";
 
 const __dirname = dirname(import.meta.url);
 
@@ -60,25 +60,13 @@ export class DevServer {
     });
 
     app.get("/size", async (req, res) => {
-      const [contentJs, contentCss] = await Promise.all([
-        await fs.readFile(
-          path.join(hfcConfig.pkgOutputPath, "esm", "hfc.js"),
-          "utf-8"
-        ),
-        await fs.readFile(
-          path.join(hfcConfig.pkgOutputPath, "hfc.css"),
-          "utf-8"
-        ),
-      ]);
+      const { sizeJs, sizeCss } = await bundleSize(
+        this.hfcConfig.pkgOutputPath
+      );
 
-      const js = await miniJs(contentJs);
-      const css = await miniCss(contentCss);
-
-      const sizeJs = prettyBytes(Buffer.from(js || "").byteLength);
-      const sizeCss = prettyBytes(Buffer.from(css).byteLength);
       res.json({
-        sizeJs,
-        sizeCss,
+        sizeJs: prettyBytes(sizeJs),
+        sizeCss: prettyBytes(sizeCss),
       });
     });
 
@@ -99,11 +87,12 @@ export class DevServer {
 
     const clientPath = path.join(__dirname, "client");
 
+    const renderHtml = fs.readFileSync(
+      path.join(clientPath, "render.html"),
+      "utf8"
+    );
+
     app.use("/render/*", (req, res) => {
-      const renderHtml = fs.readFileSync(
-        path.join(clientPath, "render.html"),
-        "utf8"
-      );
       res.setHeader("Content-Type", "text/html");
       res.send(renderHtml);
     });

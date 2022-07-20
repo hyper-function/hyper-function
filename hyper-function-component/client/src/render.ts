@@ -4,7 +4,7 @@ import { listenBuildEvents } from "./build-event-listener";
 
 const hfzGlobal = require("@hyper-function/hfz-global");
 
-(<any>window).$HFC_NPM_CDN_URL = "https://cdn.jsdelivr.net/npm";
+(<any>window).$HFC_NPM_CDN_URL = "https://unpkg.com";
 (<any>window).Vue = Vue;
 (<any>window).iFrameResizer = {
   onMessage(msg: any) {

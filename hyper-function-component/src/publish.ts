@@ -5,10 +5,13 @@ import { join } from "path";
 import tar from "tar";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
+import bundleSize from "./bundle-size.js";
+
 export async function publish({ token }: { token: string }) {
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
 
-  const pkgJsonPath = join(context, ".hfc", "build", "pkg", "package.json");
+  const pkgPath = join(context, ".hfc", "build", "pkg");
+  const pkgJsonPath = join(pkgPath, "package.json");
 
   const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
   const { description } = pkgJson;
@@ -26,18 +29,14 @@ export async function publish({ token }: { token: string }) {
     return;
   }
 
-  const sizeJs = statSync(
-    join(context, ".hfc", "build", "pkg", "esm", pkgJson.hfcName + ".js")
-  );
-
-  const sizeCss = statSync(join(context, ".hfc", "build", "pkg", "hfc.css"));
+  const { sizeJs, sizeCss } = await bundleSize(pkgPath);
 
   const form = new FormData();
   form.append("token", token!);
   form.append("description", description);
   form.append("manifest", JSON.stringify(pkgJson));
-  form.append("sizeJs", sizeJs.size.toString());
-  form.append("sizeCss", sizeCss.size.toString());
+  form.append("sizeJs", sizeJs + "");
+  form.append("sizeCss", sizeCss + "");
   form.append("doc", fileFromSync(docTarPath));
   form.append("pkg", fileFromSync(pkgTarPath));
 
