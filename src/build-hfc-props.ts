@@ -55,7 +55,9 @@ export class HfcPropsBuilder extends EventEmitter {
       chokidar.watch(this.propsFilePath).on("change", () => this.build());
     }
 
-    this.build();
+    process.nextTick(() => {
+      this.build();
+    });
   }
   build() {
     let res;
