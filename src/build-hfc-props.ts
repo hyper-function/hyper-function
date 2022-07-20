@@ -2,12 +2,14 @@ import EventEmitter from "events";
 import path from "path";
 import chokidar from "chokidar";
 import { createRequire } from "module";
-import { existsSync, writeFileSync } from "fs";
+import fs from "fs-extra";
 
 import { HfcConfig } from "./options.js";
 import parse from "./prop-types-parser.js";
 
 const require = createRequire(import.meta.url);
+
+const { existsSync, writeFile } = fs;
 
 export class HfcPropsBuilder extends EventEmitter {
   propsFilePath: string;
@@ -55,11 +57,9 @@ export class HfcPropsBuilder extends EventEmitter {
       chokidar.watch(this.propsFilePath).on("change", () => this.build());
     }
 
-    process.nextTick(() => {
-      this.build();
-    });
+    this.build();
   }
-  build() {
+  async build() {
     let res;
     try {
       res = parse(this.propsFilePath);
@@ -71,7 +71,7 @@ export class HfcPropsBuilder extends EventEmitter {
 
     this.propTypes = res.result;
 
-    writeFileSync(this.propTypesPath, JSON.stringify(this.propTypes));
+    await writeFile(this.propTypesPath, JSON.stringify(this.propTypes));
 
     // writeFileSync(
     //   path.join(this.hfcConfig.pkgOutputPath, "hfc.props.min.json"),
@@ -84,7 +84,7 @@ export class HfcPropsBuilder extends EventEmitter {
       Object.keys(res.result.slots),
     ];
 
-    writeFileSync(
+    writeFile(
       this.propNamesPath,
       `export default ${JSON.stringify(this.propNames)}`
     );

@@ -105,42 +105,11 @@ async function run(command: string, context: string) {
 
     const service = new Service(context, "build");
 
-    let docBuildComplete = false;
-    let hfcPropsBuildComplete = false;
-    let pkgJsonBuildComplete = false;
-    let pkgBuildComplete = false;
-
-    service.on("doc-build-complete", () => {
-      docBuildComplete = true;
-      tryPublish();
-    });
-    service.on("hfc-props-build-complete", () => {
-      hfcPropsBuildComplete = true;
-      tryPublish();
-    });
-    service.on("pkg-json-build-complete", () => {
-      pkgJsonBuildComplete = true;
-      tryPublish();
-    });
-    service.on("pkg-build-complete", () => {
-      pkgBuildComplete = true;
-      tryPublish();
+    service.on("ready", () => {
+      publish({ token });
     });
 
     service.run();
-
-    function tryPublish() {
-      if (
-        !docBuildComplete ||
-        !hfcPropsBuildComplete ||
-        !pkgJsonBuildComplete ||
-        !pkgBuildComplete
-      ) {
-        return;
-      }
-
-      publish({ token });
-    }
   } else {
     console.log("unknow command");
   }

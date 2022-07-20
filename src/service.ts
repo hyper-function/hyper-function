@@ -193,27 +193,66 @@ export class Service extends EventEmitter {
 
     const devServer = new DevServer(this.hfcConfig);
 
+    let docBuildrReady = false;
+    let hfcPropsBuildrReady = false;
+    let pkgJsonBuildrReady = false;
+    let pkgBuildrReady = false;
+
+    const isReady = () =>
+      docBuildrReady &&
+      hfcPropsBuildrReady &&
+      pkgJsonBuildrReady &&
+      pkgBuildrReady;
+
+    const runAfterReady = () => {
+      if (!isReady()) return;
+
+      this.emit("ready");
+      if (this.command === "serve") {
+        devServer.listen();
+      }
+    };
+
     const docBuilder = new DocBuilder(this.hfcConfig);
     docBuilder.on("build-complete", () => {
       console.log("doc build complete");
+
+      if (!docBuildrReady) {
+        docBuildrReady = true;
+        runAfterReady();
+      }
+
       this.emit("doc-build-complete");
-      if (this.command === "serve") {
+
+      if (isReady() && this.command === "serve") {
         devServer.sendMessage({ action: "update-hfc-markdown" });
       }
     });
 
     const hfcPropsBuilder = new HfcPropsBuilder(this.hfcConfig);
     hfcPropsBuilder.on("build-complete", () => {
+      if (!hfcPropsBuildrReady) {
+        hfcPropsBuildrReady = true;
+        runAfterReady();
+      }
+
       this.emit("hfc-props-build-complete");
-      if (this.command === "serve") {
+
+      if (isReady() && this.command === "serve") {
         devServer.sendMessage({ action: "update-hfc-props" });
       }
     });
 
     const hfcPkgJsonBuilder = new HfcPkgJsonBuilder(this.hfcConfig);
     hfcPkgJsonBuilder.on("build-complete", () => {
+      if (!pkgJsonBuildrReady) {
+        pkgJsonBuildrReady = true;
+        runAfterReady();
+      }
+
       this.emit("pkg-json-build-complete");
-      if (this.command === "serve") {
+
+      if (isReady() && this.command === "serve") {
         devServer.sendMessage({ action: "update-hfc-pkg-json" });
       }
     });
@@ -221,16 +260,19 @@ export class Service extends EventEmitter {
     const wfmBuilder = new WfmBuilder(this.hfcConfig);
     wfmBuilder.on("build-complete", async () => {
       console.log("hfc build complete");
-      this.emit("pkg-build-complete");
-      if (this.command === "serve") {
-        devServer.listen();
+
+      if (!pkgBuildrReady) {
+        pkgBuildrReady = true;
+        runAfterReady();
       }
+
+      this.emit("pkg-build-complete");
     });
 
     wfmBuilder.on("rebuild-complete", async () => {
       console.log("hfc rebuild complete");
 
-      if (this.command === "serve") {
+      if (isReady() && this.command === "serve") {
         devServer.sendMessage({ action: "rebuild-complete" });
       }
     });

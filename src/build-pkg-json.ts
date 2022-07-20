@@ -3,8 +3,9 @@ import path from "path";
 import readPkg from "read-pkg";
 import chokidar from "chokidar";
 import { HfcConfig } from "./options.js";
-import { existsSync, writeFileSync } from "fs";
+import fs from "fs-extra";
 
+const { existsSync, writeFile } = fs;
 export class HfcPkgJsonBuilder extends EventEmitter {
   pkgJsonFilePath: string;
   constructor(private hfcConfig: HfcConfig) {
@@ -18,6 +19,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
     if (hfcConfig.command === "serve") {
       chokidar.watch(this.pkgJsonFilePath).on("change", () => this.build());
     }
+
     this.build();
   }
   async build() {
@@ -39,12 +41,12 @@ export class HfcPkgJsonBuilder extends EventEmitter {
       dependencies: this.hfcConfig.dependencies,
     };
 
-    writeFileSync(
+    await writeFile(
       path.join(this.hfcConfig.pkgOutputPath, "package.json"),
       JSON.stringify(newPkg, null, 2)
     );
 
-    writeFileSync(
+    await writeFile(
       path.join(this.hfcConfig.pkgOutputPath, "readme.md"),
       `👉  ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
     );
