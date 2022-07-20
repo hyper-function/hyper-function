@@ -110,6 +110,13 @@ export class Service extends EventEmitter {
         },
         devtool: false,
         resolve: {
+          alias: {
+            "hfc-prop-names": path.resolve(
+              this.hfcConfig.context,
+              ".hfc",
+              "propnames.js"
+            ),
+          },
           extensions: ["..."],
         },
         module: {
@@ -213,6 +220,20 @@ export class Service extends EventEmitter {
       }
     };
 
+    const hfcPropsBuilder = new HfcPropsBuilder(this.hfcConfig);
+    hfcPropsBuilder.on("build-complete", () => {
+      if (!hfcPropsBuildrReady) {
+        hfcPropsBuildrReady = true;
+        runAfterReady();
+      }
+
+      this.emit("hfc-props-build-complete");
+
+      if (isReady() && this.command === "serve") {
+        devServer.sendMessage({ action: "update-hfc-props" });
+      }
+    });
+
     const docBuilder = new DocBuilder(this.hfcConfig);
     docBuilder.on("build-complete", () => {
       console.log("doc build complete");
@@ -226,20 +247,6 @@ export class Service extends EventEmitter {
 
       if (isReady() && this.command === "serve") {
         devServer.sendMessage({ action: "update-hfc-markdown" });
-      }
-    });
-
-    const hfcPropsBuilder = new HfcPropsBuilder(this.hfcConfig);
-    hfcPropsBuilder.on("build-complete", () => {
-      if (!hfcPropsBuildrReady) {
-        hfcPropsBuildrReady = true;
-        runAfterReady();
-      }
-
-      this.emit("hfc-props-build-complete");
-
-      if (isReady() && this.command === "serve") {
-        devServer.sendMessage({ action: "update-hfc-props" });
       }
     });
 
