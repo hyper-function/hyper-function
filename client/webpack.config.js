@@ -1,10 +1,11 @@
 import path from "path";
+import webpack from "webpack";
 import { dirname } from "desm";
 import { createRequire } from "module";
+// import CopyPlugin from "copy-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import webpack from "webpack";
 
 const __dirname = dirname(import.meta.url);
 const require = createRequire(import.meta.url);
@@ -30,6 +31,9 @@ const plugins = [
     __VUE_OPTIONS_API__: JSON.stringify(true),
     __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
   }),
+  // new CopyPlugin({
+  //   patterns: [],
+  // }),
 ];
 
 if (!isProd)

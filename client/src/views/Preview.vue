@@ -30,6 +30,7 @@
 
 <script setup lang="ts">
 import { inject, watch, ref } from "vue";
+import { iframeResize } from "iframe-resizer";
 import Sidebar from "../components/Sidebar.vue";
 import PropTypes from "../components/PropTypes.vue";
 
@@ -123,7 +124,7 @@ function renderHfcPreview() {
     const refreshBtn = document.createElement("button");
     refreshBtn.innerText = "REFRESH";
     refreshBtn.addEventListener("click", () => {
-      (sandbox as any).iFrameResizer.sendMessage({ action: "refresh" });
+      (<any>sandbox).iFrameResizer.sendMessage({ action: "refresh" });
     });
 
     actions.appendChild(openBtn);
@@ -137,7 +138,7 @@ function renderHfcPreview() {
       actions.style.visibility = "hidden";
     });
 
-    (window as any).iFrameResize(
+    iframeResize(
       {
         log: false,
         sizeHeight: false,
