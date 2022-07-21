@@ -41,9 +41,9 @@ export class WfmBuilder extends EventEmitter {
         chunkFilename:
           this.hfcConfig.command === "serve" ? undefined : "[chunkhash].js",
       },
-      optimization:
-        this.hfcConfig.command === "serve"
-          ? undefined
+      optimization: {
+        ...(this.hfcConfig.command === "serve"
+          ? {}
           : {
               chunkIds: false,
               minimize: true,
@@ -57,7 +57,8 @@ export class WfmBuilder extends EventEmitter {
                   },
                 }),
               ],
-            },
+            }),
+      },
       module: {
         generator: {
           asset: {
