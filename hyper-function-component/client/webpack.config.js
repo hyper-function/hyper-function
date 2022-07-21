@@ -4,6 +4,7 @@ import { dirname } from "desm";
 import { createRequire } from "module";
 // import CopyPlugin from "copy-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
+import TerserPlugin from "terser-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 
@@ -66,10 +67,27 @@ export default {
   },
 
   optimization: {
-    concatenateModules: true,
-    splitChunks: {
-      chunks: "all",
+    ...{
+      concatenateModules: true,
+      splitChunks: {
+        chunks: "all",
+      },
     },
+    ...(isProd
+      ? {
+          minimize: true,
+          minimizer: [
+            new TerserPlugin({
+              extractComments: false,
+              terserOptions: {
+                format: {
+                  comments: false,
+                },
+              },
+            }),
+          ],
+        }
+      : {}),
   },
 
   module: {

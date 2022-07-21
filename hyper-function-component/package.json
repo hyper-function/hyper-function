@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -70,7 +70,7 @@
     "webpack": "^5.73.0"
   },
   "devDependencies": {
-    "@hyper-function/hfz-global": "^1.1.0",
+    "@hyper-function/hfz-global": "^1.1.1",
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/fs-extra": "^9.0.12",
