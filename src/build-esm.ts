@@ -23,7 +23,33 @@ export class EsmBuilder extends EventEmitter {
       path.join(esmOutputPath, "index.js"),
       [
         `import "../hfc.css";`,
-        `import HFC from "./hfc";`,
+        `import HFC from "./hfc.js";`,
+        `export default HFC;`,
+        ``,
+      ].join("\n")
+    );
+
+    const npmName = `@hyper.fun/${this.hfcConfig.hfcName}`;
+    fs.writeFileSync(
+      path.join(this.hfcConfig.pkgOutputPath, "index.d.ts"),
+      `declare module "${npmName}";`
+    );
+
+    fs.writeFileSync(
+      path.join(this.hfcConfig.pkgOutputPath, "hfc.css.d.ts"),
+      `declare module "${npmName}/hfc.css";`
+    );
+
+    fs.writeFileSync(
+      path.join(esmOutputPath, "hfc.d.ts"),
+      `declare module "${npmName}/esm/hfc";`
+    );
+
+    fs.writeFileSync(
+      path.join(esmOutputPath, "index.js"),
+      [
+        `import "../hfc.css";`,
+        `import HFC from "./hfc.js";`,
         `export default HFC;`,
         ``,
       ].join("\n")

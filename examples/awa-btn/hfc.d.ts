@@ -3,10 +3,6 @@ interface User {
   height: HfcFloat;
 }
 
-interface HD {
-  w: HfcString;
-}
-
 interface HfcPropType {
   attrs: {
     /**
@@ -30,13 +26,7 @@ interface HfcPropType {
      * The hellooooo
      * @default blabla
      */
-    hello: {
-      /**
-       * aa The fwefwefweqq
-       * @default blabla
-       */
-      a: HD;
-    };
+    hello: {};
     n: {};
     click: {};
   };
@@ -48,5 +38,6 @@ interface HfcPropType {
     header: {
       name: HfcString;
     };
+    default: {};
   };
 }

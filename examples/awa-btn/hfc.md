@@ -1,10 +1,29 @@
 # :package: awa-btn
 
 ```html render
-<template hfz import:awa-btn="dev" :data="{ a: 1, b: 2, c: 'aa' }">
-  bbaawa sawa!!!a{{a}} {{b}} {{c}}
-  <div v-if="a === 2">baba</div>
-  <awa-btn name="awa" a="1" b="2" :c="c" @click="a += 1; c = 'dd' + a"></awa-btn>
+<template hfz import:awa-btn="dev">
+  {{a}} - {{b}} - {{c}}
+  <span v-if="a === 2">baba</span>
+  <awa-btn name="awa" :c="c" @click="hello"> {{a}} </awa-btn>
+
+  <script>
+    export default {
+      data() {
+        return { a: 1, b: 2, c: "cc" };
+      },
+      created() {
+        setInterval(() => {
+          this.a += 1;
+        }, 1000);
+      },
+      methods: {
+        hello() {
+          this.a += 1;
+          console.log("hello");
+        },
+      },
+    };
+  </script>
 </template>
 ```
 
