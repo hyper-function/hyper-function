@@ -19,6 +19,9 @@ export default class HfcAssetsPlugin {
             'new URL("../assets/$1", import.meta.url)'
           );
 
+          code = code.replace(/__webpack_require__/g, "__wp_require__");
+          code = code.replace(/__webpack_exports__/g, "__wp_exports__");
+
           compilation.updateAsset("esm/hfc.js", new sources.RawSource(code));
         }
       );

@@ -1,10 +1,11 @@
+import deep from "lodash.defaultsdeep";
 import "./index.css";
 import add from "./add";
 import logo from "./jser-logo.png";
 import props from "hfc-prop-names";
 import svg from "./heart.svg";
 
-console.log(props);
+console.log(deep);
 
 export default class HFC {
   static tag = "div";
@@ -15,13 +16,22 @@ export default class HFC {
     btn.classList.add("btn");
     btn.innerText = "AWA BTN!!!";
     btn.onclick = function () {
-      props.events.click();
+      console.log("dispatching click");
+      setTimeout(() => {
+        props.events.click();
+      }, 50);
     };
 
     const img = document.createElement("img");
     img.src = logo;
     container.appendChild(btn);
     container.appendChild(img);
+
+    if (props.slots.default) {
+      const div = document.createElement("div");
+      container.appendChild(div);
+      props.slots.default(div);
+    }
   }
   changed(props) {
     console.log(props);
