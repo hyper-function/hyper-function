@@ -25,5 +25,8 @@
     "@types/hyper-function-component": "^1.4.0",
     "hfc-cli-service": "../../",
     "hfc-prop-names": "^1.0.2"
+  },
+  "hfc": {
+    "name": "awa-btn"
   }
 }
