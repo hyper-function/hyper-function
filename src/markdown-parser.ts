@@ -23,7 +23,7 @@ const sanitizeSchema: any = deepmerge(defaultSchema, {
   },
 });
 
-const supportImgExts = [".jpg", ".jpeg", ".png", ".gif"];
+const supportImgExts = [".jpg", ".jpeg", ".png", ".gif", ".svg"];
 
 const imgCache: Record<
   string,

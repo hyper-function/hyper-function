@@ -173,7 +173,9 @@ async function askForHfcName(context: string) {
   const { name } = answer;
   const pkgJsonPath = path.join(context, "package.json");
   const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
-  pkgJson.hfcName = name;
+  const hfcObject = pkgJson.hfc || {};
+  hfcObject.name = name;
+  pkgJson.hfc = hfcObject;
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
 
   const docPath = path.join(context, "hfc.md");
@@ -198,7 +200,11 @@ async function askForHfcName(context: string) {
 
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
   const cwdPkg = await readPkg({ cwd: context });
-  if (!cwdPkg.hfcName || verifyHfcName(cwdPkg.hfcName) !== true) {
+  if (
+    !cwdPkg.hfc ||
+    !cwdPkg.hfc.name ||
+    verifyHfcName(cwdPkg.hfc.name) !== true
+  ) {
     await askForHfcName(context);
   }
 

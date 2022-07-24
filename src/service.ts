@@ -68,7 +68,7 @@ export class Service extends EventEmitter {
     this.hfcConfig.command = this.command;
     this.hfcConfig.context = this.context;
     this.hfcConfig.name = packageJson.name;
-    this.hfcConfig.hfcName = packageJson.hfcName;
+    this.hfcConfig.hfcName = packageJson.hfc.name;
     this.hfcConfig.version = packageJson.version;
     this.hfcConfig.license = packageJson.license || "";
     this.hfcConfig.dependencies = packageJson.dependencies || {};

@@ -6,6 +6,7 @@ import tar from "tar";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
 import bundleSize from "./bundle-size.js";
+import fs from "fs-extra";
 
 export async function publish({ token }: { token: string }) {
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
@@ -13,10 +14,10 @@ export async function publish({ token }: { token: string }) {
   const pkgPath = join(context, ".hfc", "build", "pkg");
   const pkgJsonPath = join(pkgPath, "package.json");
 
-  const pkgJson = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
+  const pkgJson = JSON.parse(await fs.readJSON(pkgJsonPath, "utf-8"));
   const { description } = pkgJson;
 
-  pkgJson.description = `👉  https://hyper.fun/c/${pkgJson.hfcName}/${
+  pkgJson.description = `👉  https://hyper.fun/c/${pkgJson.hfc.name}/${
     pkgJson.version
   }${description ? ` - ${description}` : ""}`;
 
