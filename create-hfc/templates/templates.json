@@ -1,11 +1,11 @@
 {
   "templates": [
     {
-      "title": "Vanilla JS",
+      "title": "Vanilla",
       "folder": "vanilla"
     },
     {
-      "title": "Vanilla JS - TypeScript",
+      "title": "Vanilla - TypeScript",
       "folder": "vanilla-ts"
     },
     {

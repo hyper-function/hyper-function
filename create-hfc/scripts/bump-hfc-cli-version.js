@@ -1,4 +1,5 @@
-const fs = require("fs");
+const { execSync } = require("child_process");
+const fs = require("fs-extra");
 const path = require("path");
 const { templates } = require("../templates/templates.json");
 
@@ -11,17 +12,21 @@ if (!version) {
 
 console.log("updating version to", version);
 
-templates.forEach((template) => {
-  const file = path.resolve(
-    __dirname,
-    "..",
-    "templates",
-    template.folder,
-    "package.json"
-  );
-  const packageJson = JSON.parse(fs.readFileSync(file, "utf-8"));
-  packageJson.devDependencies["@hyper-function/cli-service"] = "^" + version;
-  fs.writeFileSync(file, JSON.stringify(packageJson, null, 2));
-});
+(async () => {
+  await Promise.all(
+    templates.map(async (template) => {
+      const dir = path.resolve(__dirname, "..", "templates", template.folder);
 
-console.log("done");
+      const packageFile = path.resolve(dir, "package.json");
+
+      const packageJson = JSON.parse(fs.readFileSync(packageFile, "utf-8"));
+      packageJson.devDependencies["@hyper-function/cli-service"] =
+        "^" + version;
+      fs.writeFileSync(packageFile, JSON.stringify(packageJson, null, 2));
+
+      execSync("npm i --package-lock-only", { cwd: dir });
+    })
+  );
+
+  console.log("done");
+})();
