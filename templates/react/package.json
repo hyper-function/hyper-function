@@ -1,5 +1,7 @@
 {
-  "hfcName": "",
+  "hfc": {
+    "name": ""
+  },
   "name": "awesome-hfc",
   "version": "1.0.0",
   "license": "MIT",
@@ -18,7 +20,7 @@
     "react-to-hfc": "^1.2.0"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.4.0",
+    "@hyper-function/cli-service": "^1.5.1",
     "@types/hyper-function-component": "^1.4.0",
     "hfc-plugin-react": "^1.0.3"
   }

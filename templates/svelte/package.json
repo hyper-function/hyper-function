@@ -1,5 +1,7 @@
 {
-  "hfcName": "",
+  "hfc": {
+    "name": ""
+  },
   "name": "awesome-hfc",
   "version": "1.0.0",
   "license": "MIT",
@@ -16,7 +18,7 @@
     "svelte-to-hfc": "^1.1.0"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.4.0",
+    "@hyper-function/cli-service": "^1.5.1",
     "@types/hyper-function-component": "^1.4.0",
     "hfc-plugin-svelte": "^1.0.1",
     "hfc-prop-names": "^1.0.3"
