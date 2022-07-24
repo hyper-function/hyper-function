@@ -16,12 +16,14 @@
   },
   "devDependencies": {
     "@hyper-function/cli-service": "^1.7.0",
-    "@types/hyper-function-component": "^2.0.0",
     "hfc-plugin-vue": "^1.0.2",
     "hfc-prop-names": "^1.0.3"
   },
   "dependencies": {
     "vue": "^3",
     "vue-to-hfc": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "@types/hyper-function-component": "^2.0.0"
   }
 }
