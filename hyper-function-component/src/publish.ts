@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { readFileSync, statSync } from "fs";
+import { readFileSync } from "fs";
 import { tmpdir, homedir } from "os";
 import { join } from "path";
 import tar from "tar";
@@ -14,7 +14,7 @@ export async function publish({ token }: { token: string }) {
   const pkgPath = join(context, ".hfc", "build", "pkg");
   const pkgJsonPath = join(pkgPath, "package.json");
 
-  const pkgJson = JSON.parse(await fs.readJSON(pkgJsonPath, "utf-8"));
+  const pkgJson = await fs.readJSON(pkgJsonPath);
   const { description } = pkgJson;
 
   pkgJson.description = `👉  https://hyper.fun/c/${pkgJson.hfc.name}/${
@@ -32,6 +32,23 @@ export async function publish({ token }: { token: string }) {
 
   const { sizeJs, sizeCss } = await bundleSize(pkgPath);
 
+  const [bannerJpg, bannerJpeg, bannerPng, bannerSvg] = await Promise.all(
+    [".jpg", ".jpeg", ".png", ".svg"].map(async (ext) => {
+      const bannerPath = join(context, "banner" + ext);
+      if (await fs.pathExists(bannerPath)) {
+        return ext;
+      }
+      return null;
+    })
+  );
+
+  const bannerExt = bannerJpg || bannerJpeg || bannerPng || bannerSvg;
+
+  let bannerPath;
+  if (bannerExt) {
+    bannerPath = join(context, "banner" + bannerExt);
+  }
+
   const form = new FormData();
   form.append("token", token!);
   form.append("description", description);
@@ -40,6 +57,10 @@ export async function publish({ token }: { token: string }) {
   form.append("sizeCss", sizeCss + "");
   form.append("doc", fileFromSync(docTarPath));
   form.append("pkg", fileFromSync(pkgTarPath));
+  if (bannerPath) {
+    form.append("banner", fileFromSync(bannerPath));
+    form.append("bannerExt", bannerExt!);
+  }
 
   const publishUrl =
     process.env.NODE_ENV === "development"
