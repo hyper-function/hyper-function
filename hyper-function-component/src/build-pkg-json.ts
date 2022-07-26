@@ -1,6 +1,5 @@
 import EventEmitter from "events";
 import path from "path";
-import readPkg from "read-pkg";
 import chokidar from "chokidar";
 import { HfcConfig } from "./options.js";
 import fs from "fs-extra";
@@ -23,7 +22,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
     this.build();
   }
   async build() {
-    const pkg = await readPkg({ cwd: this.hfcConfig.context });
+    const pkg = await fs.readJson(this.pkgJsonFilePath);
 
     const hfcPage = `https://hyper.fun/c/${this.hfcConfig.hfcName}/${pkg.version}`;
 
