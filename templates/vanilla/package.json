@@ -6,6 +6,8 @@
   "version": "1.0.0",
   "license": "MIT",
   "description": "",
+  "homepage": "",
+  "repository": "",
   "keywords": [],
   "type": "module",
   "scripts": {
@@ -16,9 +18,7 @@
   },
   "devDependencies": {
     "@hyper-function/cli-service": "^1.7.0",
+    "@types/hyper-function-component": "^2.0.0",
     "hfc-prop-names": "^1.0.3"
-  },
-  "optionalDependencies": {
-    "@types/hyper-function-component": "^2.0.0"
   }
 }
