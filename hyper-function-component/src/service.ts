@@ -177,6 +177,7 @@ export class Service extends EventEmitter {
             "process.env.NODE_ENV": JSON.stringify(
               this.hfcConfig.command === "serve" ? "development" : "production"
             ),
+            ...this.hfcConfig.defineEnv,
           }),
         ],
       };
