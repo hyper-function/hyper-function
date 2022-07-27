@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.7.3",
+  "version": "1.7.5",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -48,7 +48,6 @@
     "postcss-loader": "^6.1.1",
     "pretty-bytes": "^6.0.0",
     "quick-lru": "^6.1.1",
-    "read-pkg": "^5.2.0",
     "rehype-raw": "^6.1.1",
     "rehype-sanitize": "^5.0.1",
     "rehype-stringify": "^9.0.3",

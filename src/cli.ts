@@ -1,5 +1,5 @@
 import os from "os";
-import fs from "fs";
+import fs from "fs-extra";
 import path from "path";
 import chalk from "chalk";
 import minimist from "minimist";
@@ -10,7 +10,6 @@ import * as desm from "desm";
 
 import { Service } from "./service.js";
 import { publish, readToken } from "./publish.js";
-import readPkg from "read-pkg";
 
 const pkg = JSON.parse(
   fs.readFileSync(desm.join(import.meta.url, "..", "package.json"), "utf-8")
@@ -199,7 +198,7 @@ async function askForHfcName(context: string) {
   }
 
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
-  const cwdPkg = await readPkg({ cwd: context });
+  const cwdPkg = await fs.readJson(path.join(context, "package.json"));
   if (
     !cwdPkg.hfc ||
     !cwdPkg.hfc.name ||

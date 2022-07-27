@@ -2,7 +2,6 @@ import path from "path";
 import rm from "rimraf";
 import fs from "fs-extra";
 import webpack from "webpack";
-import readPkg from "read-pkg";
 import EventEmitter from "events";
 import { dirname } from "desm";
 // import { createRequire } from "module";
@@ -58,7 +57,9 @@ export class Service extends EventEmitter {
       });
     }
 
-    const packageJson = await readPkg({ cwd: this.context });
+    const packageJson = await fs.readJson(
+      path.join(this.context, "package.json")
+    );
 
     const options = await this.loadUserOptions();
     this.hfcConfig = defaultsDeep(options, defaults(), {
