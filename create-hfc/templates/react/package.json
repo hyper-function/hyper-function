@@ -19,7 +19,7 @@
   "dependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "react-to-hfc": "^1.2.0"
+    "react-to-hfc": "^1.2.3"
   },
   "devDependencies": {
     "@hyper-function/cli-service": "^1.7.5",
