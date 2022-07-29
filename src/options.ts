@@ -35,7 +35,7 @@ export interface Options {
       opts: { mode: string; webpack: typeof webpack }
     ) => webpack.Configuration;
   }[];
-  defineEnv: Record<string, string>;
+  env: Record<string, string>;
 }
 
 export type HfcConfig = Options & {};
@@ -47,5 +47,5 @@ export const defaults = () => ({
     /\.(png|jpe?g|gif|webp|svg|mp4|webm|ogg|mp3|wav|flac|aac|eot|ttf|otf|woff2?)$/i,
   css: {},
   plugins: [],
-  defineEnv: {},
+  env: {},
 });
