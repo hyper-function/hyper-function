@@ -14,7 +14,11 @@ export class WfmBuilder extends EventEmitter {
   wfmPath: string;
   constructor(private hfcConfig: HfcConfig) {
     super();
-    const wfmEntry = path.join(this.hfcConfig.context, ".hfc", "wfm-entry.js");
+    const wfmEntry = path.join(
+      this.hfcConfig.context,
+      ".hfc",
+      `wfm-entry-${Date.now()}.js`
+    );
 
     fs.writeFileSync(
       wfmEntry,
@@ -42,10 +46,13 @@ export class WfmBuilder extends EventEmitter {
           this.hfcConfig.command === "serve" ? undefined : "[chunkhash].js",
       },
       optimization: {
+        concatenateModules: true,
+        usedExports: true,
+        moduleIds: false,
+        chunkIds: false,
         ...(this.hfcConfig.command === "serve"
           ? {}
           : {
-              chunkIds: false,
               minimize: true,
               minimizer: [
                 new TerserPlugin({
@@ -94,7 +101,10 @@ export class WfmBuilder extends EventEmitter {
           },
         }),
         new webpack.ids.DeterministicChunkIdsPlugin({
-          maxLength: 8,
+          maxLength: 9,
+        }),
+        new webpack.ids.DeterministicModuleIdsPlugin({
+          maxLength: 9,
         }),
         new webpack.DefinePlugin({
           "process.env.NODE_ENV": JSON.stringify(
