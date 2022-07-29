@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
+import { tmpdir } from "os";
 import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
@@ -14,10 +15,10 @@ export class WfmBuilder extends EventEmitter {
   wfmPath: string;
   constructor(private hfcConfig: HfcConfig) {
     super();
+
     const wfmEntry = path.join(
-      this.hfcConfig.context,
-      ".hfc",
-      `wfm-entry-${Date.now()}.js`
+      tmpdir(),
+      `wfm-entry-${Date.now()}-${Math.random().toString(36).slice(2)}.js`
     );
 
     fs.writeFileSync(
@@ -34,6 +35,38 @@ export class WfmBuilder extends EventEmitter {
 
     this.wfmPath = path.resolve(this.hfcConfig.pkgOutputPath, "wfm");
 
+    const plugins = [
+      new webpack.container.ModuleFederationPlugin({
+        name: "@hyper.fun/" + this.hfcConfig.hfcName,
+        filename: "entry.js",
+        library: {
+          name: `$HFC_WFM_CONTAINERS["@hyper.fun/${this.hfcConfig.hfcName}"]`,
+          type: "assign",
+        },
+        shared: this.hfcConfig.dependencies,
+        exposes: {
+          "./hfc": wfmEntry,
+        },
+      }),
+      new webpack.DefinePlugin({
+        "process.env.NODE_ENV": JSON.stringify(
+          this.hfcConfig.command === "serve" ? "development" : "production"
+        ),
+        __VUE_OPTIONS_API__: JSON.stringify(true),
+        __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+      }),
+    ];
+
+    if (this.hfcConfig.command === "build") {
+      plugins.push(
+        new webpack.ids.HashedModuleIdsPlugin({
+          hashFunction: "sha256",
+          hashDigest: "base64",
+          hashDigestLength: 13,
+        })
+      );
+    }
+
     this.compiler = webpack({
       context: this.wfmPath,
       mode: this.hfcConfig.command === "serve" ? "development" : "production",
@@ -48,11 +81,14 @@ export class WfmBuilder extends EventEmitter {
       optimization: {
         concatenateModules: true,
         usedExports: true,
-        moduleIds: false,
-        chunkIds: false,
         ...(this.hfcConfig.command === "serve"
-          ? {}
+          ? {
+              moduleIds: "named",
+              chunkIds: "named",
+            }
           : {
+              moduleIds: false,
+              chunkIds: "deterministic",
               minimize: true,
               minimizer: [
                 new TerserPlugin({
@@ -87,33 +123,7 @@ export class WfmBuilder extends EventEmitter {
           },
         ],
       },
-      plugins: [
-        new webpack.container.ModuleFederationPlugin({
-          name: "@hyper.fun/" + this.hfcConfig.hfcName,
-          filename: "entry.js",
-          library: {
-            name: `$HFC_WFM_CONTAINERS["@hyper.fun/${this.hfcConfig.hfcName}"]`,
-            type: "assign",
-          },
-          shared: this.hfcConfig.dependencies,
-          exposes: {
-            "./hfc": wfmEntry,
-          },
-        }),
-        new webpack.ids.DeterministicChunkIdsPlugin({
-          maxLength: 9,
-        }),
-        new webpack.ids.DeterministicModuleIdsPlugin({
-          maxLength: 9,
-        }),
-        new webpack.DefinePlugin({
-          "process.env.NODE_ENV": JSON.stringify(
-            this.hfcConfig.command === "serve" ? "development" : "production"
-          ),
-          __VUE_OPTIONS_API__: JSON.stringify(true),
-          __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
-        }),
-      ],
+      plugins,
     });
   }
   build() {
