@@ -29,16 +29,6 @@ export class EsmBuilder extends EventEmitter {
       ].join("\n")
     );
 
-    fs.writeFileSync(
-      path.join(esmOutputPath, "index.js"),
-      [
-        `import "../hfc.css";`,
-        `import HFC from "./hfc.js";`,
-        `export default HFC;`,
-        ``,
-      ].join("\n")
-    );
-
     Object.assign(this.webpackConfig, {
       externals: [
         function ({ request }: { request: string }, callback: any) {
