@@ -14,7 +14,7 @@ export default class HFC {
     console.log(props);
     const btn = document.createElement("button");
     btn.classList.add("btn");
-    btn.innerText = "AWA BTN!!!";
+    btn.innerText = "AWA BTN!";
     btn.onclick = function () {
       console.log("dispatching click");
       setTimeout(() => {

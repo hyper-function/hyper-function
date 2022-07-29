@@ -1,10 +1,12 @@
 # :package: awa-btn
 
 ```html render
-<template hfz import:awa-btn="dev">
-  {{a}} - {{b}} - {{c}}
+<template hfz import:awa-btn="dev" import:flex-box="1.3.2">
+  {{a}} - {{b}} - {{c}} - 1
   <span v-if="a === 2">baba</span>
-  <awa-btn name="awa" :c="c" @click="hello"> {{a}} </awa-btn>
+  <flex-box justify="center">
+    <awa-btn name="awa" :c="c" @click="hello"> {{a}} 1 </awa-btn>
+  </flex-box>
 
   <script>
     export default {
