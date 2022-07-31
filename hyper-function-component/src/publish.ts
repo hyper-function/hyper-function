@@ -21,10 +21,18 @@ export async function publish({ token }: { token: string }) {
     pkgJson.version
   }${description ? ` - ${description}` : ""}`;
 
-  let docTarPath;
+  const docHtml = await fs.readFile(
+    join(context, ".hfc", "build", "doc", "index.html"),
+    "utf8"
+  );
+
+  let docImgsTarPath;
   let pkgTarPath;
   try {
-    [docTarPath, pkgTarPath] = await Promise.all([packDoc(), packHfcPkg()]);
+    [docImgsTarPath, pkgTarPath] = await Promise.all([
+      packDocImgs(),
+      packHfcPkg(),
+    ]);
   } catch (error) {
     console.log("failed to pack:", error);
     return;
@@ -55,7 +63,8 @@ export async function publish({ token }: { token: string }) {
   form.append("manifest", JSON.stringify(pkgJson));
   form.append("sizeJs", sizeJs + "");
   form.append("sizeCss", sizeCss + "");
-  form.append("doc", fileFromSync(docTarPath));
+  form.append("docHtml", docHtml);
+  form.append("docImgs", fileFromSync(docImgsTarPath));
   form.append("pkg", fileFromSync(pkgTarPath));
   if (bannerPath) {
     form.append("banner", fileFromSync(bannerPath));
@@ -74,12 +83,17 @@ export async function publish({ token }: { token: string }) {
     })
       .then((res) => res.json())
       .then((res: any) => {
+        if (res.success) {
+          console.log("publish success");
+          return;
+        }
+
         if (res.error) {
           console.log(res.message);
           return;
         }
 
-        console.log("publish success");
+        console.log("publish failed:", res);
       });
   } catch (error) {
     console.log("failed to publish, network error");
@@ -87,13 +101,13 @@ export async function publish({ token }: { token: string }) {
   }
 }
 
-async function packDoc(): Promise<string> {
+async function packDocImgs(): Promise<string> {
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
   const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar");
 
   await tar.create(
     {
-      cwd: join(context, ".hfc", "build", "doc"),
+      cwd: join(context, ".hfc", "build", "doc", "imgs"),
       file: output,
     },
     ["."]
