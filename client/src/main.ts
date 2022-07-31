@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import App from "./App.vue";
 import Preview from "./views/Preview.vue";
 
-import "../css/style.css";
+import "./main.css";
 
 const router = createRouter({
   history: createWebHistory(),

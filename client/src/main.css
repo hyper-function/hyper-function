@@ -1,5 +1,6 @@
-@import url(./modern-normalize.css);
-@import url(./github-markdown.css);
+@import "~normalize.css/normalize.css";
+@import "./styles/prism.css";
+@import "~github-markdown-css/github-markdown-light.css";
 
 :root {
   --main-bg: #f9f7ec;
@@ -44,6 +45,10 @@
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -116,6 +121,10 @@ body {
 
 .markdown-body {
   font-family: var(--font-sans);
+}
+
+.markdown-body pre {
+  background-color: #f6f8fa !important;
 }
 
 .markdown-body code {
