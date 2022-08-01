@@ -251,20 +251,30 @@ body {
   transition: height 300ms ease;
 }
 
+.hfz-preview:hover iframe {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+}
+
 .hfz-preview-actions {
   display: flex;
-  justify-content: flex-end;
+  margin-top: 8px;
+  visibility: hidden;
+}
+
+.hfz-preview:hover .hfz-preview-actions {
+  visibility: visible;
 }
 
 .hfz-preview-actions > button {
+  display: flex;
+  align-items: center;
   border: none;
   background-color: transparent;
   outline: none;
   cursor: pointer;
-  font-size: 90%;
-  color: #999;
+  fill: #8e8e93;
 }
 
 .hfz-preview-actions > button:hover {
-  color: rgb(0, 172, 91);
+  fill: rgb(0, 172, 91);
 }
