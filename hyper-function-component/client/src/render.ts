@@ -8,7 +8,7 @@ const hfzGlobal = require("@hyper-function/hfz-global");
 (<any>window).Vue = Vue;
 (<any>window).iFrameResizer = {
   onMessage(msg: any) {
-    if (msg && msg.action === "refresh") {
+    if (msg && msg.action === "reload") {
       location.reload();
     }
   },
