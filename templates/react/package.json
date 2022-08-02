@@ -22,7 +22,7 @@
     "react-to-hfc": "^1.2.3"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.7.5",
+    "@hyper-function/cli-service": "^1.8.2",
     "@types/hyper-function-component": "^2.0.0",
     "hfc-plugin-react": "^1.0.3"
   }
