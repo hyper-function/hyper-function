@@ -1,11 +1,9 @@
 import path from "path";
 import fs from "fs-extra";
-import { createHash } from "crypto";
 import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
 import { createRequire } from "module";
-import base64url from "base64url";
 
 import { HfcConfig } from "./options.js";
 
@@ -67,6 +65,12 @@ export class WfmBuilder extends EventEmitter {
           hashDigestLength: 13,
         })
       );
+
+      plugins.push(
+        new webpack.ids.DeterministicChunkIdsPlugin({
+          maxLength: 13,
+        })
+      );
     }
 
     this.compiler = webpack({
@@ -90,7 +94,7 @@ export class WfmBuilder extends EventEmitter {
             }
           : {
               moduleIds: false,
-              chunkIds: "deterministic",
+              chunkIds: false,
               minimize: true,
               minimizer: [
                 new TerserPlugin({
