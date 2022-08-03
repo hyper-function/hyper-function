@@ -85,7 +85,7 @@ export class HfcPropsBuilder extends EventEmitter {
 
     await writeFile(
       this.propNamesPath,
-      `export default ${JSON.stringify(this.propNames)}`
+      `export default ${JSON.stringify(this.propNames)};\n`
     );
 
     this.emit("build-complete");
