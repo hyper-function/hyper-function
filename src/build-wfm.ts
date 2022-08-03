@@ -1,10 +1,11 @@
 import path from "path";
 import fs from "fs-extra";
-import { tmpdir } from "os";
+import { createHash } from "crypto";
 import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
 import { createRequire } from "module";
+import base64url from "base64url";
 
 import { HfcConfig } from "./options.js";
 
@@ -17,8 +18,9 @@ export class WfmBuilder extends EventEmitter {
     super();
 
     const wfmEntry = path.join(
-      tmpdir(),
-      `wfm-entry-${Date.now()}-${Math.random().toString(36).slice(2)}.js`
+      hfcConfig.context,
+      ".hfc",
+      `wfm-entry-${hfcConfig.hfcName + "-" + hfcConfig.version}.js`
     );
 
     fs.writeFileSync(
