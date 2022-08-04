@@ -11,9 +11,7 @@ import * as desm from "desm";
 import { Service } from "./service.js";
 import { publish, readToken } from "./publish.js";
 
-const pkg = JSON.parse(
-  fs.readFileSync(desm.join(import.meta.url, "..", "package.json"), "utf-8")
-);
+const pkg = fs.readJSONSync(desm.join(import.meta.url, "..", "package.json"));
 
 pleaseUpgradeNode(pkg);
 
