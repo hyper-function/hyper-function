@@ -94,6 +94,13 @@ export class Service extends EventEmitter {
     );
     fs.ensureDirSync(this.hfcConfig.docOutputPath);
 
+    const env: Record<string, any> = {};
+    Object.keys(process.env).forEach((key) => {
+      if (key.startsWith("HFC_PUBLIC_")) {
+        env["process.env." + key] = process.env[key];
+      }
+    });
+
     this.configureWebpack((webpackConfig: webpack.Configuration) => {
       const config: webpack.Configuration = {
         mode: this.hfcConfig.command === "serve" ? "development" : "production",
@@ -179,6 +186,7 @@ export class Service extends EventEmitter {
               this.hfcConfig.command === "serve" ? "development" : "production"
             ),
             ...this.hfcConfig.env,
+            ...env,
           }),
         ],
       };
