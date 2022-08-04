@@ -1,35 +1,35 @@
 import path from "path";
 import fs from "fs-extra";
-import { tmpdir } from "os";
 import webpack from "webpack";
 import EventEmitter from "events";
 import TerserPlugin from "terser-webpack-plugin";
 import { createRequire } from "module";
 
 import { HfcConfig } from "./options.js";
+import {
+  UniqueModuleIdsPlugin,
+  UniqueChunkIdsPlugin,
+} from "./unique-ids-plugin.js";
 
 const require = createRequire(import.meta.url);
-
 export class WfmBuilder extends EventEmitter {
   compiler: webpack.Compiler;
   wfmPath: string;
   constructor(private hfcConfig: HfcConfig) {
     super();
 
-    const wfmEntry = path.join(
-      tmpdir(),
-      `wfm-entry-${Date.now()}-${Math.random().toString(36).slice(2)}.js`
-    );
+    const wfmEntry = path.join(hfcConfig.context, ".hfc", `wfm-entry.js`);
 
     fs.writeFileSync(
       wfmEntry,
       [
-        `import HFC from "${path.resolve(
-          this.hfcConfig.pkgOutputPath,
+        `import HFC from "./${path.join(
+          hfcConfig.command,
+          "pkg",
           "esm",
           "index.js"
         )}";`,
-        `export default HFC;`,
+        `export default HFC;\n`,
       ].join("\n")
     );
 
@@ -58,13 +58,8 @@ export class WfmBuilder extends EventEmitter {
     ];
 
     if (this.hfcConfig.command === "build") {
-      plugins.push(
-        new webpack.ids.HashedModuleIdsPlugin({
-          hashFunction: "sha256",
-          hashDigest: "base64",
-          hashDigestLength: 13,
-        })
-      );
+      plugins.push(new UniqueModuleIdsPlugin());
+      plugins.push(new UniqueChunkIdsPlugin());
     }
 
     this.compiler = webpack({
@@ -88,7 +83,7 @@ export class WfmBuilder extends EventEmitter {
             }
           : {
               moduleIds: false,
-              chunkIds: "deterministic",
+              chunkIds: false,
               minimize: true,
               minimizer: [
                 new TerserPlugin({

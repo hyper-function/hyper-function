@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.8.2",
+  "version": "1.8.8",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -41,6 +41,7 @@
     "lodash.defaultsdeep": "^4.6.1",
     "mini-css-extract-plugin": "^2.2.0",
     "minimist": "^1.2.5",
+    "nanoid": "^4.0.0",
     "node-fetch": "^3.2.2",
     "please-upgrade-node": "^3.2.0",
     "portfinder": "^1.0.28",

@@ -31,7 +31,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
         name: this.hfcConfig.hfcName,
       },
       name: "@hyper.fun/" + this.hfcConfig.hfcName,
-      version: pkg.version,
+      version: this.hfcConfig.version,
       main: "esm/index.js",
       module: "esm/index.js",
       type: "module",
