@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.8.9",
+  "version": "1.9.0",
   "description": "",
   "main": "dist/service.js",
   "type": "module",

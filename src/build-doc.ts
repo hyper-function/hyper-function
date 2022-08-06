@@ -13,23 +13,20 @@ export class DocBuilder extends EventEmitter {
     super();
     this.mdFilePath = path.join(this.hfcConfig.context, "hfc.md");
 
-    Object.keys(hfcConfig.docEnv).forEach((key) => {
-      this.envs.push({
-        re: new RegExp(`\\$\{${key}\}`, "g"),
-        value: hfcConfig.docEnv[key],
-      });
-    });
+    const env: Record<string, string> = { ...hfcConfig.docEnv };
 
     Object.keys(process.env).forEach((key) => {
       if (key.startsWith("HFC_DOC_")) {
-        this.envs.push({
-          re: new RegExp(`\\$\{${key}\}`, "g"),
-          value: process.env[key]!,
-        });
+        env[key] = process.env[key]!;
       }
     });
 
-    console.log(this.envs);
+    Object.keys(env).forEach((key) => {
+      this.envs.push({
+        re: new RegExp(`\\$\{${key}\}`, "g"),
+        value: env[key],
+      });
+    });
 
     if (this.hfcConfig.command === "serve") {
       chokidar.watch(this.mdFilePath).on("change", () => this.build());
