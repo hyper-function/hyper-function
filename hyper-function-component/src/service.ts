@@ -95,6 +95,10 @@ export class Service extends EventEmitter {
     fs.ensureDirSync(this.hfcConfig.docOutputPath);
 
     const env: Record<string, any> = {};
+    Object.keys(this.hfcConfig.env).forEach((key) => {
+      env["process.env." + key] = this.hfcConfig.env[key];
+    });
+
     Object.keys(process.env).forEach((key) => {
       if (key.startsWith("HFC_PUBLIC_")) {
         env["process.env." + key] = process.env[key];
@@ -185,7 +189,6 @@ export class Service extends EventEmitter {
             "process.env.NODE_ENV": JSON.stringify(
               this.hfcConfig.command === "serve" ? "development" : "production"
             ),
-            ...this.hfcConfig.env,
             ...env,
           }),
         ],

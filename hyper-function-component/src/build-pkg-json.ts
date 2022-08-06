@@ -26,6 +26,15 @@ export class HfcPkgJsonBuilder extends EventEmitter {
 
     const hfcPage = `https://hyper.fun/c/${this.hfcConfig.hfcName}/${pkg.version}`;
 
+    const homepage = process.env.HFC_HOMEPAGE || pkg.homepage;
+    const description = process.env.HFC_DESCRIPTION || pkg.description;
+    const repository = process.env.HFC_REPOSITORY || pkg.repository;
+    const license = process.env.HFC_LICENSE || pkg.license;
+    let keywords = pkg.keywords || [];
+    if (process.env.HFC_KEYWORDS) {
+      keywords = process.env.HFC_KEYWORDS.split(",");
+    }
+
     const newPkg = {
       hfc: {
         name: this.hfcConfig.hfcName,
@@ -35,11 +44,11 @@ export class HfcPkgJsonBuilder extends EventEmitter {
       main: "esm/index.js",
       module: "esm/index.js",
       type: "module",
-      homepage: pkg.homepage,
-      description: pkg.description,
-      keywords: ["hyper-function-component", "hfc", ...(pkg.keywords || [])],
-      license: pkg.license,
-      repository: pkg.repository,
+      homepage,
+      description,
+      keywords: ["hyper-function-component", "hfc", ...keywords],
+      license,
+      repository,
       dependencies: this.hfcConfig.dependencies,
       optionalDependencies: {
         "@types/hyper-function-component": "^2.0.0",
