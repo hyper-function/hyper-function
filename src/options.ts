@@ -36,6 +36,7 @@ export interface Options {
     ) => webpack.Configuration;
   }[];
   env: Record<string, string>;
+  docEnv: Record<string, string>;
 }
 
 export type HfcConfig = Options & {};
@@ -48,4 +49,5 @@ export const defaults = () => ({
   css: {},
   plugins: [],
   env: {},
+  docEnv: {},
 });
