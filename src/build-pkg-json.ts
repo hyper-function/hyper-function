@@ -24,7 +24,7 @@ export class HfcPkgJsonBuilder extends EventEmitter {
   async build() {
     const pkg = await fs.readJson(this.pkgJsonFilePath);
 
-    const hfcPage = `https://hyper.fun/c/${this.hfcConfig.hfcName}/${pkg.version}`;
+    const hfcPage = `https://hyper.fun/c/${this.hfcConfig.hfcName}/${this.hfcConfig.version}`;
 
     const homepage = process.env.HFC_HOMEPAGE || pkg.homepage;
     const description = process.env.HFC_DESCRIPTION || pkg.description;
