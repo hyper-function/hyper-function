@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -41,7 +41,6 @@
     "lodash.defaultsdeep": "^4.6.1",
     "mini-css-extract-plugin": "^2.2.0",
     "minimist": "^1.2.5",
-    "nanoid": "^4.0.0",
     "node-fetch": "^3.2.2",
     "please-upgrade-node": "^3.2.0",
     "portfinder": "^1.0.28",
@@ -63,6 +62,7 @@
     "terser-webpack-plugin": "^5.3.1",
     "typescript": "^4.7.4",
     "typescript-json-schema": "^0.54",
+    "ulidx": "^0.3.0",
     "unified": "^10.1.2",
     "unist-util-visit": "^4.1.0",
     "update-notifier": "^5.1.0",
