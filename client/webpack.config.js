@@ -61,23 +61,48 @@ export default {
   devtool: false,
   resolve: {
     alias: {
-      vue: "vue/dist/vue.esm-bundler.js",
+      vue: "vue/dist/vue.esm-browser.prod.js",
     },
     extensions: ["...", ".ts", ".vue"],
   },
 
   optimization: {
-    ...{
-      concatenateModules: true,
-      splitChunks: {
-        chunks: "all",
+    concatenateModules: true,
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          name: `vendors`,
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          chunks: "initial",
+        },
+        hfzGlobal: {
+          name: `hfz-global`,
+          test: /[\\/]hfz-global[\\/]/,
+          priority: 0,
+          chunks: "all",
+        },
+        vue: {
+          name: `vue`,
+          test: /[\\/]vue[\\/]/,
+          priority: 0,
+          chunks: "all",
+        },
+        iframeResizer: {
+          name: "iframe-resizer",
+          test: /[\\/]iframe-resizer[\\/]/,
+          priority: 0,
+          chunks: "all",
+        },
       },
     },
+    chunkIds: "named",
     ...(isProd
       ? {
           minimize: true,
           minimizer: [
             new TerserPlugin({
+              exclude: /hfz\-global/,
               extractComments: false,
               terserOptions: {
                 format: {
