@@ -69,19 +69,8 @@ export default {
   optimization: {
     concatenateModules: true,
     splitChunks: {
+      minSize: 0,
       cacheGroups: {
-        vendors: {
-          name: `vendors`,
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10,
-          chunks: "initial",
-        },
-        hfzGlobal: {
-          name: `hfz-global`,
-          test: /[\\/]hfz-global[\\/]/,
-          priority: 0,
-          chunks: "all",
-        },
         vue: {
           name: `vue`,
           test: /[\\/]vue[\\/]/,
@@ -91,6 +80,12 @@ export default {
         iframeResizer: {
           name: "iframe-resizer",
           test: /[\\/]iframe-resizer[\\/]/,
+          priority: 0,
+          chunks: "all",
+        },
+        hfzGlobal: {
+          name: `hfz-global`,
+          test: /[\\/]hfz-global[\\/]/,
           priority: 0,
           chunks: "all",
         },
