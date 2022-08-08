@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.9.2",
+  "version": "1.9.5",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -67,7 +67,7 @@
     "unist-util-visit": "^4.1.0",
     "update-notifier": "^5.1.0",
     "vue": "^3.2.37",
-    "webpack": "^5.73.0"
+    "webpack": "^5.74.0"
   },
   "devDependencies": {
     "@hyper-function/hfz-global": "^1.1.2",
