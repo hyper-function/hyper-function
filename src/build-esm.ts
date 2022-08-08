@@ -24,6 +24,8 @@ export class EsmBuilder extends EventEmitter {
       [
         `import "../hfc.css";`,
         `import HFC from "./hfc.js";`,
+        `HFC.name = "${this.hfcConfig.hfcName}";`,
+        `HFC.v = "${this.hfcConfig.version}";`,
         `export default HFC;`,
         ``,
       ].join("\n")
