@@ -6,34 +6,28 @@ import TerserPlugin from "terser-webpack-plugin";
 import { createRequire } from "module";
 
 import { HfcConfig } from "./options.js";
-import {
-  UniqueModuleIdsPlugin,
-  UniqueChunkIdsPlugin,
-} from "./unique-ids-plugin.js";
 
 const require = createRequire(import.meta.url);
 export class WfmBuilder extends EventEmitter {
   compiler: webpack.Compiler;
-  wfmPath: string;
+  wfmContextPath: string;
   constructor(private hfcConfig: HfcConfig) {
     super();
 
-    const wfmEntry = path.join(hfcConfig.context, ".hfc", `wfm-entry.js`);
+    const wfmEntry = path.join(hfcConfig.pkgOutputPath, "esm", "index.js");
+    const emptyEntry = path.join(hfcConfig.context, ".hfc", "empty.js");
 
-    fs.writeFileSync(
-      wfmEntry,
-      [
-        `import HFC from "./${path.join(
-          hfcConfig.command,
-          "pkg",
-          "esm",
-          "index.js"
-        )}";`,
-        `export default HFC;\n`,
-      ].join("\n")
-    );
+    fs.writeFileSync(emptyEntry, "");
 
-    this.wfmPath = path.resolve(this.hfcConfig.pkgOutputPath, "wfm");
+    this.wfmContextPath = path.resolve(this.hfcConfig.pkgOutputPath, "wfm");
+
+    const shared: Record<string, any> = {};
+    Object.keys(this.hfcConfig.dependencies).forEach((key) => {
+      shared[key] = {
+        requiredVersion: this.hfcConfig.dependencies[key],
+        singleton: true,
+      };
+    });
 
     const plugins = [
       new webpack.container.ModuleFederationPlugin({
@@ -43,7 +37,7 @@ export class WfmBuilder extends EventEmitter {
           name: `$HFC_WFM_CONTAINERS["@hyper.fun/${this.hfcConfig.hfcName}"]`,
           type: "assign",
         },
-        shared: this.hfcConfig.dependencies,
+        shared,
         exposes: {
           "./hfc": wfmEntry,
         },
@@ -58,32 +52,25 @@ export class WfmBuilder extends EventEmitter {
     ];
 
     if (this.hfcConfig.command === "build") {
-      plugins.push(new UniqueModuleIdsPlugin());
-      plugins.push(new UniqueChunkIdsPlugin());
     }
 
     this.compiler = webpack({
-      context: this.wfmPath,
+      context: this.wfmContextPath,
       mode: this.hfcConfig.command === "serve" ? "development" : "production",
-      entry: wfmEntry,
+      entry: emptyEntry,
       devtool: false,
       output: {
-        path: this.wfmPath,
-        filename: "__hfc.js",
-        chunkFilename:
-          this.hfcConfig.command === "serve" ? undefined : "[chunkhash].js",
+        path: this.wfmContextPath,
+        filename: "empty.js",
+        chunkFilename: "[id].js",
+        chunkLoadingGlobal: `$HCK-${this.hfcConfig.hfcName}-${this.hfcConfig.version}`,
       },
       optimization: {
         concatenateModules: true,
         usedExports: true,
         ...(this.hfcConfig.command === "serve"
-          ? {
-              moduleIds: "named",
-              chunkIds: "named",
-            }
+          ? {}
           : {
-              moduleIds: false,
-              chunkIds: false,
               minimize: true,
               minimizer: [
                 new TerserPlugin({
@@ -122,7 +109,7 @@ export class WfmBuilder extends EventEmitter {
     });
   }
   build() {
-    const invalidHfcJsPath = path.join(this.wfmPath, "__hfc.js");
+    const emptyOutputJsPath = path.join(this.wfmContextPath, "empty.js");
 
     if (this.hfcConfig.command === "build") {
       this.compiler.run((err, stats) => {
@@ -135,7 +122,7 @@ export class WfmBuilder extends EventEmitter {
           console.error(stats.compilation.errors);
         }
 
-        fs.rm(invalidHfcJsPath);
+        fs.rm(emptyOutputJsPath);
 
         this.emit("build-complete", stats);
       });
