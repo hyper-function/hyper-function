@@ -63,7 +63,9 @@ export default async (
             const codeElement = node.children[0];
             const { className } = codeElement.properties;
             if (
-              ["language-html", "language-hfz"].includes(className[0]) &&
+              ["language-hfz", "language-html", "language-vue"].includes(
+                className[0]
+              ) &&
               codeElement.data?.meta.includes("render")
             ) {
               const code = codeElement.children[0].value;
