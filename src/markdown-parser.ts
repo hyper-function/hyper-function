@@ -11,7 +11,6 @@ import sanitize, { defaultSchema } from "rehype-sanitize";
 import deepmerge from "deepmerge";
 import path from "path";
 import crypto from "crypto";
-import b64url from "base64url";
 import { Stats } from "fs";
 import kvCache from "./kv-cache.js";
 
@@ -138,9 +137,10 @@ export default async (
 
             const imgBuf = await fs.readFile(imgPath);
 
-            const imgId = b64url.encode(
-              crypto.createHash("md5").update(imgBuf).digest()
-            );
+            const imgId = crypto
+              .createHash("md5")
+              .update(imgBuf)
+              .digest("base64url");
 
             const distImgName = imgId + imgExt;
             const distImgPath = path.join(imgDir, distImgName);
