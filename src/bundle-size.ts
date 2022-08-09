@@ -10,8 +10,10 @@ export default async function (outputPath: string) {
 
   const [js, css] = await Promise.all([miniJs(contentJs), miniCss(contentCss)]);
 
-  const sizeJs = brotliCompressSync(Buffer.from(js || "")).byteLength;
-  const sizeCss = brotliCompressSync(Buffer.from(css)).byteLength;
+  const sizeJs =
+    js === "" ? 0 : brotliCompressSync(Buffer.from(js || "")).byteLength;
+  const sizeCss =
+    css === "" ? 0 : brotliCompressSync(Buffer.from(css)).byteLength;
 
   return { sizeJs, sizeCss };
 }

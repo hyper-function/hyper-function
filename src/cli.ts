@@ -173,6 +173,7 @@ async function askForHfcName(context: string) {
   const hfcObject = pkgJson.hfc || {};
   hfcObject.name = name;
   pkgJson.hfc = hfcObject;
+  pkgJson.name = "@hyper.fun/" + name;
   fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
 
   const docPath = path.join(context, "hfc.md");
