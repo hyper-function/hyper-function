@@ -61,7 +61,7 @@ export default {
   devtool: false,
   resolve: {
     alias: {
-      vue: "vue/dist/vue.esm-browser.prod.js",
+      vue: "vue/dist/vue.esm-bundler.js",
     },
     extensions: ["...", ".ts", ".vue"],
   },

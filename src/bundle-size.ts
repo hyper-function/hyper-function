@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
+import { brotliCompressSync } from "zlib";
 
 export default async function (outputPath: string) {
   const [contentJs, contentCss] = await Promise.all([
@@ -9,8 +10,8 @@ export default async function (outputPath: string) {
 
   const [js, css] = await Promise.all([miniJs(contentJs), miniCss(contentCss)]);
 
-  const sizeJs = Buffer.from(js || "").byteLength;
-  const sizeCss = Buffer.from(css).byteLength;
+  const sizeJs = brotliCompressSync(Buffer.from(js || "")).byteLength;
+  const sizeCss = brotliCompressSync(Buffer.from(css)).byteLength;
 
   return { sizeJs, sizeCss };
 }
@@ -26,21 +27,11 @@ export async function miniJs(content: string) {
 }
 
 export async function miniCss(content: string) {
-  const [postcss, cssnano, litePreset] = await Promise.all([
-    import("postcss"),
-    import("cssnano"),
-    import("cssnano-preset-lite"),
-  ]);
+  const { default: CleanCss } = await import("clean-css");
 
-  const preset = litePreset.default({
-    discardComments: { removeAll: true },
-  });
-
-  const { css } = await postcss
-    .default([cssnano.default({ preset })])
-    .process(content, {
-      from: undefined,
-    });
+  const css = new CleanCss({
+    level: { 1: { specialComments: undefined } },
+  }).minify(content).styles;
 
   return css;
 }

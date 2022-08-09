@@ -62,7 +62,9 @@ export class WfmBuilder extends EventEmitter {
       output: {
         path: this.wfmContextPath,
         filename: "empty.js",
-        chunkFilename: "[id].js",
+        chunkFilename: (pathData) => {
+          return "[id].js";
+        },
         chunkLoadingGlobal: `$HCK-${this.hfcConfig.hfcName}-${this.hfcConfig.version}`,
       },
       optimization: {
