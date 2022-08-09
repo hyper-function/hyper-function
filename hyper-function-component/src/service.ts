@@ -115,6 +115,9 @@ export class Service extends EventEmitter {
         output: {
           path: this.hfcConfig.pkgOutputPath,
           filename: `esm/hfc.js`,
+          hashDigest: "base64url",
+          hashDigestLength: 13,
+          hashFunction: "xxhash64",
           library: {
             type: "module",
           },
@@ -136,7 +139,7 @@ export class Service extends EventEmitter {
             asset: {
               outputPath: "assets",
               publicPath: "##HFC_ASSETS_MARK##",
-              filename: "[hash:12][ext]",
+              filename: "[contenthash][ext]",
             },
           },
           rules: [

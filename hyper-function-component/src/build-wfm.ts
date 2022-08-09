@@ -62,6 +62,9 @@ export class WfmBuilder extends EventEmitter {
       output: {
         path: this.wfmContextPath,
         filename: "empty.js",
+        hashDigest: "base64url",
+        hashDigestLength: 13,
+        hashFunction: "xxhash64",
         chunkFilename: (pathData) => {
           return "[id].js";
         },
@@ -90,7 +93,7 @@ export class WfmBuilder extends EventEmitter {
         generator: {
           asset: {
             emit: false,
-            filename: "../assets/[hash:12][ext]",
+            filename: "../assets/[contenthash][ext]",
           },
         },
         rules: [
