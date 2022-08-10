@@ -124,6 +124,7 @@ body {
 }
 
 .markdown-body pre {
+  font-size: 1em !important;
   background-color: #f6f8fa !important;
 }
 
@@ -257,6 +258,7 @@ body {
 .hfz-preview-actions {
   display: flex;
   justify-content: center;
+  gap: 6px;
   margin: 6px 0;
   visibility: hidden;
 }
@@ -267,7 +269,7 @@ body {
 
 .hfz-preview-actions > button {
   display: flex;
-  align-items: center;
+  align-items: inherit;
   height: 22px;
   line-height: 22px;
   font-size: 14px;
@@ -277,14 +279,16 @@ body {
   outline: none;
   cursor: pointer;
   color: #8e8e93;
-  fill: #8e8e93;
 }
 
 .hfz-preview-actions > button:hover {
   color: rgb(0, 172, 91);
-  fill: rgb(0, 172, 91);
 }
 
 .hfz-preview-actions > button svg {
   margin-right: 4px;
+}
+
+.hfz-code-preview-editor {
+  margin-bottom: 12px;
 }

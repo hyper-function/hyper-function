@@ -33,6 +33,7 @@ import { inject, watch, ref } from "vue";
 import { iframeResize } from "iframe-resizer";
 import Sidebar from "../components/Sidebar.vue";
 import PropTypes from "../components/PropTypes.vue";
+import { debounce } from "../utils";
 
 const meta = inject<any>("meta")!;
 const docHtml = inject<any>("docHtml")!;
@@ -40,6 +41,21 @@ const docContainer = ref<HTMLDivElement | null>(null);
 const activeTab = ref("Readme");
 
 watch(() => docHtml, renderHfcDoc, { deep: true });
+function showEditor(
+  container: HTMLDivElement,
+  code: string,
+  onChange: Function
+) {
+  const parent = document.createElement("div");
+  parent.className = "hfz-code-preview-editor";
+  container.appendChild(parent);
+
+  import("../components/CodeMirror").then(({ render }) => {
+    render(parent, code, onChange);
+  });
+
+  return parent;
+}
 
 function renderHfcDoc() {
   document.title = meta.value.name;
@@ -87,7 +103,7 @@ function renderHfcPreview() {
   containers.forEach((container) => {
     const id = container.dataset.hfzId;
 
-    let code = container.dataset.hfz;
+    let code = decodeURIComponent(container.dataset.hfz!);
     container.setAttribute("data-hfz", "");
     container.classList.add("hfz-preview");
 
@@ -115,7 +131,16 @@ function renderHfcPreview() {
         sizeHeight: false,
         checkOrigin: false,
         heightCalculationMethod: "grow",
-        onInit() {},
+        onInit() {
+          (sandbox as any).iFrameResizer.sendMessage({
+            action: "render",
+            data: {
+              code: code,
+              name: meta.value.name,
+              version: meta.value.version,
+            },
+          });
+        },
         onResized(res: any) {
           if (res.height <= 16) return;
           sandbox.style.height = res.height + "px";
@@ -130,7 +155,7 @@ function renderHfcPreview() {
     const openBtn = document.createElement("button");
     openBtn.title = "Open in new tab";
     openBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="18px" viewBox="0 0 24 24">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="currentColor">
         <path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h5c.55 0 1-.45 1-1s-.45-1-1-1H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1v5c0 .55-.45 1-1 1zM14 4c0 .55.45 1 1 1h2.59l-9.13 9.13c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L19 6.41V9c0 .55.45 1 1 1s1-.45 1-1V4c0-.55-.45-1-1-1h-5c-.55 0-1 .45-1 1z"/>
       </svg>
       <span>OPEN</span>
@@ -139,10 +164,44 @@ function renderHfcPreview() {
       window.open("/render/" + id, "_blank");
     });
 
+    const editBtn = document.createElement("button");
+    editBtn.title = "Edit code";
+    editBtn.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"  fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+        <polyline points="7 8 3 12 7 16" />
+        <polyline points="17 8 21 12 17 16" />
+        <line x1="14" y1="4" x2="10" y2="20" />
+      </svg>
+      <span>EDIT</span>
+    `;
+
+    let editorContainer: HTMLDivElement | null = null;
+    editBtn.addEventListener("click", () => {
+      if (editorContainer) {
+        container.removeChild(editorContainer);
+        editorContainer = null;
+        return;
+      }
+
+      editorContainer = showEditor(
+        container,
+        code!,
+        debounce((newCode: string) => {
+          if (newCode === code) {
+            return;
+          }
+
+          code = newCode;
+          (sandbox as any).iFrameResizer.sendMessage({ action: "reload" });
+        }, 250)
+      );
+    });
+
     const reloadBtn = document.createElement("button");
     reloadBtn.title = "Reload";
     reloadBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="20px" viewBox="0 0 24 24">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24" fill="currentColor">
         <path d="M0 0h24v24H0V0z" fill="none"/><path d="M17.65 6.35c-1.63-1.63-3.94-2.57-6.48-2.31-3.67.37-6.69 3.35-7.1 7.02C3.52 15.91 7.27 20 12 20c3.19 0 5.93-1.87 7.21-4.56.32-.67-.16-1.44-.9-1.44-.37 0-.72.2-.88.53-1.13 2.43-3.84 3.97-6.8 3.31-2.22-.49-4.01-2.3-4.48-4.52C5.31 9.44 8.26 6 12 6c1.66 0 3.14.69 4.22 1.78l-1.51 1.51c-.63.63-.19 1.71.7 1.71H19c.55 0 1-.45 1-1V6.41c0-.89-1.08-1.34-1.71-.71l-.64.65z"/>
       </svg>
       <span>RELOAD</span>
@@ -152,6 +211,7 @@ function renderHfcPreview() {
     });
 
     actions.appendChild(openBtn);
+    actions.appendChild(editBtn);
     actions.appendChild(reloadBtn);
 
     container.appendChild(actions);
