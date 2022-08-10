@@ -68,7 +68,7 @@ export class WfmBuilder extends EventEmitter {
         chunkFilename: (pathData) => {
           return "[id].js";
         },
-        chunkLoadingGlobal: `$HCK-${this.hfcConfig.hfcName}-${this.hfcConfig.version}`,
+        chunkLoadingGlobal: "$HFC_CHUNKS",
       },
       optimization: {
         concatenateModules: true,

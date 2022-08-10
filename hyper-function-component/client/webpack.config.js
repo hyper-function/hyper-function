@@ -7,6 +7,7 @@ import { VueLoaderPlugin } from "vue-loader";
 import TerserPlugin from "terser-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
 
 const __dirname = dirname(import.meta.url);
 const require = createRequire(import.meta.url);
@@ -61,7 +62,7 @@ export default {
   devtool: false,
   resolve: {
     alias: {
-      vue: "vue/dist/vue.esm-bundler.js",
+      vue: "vue/dist/vue.esm-browser.prod.js",
     },
     extensions: ["...", ".ts", ".vue"],
   },
@@ -70,9 +71,10 @@ export default {
     concatenateModules: true,
     splitChunks: {
       minSize: 0,
+      chunks: "all",
       cacheGroups: {
         vue: {
-          name: `vue`,
+          name: "vue",
           test: /[\\/]vue[\\/]/,
           priority: 0,
           chunks: "all",
@@ -103,6 +105,16 @@ export default {
                 format: {
                   comments: false,
                 },
+              },
+            }),
+            new CssMinimizerPlugin({
+              minimizerOptions: {
+                preset: [
+                  "default",
+                  {
+                    discardComments: { removeAll: true },
+                  },
+                ],
               },
             }),
           ],
