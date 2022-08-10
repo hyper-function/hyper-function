@@ -78,8 +78,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from "@vue/reactivity";
-import { inject, ref } from "vue";
+import { inject, computed, ref } from "vue";
 
 const meta = inject<any>("meta");
 const deps = computed(() => {

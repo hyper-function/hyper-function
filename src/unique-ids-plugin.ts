@@ -11,7 +11,7 @@ import {
   getFullModuleName,
   // @ts-ignore
 } from "webpack/lib/ids/IdHelpers.js";
-import { ulid } from "ulidx";
+// import { ulid } from "ulidx";
 
 export class UniqueModuleIdsPlugin {
   constructor() {}
@@ -29,7 +29,7 @@ export class UniqueModuleIdsPlugin {
         for (const module of modulesInNaturalOrder) {
           // const ident = getFullModuleName(module, context, compiler.root);
 
-          const moduleId = "M" + ulid();
+          const moduleId = "M"; // + ulid();
           chunkGraph.setModuleId(module, moduleId);
           usedIds.add(moduleId);
         }
@@ -51,7 +51,7 @@ export class UniqueChunkIdsPlugin {
         const compareNatural = compareChunksNatural(chunkGraph);
         const chunksInNaturalOrder = Array.from(chunks).sort(compareNatural);
         for (const chunk of chunksInNaturalOrder) {
-          const id = "C" + ulid();
+          const id = "C"; // + ulid();
           chunk.id = id;
           chunk.ids = [id];
         }

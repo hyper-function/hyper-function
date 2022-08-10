@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.10.2",
+  "version": "1.10.4",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -59,7 +59,6 @@
     "terser-webpack-plugin": "^5.3.1",
     "typescript": "^4.7.4",
     "typescript-json-schema": "^0.54",
-    "ulidx": "^0.3.0",
     "unified": "^10.1.2",
     "unist-util-visit": "^4.1.0",
     "update-notifier": "^5.1.0",
@@ -67,6 +66,7 @@
   },
   "devDependencies": {
     "@codemirror/lang-html": "^6.1.0",
+    "@codemirror/language": "^6.2.1",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.0",
     "@hyper-function/hfz-global": "^1.1.8",
@@ -85,6 +85,7 @@
     "codemirror": "^6.0.1",
     "concurrently": "^7.2.2",
     "copy-webpack-plugin": "^11.0.0",
+    "css-minimizer-webpack-plugin": "^4.0.0",
     "github-markdown-css": "^5.1.0",
     "html-webpack-plugin": "^5.5.0",
     "iframe-resizer": "^4.3.2",
