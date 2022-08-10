@@ -16,17 +16,6 @@ const hfzGlobal = require("@hyper-function/hfz-global");
 };
 
 const id = location.pathname.split("/").pop();
-fetch("/hfz/template?id=" + id)
-  .then((res) => res.json())
-  .then((res) => {
-    if (!res.code) {
-      document.write("404 not found");
-      return;
-    }
-
-    renderCode(res);
-  });
-
 function renderCode({
   code,
   name,
@@ -48,6 +37,17 @@ function renderCode({
 }
 
 if (self === top) {
+  fetch("/hfz/template?id=" + id)
+    .then((res) => res.json())
+    .then((res) => {
+      if (!res.code) {
+        document.write("404 not found");
+        return;
+      }
+
+      renderCode(res);
+    });
+
   listenBuildEvents((data) => {
     if (data.action === "update-hfc-markdown") {
       location.reload();
@@ -57,4 +57,16 @@ if (self === top) {
       location.reload();
     }
   });
+} else {
+  (window as any).iFrameResizer = {
+    onMessage(msg: any) {
+      if (msg.action === "render") {
+        renderCode(msg.data);
+      }
+
+      if (msg.action === "reload") {
+        location.reload();
+      }
+    },
+  };
 }
