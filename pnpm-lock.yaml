@@ -5,7 +5,7 @@ specifiers:
   '@codemirror/language': ^6.2.1
   '@codemirror/state': ^6.1.1
   '@codemirror/view': ^6.2.0
-  '@hyper-function/hfz-global': ^1.1.8
+  '@hyper-function/hfz-global': ^1.1.10
   '@lezer/highlight': ^1.0.0
   '@types/clean-css': ^4.2.5
   '@types/cors': ^2.8.12
@@ -118,7 +118,7 @@ devDependencies:
   '@codemirror/language': 6.2.1
   '@codemirror/state': 6.1.1
   '@codemirror/view': 6.2.0
-  '@hyper-function/hfz-global': 1.1.8
+  '@hyper-function/hfz-global': 1.1.10
   '@lezer/highlight': 1.0.0
   '@types/clean-css': 4.2.5
   '@types/cors': 2.8.12
@@ -574,8 +574,8 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
-  /@hyper-function/hfz-global/1.1.8:
-    resolution: {integrity: sha512-cBqrysIA+C41gjcpYrylllljMNf/9m9kiIHfjg1z43tGbC3/sM0DMu5KZCBf6YzFkyS9eDUJi0RelLHyAzLviQ==}
+  /@hyper-function/hfz-global/1.1.10:
+    resolution: {integrity: sha512-9drDR3ucxxfdpSGiVhODCjQscuR/0hkOBEkCJaCuGKvhVmcooRq81vDbuRo7CTX4idy15oCe9FDcfUgRDKfU/Q==}
     dev: true
 
   /@istanbuljs/load-nyc-config/1.1.0:

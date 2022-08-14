@@ -1,6 +1,6 @@
 {
   "name": "@hyper-function/cli-service",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -69,7 +69,7 @@
     "@codemirror/language": "^6.2.1",
     "@codemirror/state": "^6.1.1",
     "@codemirror/view": "^6.2.0",
-    "@hyper-function/hfz-global": "^1.1.8",
+    "@hyper-function/hfz-global": "^1.1.10",
     "@lezer/highlight": "^1.0.0",
     "@types/clean-css": "^4.2.5",
     "@types/cors": "^2.8.12",
