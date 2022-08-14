@@ -21,7 +21,7 @@
     "vue-to-hfc": "^1.2.0"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.10.4",
+    "@hyper-function/cli-service": "^1.10.5",
     "@types/hyper-function-component": "^2.0.0",
     "hfc-plugin-vue": "^1.0.2",
     "hfc-prop-names": "^1.0.3"
