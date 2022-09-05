@@ -1,11 +1,10 @@
-import http from "http";
 import cors from "cors";
 import path from "path";
 import fs from "fs-extra";
+import sirv from "sirv";
+import polka from "polka";
 import { dirname } from "desm";
-import express, { Response } from "express";
 // @ts-ignore
-import fallback from "express-history-api-fallback";
 import portfinder from "portfinder";
 import prettyBytes from "pretty-bytes";
 
@@ -16,17 +15,22 @@ import bundleSize from "./bundle-size.js";
 const __dirname = dirname(import.meta.url);
 
 export class DevServer {
-  server: http.Server | null = null;
+  app: polka.Polka;
   eventMessageId = Date.now();
   eventMessages: { id: number; data: any }[] = [];
-  eventResponses: Response[] = [];
+  eventResponses: any[] = [];
   constructor(private hfcConfig: HfcConfig) {
-    const app = express();
-    app.use(cors());
+    this.app = polka();
+    this.app.use(cors());
+    this.app.use((req, res: any, next) => {
+      res.json = (d: any) => {
+        res.setHeader("content-type", "application/json");
+        res.end(JSON.stringify(d));
+      };
+      next();
+    });
 
-    this.server = http.createServer(app);
-
-    app.get("/events", (req, res) => {
+    this.app.get("/api/events", (req, res) => {
       const msgId = parseInt(req.query.id + "");
 
       if (msgId) {
@@ -50,7 +54,7 @@ export class DevServer {
       });
     });
 
-    app.get("/meta", async (req, res) => {
+    this.app.get("/api/meta", async (req, res) => {
       res.json({
         name: this.hfcConfig.hfcName,
         version: this.hfcConfig.version,
@@ -59,7 +63,7 @@ export class DevServer {
       });
     });
 
-    app.get("/size", async (req, res) => {
+    this.app.get("/api/size", async (req, res) => {
       const { sizeJs, sizeCss } = await bundleSize(
         this.hfcConfig.pkgOutputPath
       );
@@ -70,11 +74,7 @@ export class DevServer {
       });
     });
 
-    const wfmServePath = `/@hyper.fun/${this.hfcConfig.hfcName}@${this.hfcConfig.version}`;
-    app.use(wfmServePath, express.static(this.hfcConfig.pkgOutputPath));
-    app.use("/doc", express.static(this.hfcConfig.docOutputPath));
-
-    app.get("/hfz/template", (req, res) => {
+    this.app.get("/api/hfz/template", (req, res) => {
       const { id } = req.query;
       const code = kvCache.get("HFZ_TEMPLATE_" + id);
 
@@ -85,6 +85,27 @@ export class DevServer {
       });
     });
 
+    const wfmStatic = sirv(this.hfcConfig.pkgOutputPath, {
+      dev: true,
+      etag: true,
+    });
+
+    const pathPrefix = `/@hyper.fun/${this.hfcConfig.hfcName}@${this.hfcConfig.version}`;
+    const wfmServePath = pathPrefix + "/*";
+    this.app.get(wfmServePath, (req, res) => {
+      const pathname = (req as any)._parsedUrl.pathname;
+      (req as any)._parsedUrl.pathname = pathname.replace(pathPrefix, "");
+      wfmStatic(req, res);
+    });
+
+    this.app.use(
+      "/doc",
+      sirv(this.hfcConfig.docOutputPath, {
+        dev: true,
+        etag: true,
+      })
+    );
+
     const clientPath = path.join(__dirname, "client");
 
     const renderHtml = fs.readFileSync(
@@ -92,13 +113,12 @@ export class DevServer {
       "utf8"
     );
 
-    app.use("/render/*", (req, res) => {
+    this.app.get("/render/*", (req, res) => {
       res.setHeader("Content-Type", "text/html");
-      res.send(renderHtml);
+      res.end(renderHtml);
     });
 
-    app.use(express.static(clientPath));
-    app.use(fallback("index.html", { root: clientPath }));
+    this.app.use(sirv(clientPath, { dev: true, etag: true }));
   }
   sendMessage(msg: any) {
     const id = this.eventMessageId++;
@@ -118,7 +138,7 @@ export class DevServer {
       port: this.hfcConfig.port,
     });
 
-    this.server!.listen(port, () => {
+    this.app.listen(port, () => {
       console.log();
       console.log("Preview server running at: http://localhost:" + port);
     });

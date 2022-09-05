@@ -93,7 +93,7 @@ export default {
         },
       },
     },
-    chunkIds: "named",
+    // chunkIds: "named",
     ...(isProd
       ? {
           minimize: true,

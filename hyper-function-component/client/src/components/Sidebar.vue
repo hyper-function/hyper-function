@@ -98,7 +98,7 @@ function getSize() {
   loadingSize.value = true;
   sizeJs.value = "--";
   sizeCss.value = "--";
-  fetch(`/size`)
+  fetch(`/api/size`)
     .then((res) => res.json())
     .then((res) => {
       loadingSize.value = false;

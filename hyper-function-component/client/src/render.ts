@@ -2,7 +2,7 @@ import * as Vue from "vue";
 import "iframe-resizer/js/iframeResizer.contentWindow.min.js";
 import { listenBuildEvents } from "./build-event-listener";
 
-const hfzGlobal = require("@hyper-function/hfz-global");
+require("@hyper-function/hfz-global");
 
 (<any>window).$HFC_NPM_CDN_URL = "https://unpkg.com";
 (<any>window).Vue = Vue;
@@ -32,12 +32,10 @@ function renderCode({
 
   const container = document.getElementById("app")!;
   container.innerHTML = code;
-
-  hfzGlobal.run();
 }
 
 if (self === top) {
-  fetch("/hfz/template?id=" + id)
+  fetch("/api/hfz/template?id=" + id)
     .then((res) => res.json())
     .then((res) => {
       if (!res.code) {

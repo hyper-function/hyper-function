@@ -1,5 +1,6 @@
+import type { Element } from "hast";
 import fs from "fs/promises";
-import { unified } from "unified";
+import { unified, Plugin } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
@@ -10,9 +11,12 @@ import { visit } from "unist-util-visit";
 import sanitize, { defaultSchema } from "rehype-sanitize";
 import deepmerge from "deepmerge";
 import path from "path";
-import crypto from "crypto";
 import { Stats } from "fs";
 import kvCache from "./kv-cache.js";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const xxhash = require("webpack/lib/util/hash/xxhash64");
 
 const sanitizeSchema: any = deepmerge(defaultSchema, {
   attributes: {
@@ -40,8 +44,7 @@ export default async (
     hash: "filename" | "content";
   }
 ) => {
-  options.hash = options.hash || "content";
-  const imgDir = path.resolve(options?.outputPath!, "imgs");
+  const imgDir = path.resolve(options.outputPath!, "imgs");
 
   try {
     await fs.stat(imgDir);
@@ -55,37 +58,44 @@ export default async (
     .use(emoji)
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(() => {
-      let hfzId = 0;
-      return async (tree) => {
-        visit(tree, (node: any) => {
+      let hfzId = 1;
+      return (tree: any) => {
+        visit(tree, (node) => {
           if (node.tagName === "pre") {
             const codeElement = node.children[0];
-            const { className } = codeElement.properties;
-            if (
-              ["language-hfz", "language-html", "language-vue"].includes(
-                className[0]
-              ) &&
-              codeElement.data?.meta.includes("render")
-            ) {
-              const code = codeElement.children[0].value;
+            if (!codeElement || codeElement.type !== "element") return;
 
-              node.tagName = "div";
-              node.properties.dataHfz = encodeURIComponent(code);
-              const id = hfzId++;
-              node.properties.dataHfzId = id;
+            const classNames = codeElement.properties?.className as string[];
+            const meta = codeElement.data?.meta as string;
 
-              kvCache.set("HFZ_TEMPLATE_" + id, code);
-              node.children = [];
+            if (classNames && meta) {
+              const className = classNames[0];
+              if (
+                ["language-hfz", "language-html", "language-vue"].includes(
+                  className
+                ) &&
+                meta.includes("render")
+              ) {
+                const code = (codeElement as any).children[0].value;
+
+                node.tagName = "div";
+                node.properties!.dataHfz = encodeURIComponent(code);
+                const id = hfzId++;
+                node.properties!.dataHfzId = id;
+
+                kvCache.set("HFZ_TEMPLATE_" + id, code);
+                node.children = [];
+              }
             }
           }
         });
       };
     })
-    .use(raw)
+    .use(raw as any)
     .use(() => {
-      return async (tree) => {
-        const imgs: any[] = [];
-        visit(tree, (node: any) => {
+      return async (tree: any) => {
+        const imgs: Element[] = [];
+        visit(tree, (node) => {
           if (node.tagName === "img") {
             imgs.push(node);
           }
@@ -93,61 +103,58 @@ export default async (
 
         await Promise.all(
           imgs.map(async (node) => {
-            const src: string = node.properties.src;
+            const src = node.properties!.src as string;
 
             const cached = imgCache[src];
             if (cached) {
-              delete node.properties.src;
-              node.properties.dataSrc = cached.distImgName;
+              delete node.properties!.src;
+              node.properties!.dataSrc = cached.distImgName;
               return;
             }
 
             if (src.startsWith("http")) {
-              node.properties.src = "";
-              node.properties.alt = "Not Support Remote Image";
+              node.properties!.src = "";
+              node.properties!.alt = "Not Support Remote Image";
               return;
             }
 
-            const imgPath = path.resolve(options?.basePath!, src);
+            const imgPath = path.resolve(options.basePath, src);
             let imgStat: Stats;
 
             try {
               imgStat = await fs.stat(imgPath);
             } catch (error) {
               delete imgCache[src];
-              node.properties.src = "";
-              node.properties.alt = "Image File Not Found";
+              node.properties!.src = "";
+              node.properties!.alt = "Image File Not Found";
               return;
             }
 
             const imgExt = path.extname(src);
             if (!supportImgExts.includes(imgExt)) {
-              node.properties.src = "";
-              node.properties.alt = `Not Support Image Type: ${imgExt}; support: ${supportImgExts.join(
+              node.properties!.src = "";
+              node.properties!.alt = `Not Support Image Type: ${imgExt}; support: ${supportImgExts.join(
                 ", "
               )}`;
               return;
             }
 
             if (imgStat.size > 1024 * 1024 * 2) {
-              node.properties.src = "";
-              node.properties.alt = "Image File Too Large, max 2M";
+              node.properties!.src = "";
+              node.properties!.alt = "Image File Too Large, max 2M";
               return;
             }
 
             const imgBuf = await fs.readFile(imgPath);
 
-            const imgId = crypto
-              .createHash("md5")
-              .update(imgBuf)
-              .digest("base64url");
+            const imgId = xxhash().update(imgBuf).digest("base64url");
 
             const distImgName = imgId + imgExt;
             const distImgPath = path.join(imgDir, distImgName);
             await fs.writeFile(distImgPath, imgBuf);
 
-            delete node.properties.src;
-            node.properties.dataSrc = distImgName;
+            delete node.properties!.src;
+            node.properties!.dataSrc = distImgName;
 
             imgCache[src] = {
               stat: imgStat,
