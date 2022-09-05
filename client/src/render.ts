@@ -35,7 +35,7 @@ function renderCode({
 }
 
 if (self === top) {
-  fetch("/hfz/template?id=" + id)
+  fetch("/api/hfz/template?id=" + id)
     .then((res) => res.json())
     .then((res) => {
       if (!res.code) {

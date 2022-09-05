@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, watch, ref } from "vue";
+import { inject, watch, ref, compile } from "vue";
 import { iframeResize } from "iframe-resizer";
 import Sidebar from "../components/Sidebar.vue";
 import PropTypes from "../components/PropTypes.vue";
@@ -37,24 +37,64 @@ import { debounce } from "../utils";
 
 const meta = inject<any>("meta")!;
 const docHtml = inject<any>("docHtml")!;
+const hfcRebuildInfo = inject<any>("hfcRebuildInfo");
 const docContainer = ref<HTMLDivElement | null>(null);
 const activeTab = ref("Readme");
 
-watch(() => docHtml, renderHfcDoc, { deep: true });
+watch(() => docHtml.value, renderHfcDoc);
+watch(() => hfcRebuildInfo.value, reloadHfcPreview);
+
 function showEditor(
   container: HTMLDivElement,
   code: string,
   onChange: Function
 ) {
-  const parent = document.createElement("div");
-  parent.className = "hfz-code-preview-editor";
-  container.appendChild(parent);
+  const editor = document.createElement("iframe");
+  editor.setAttribute(
+    "sandbox",
+    [
+      "allow-same-origin",
+      "allow-popups",
+      "allow-modals",
+      "allow-forms",
+      "allow-pointer-lock",
+      "allow-scripts",
+      "allow-top-navigation-by-user-activation",
+    ].join(" ")
+  );
 
-  import("../components/CodeMirror").then(({ render }) => {
-    render(parent, code, onChange);
-  });
+  editor.src = "https://code.hyper.fun/embed-editor";
+  container.appendChild(editor);
 
-  return parent;
+  iframeResize(
+    {
+      log: false,
+      sizeHeight: false,
+      checkOrigin: false,
+      heightCalculationMethod: "grow",
+      onInit() {
+        (editor as any).iFrameResizer.sendMessage({
+          action: "init",
+          data: {
+            code: code,
+          },
+        });
+      },
+      onResized(res: any) {
+        if (res.height <= 16) return;
+        editor.style.height = res.height + "px";
+      },
+      onMessage(res: any) {
+        if (res.message.action === "editorReady") {
+        }
+
+        if (res.message.action === "change") {
+          onChange(res.message.code);
+        }
+      },
+    },
+    editor
+  );
 }
 
 function renderHfcDoc() {
@@ -91,6 +131,12 @@ function renderCodeBlock() {
 }
 
 let sandboxes: HTMLIFrameElement[] = [];
+function reloadHfcPreview() {
+  sandboxes.forEach((sandbox) => {
+    (sandbox as any).iFrameResizer.sendMessage({ action: "reload" });
+  });
+}
+
 function renderHfcPreview() {
   if (sandboxes.length) {
     sandboxes.forEach((sandbox) => {
@@ -184,8 +230,11 @@ function renderHfcPreview() {
         return;
       }
 
-      editorContainer = showEditor(
-        container,
+      editorContainer = document.createElement("div");
+      editorContainer.className = "hfz-code-preview-editor";
+      container.appendChild(editorContainer);
+      showEditor(
+        editorContainer,
         code!,
         debounce((newCode: string) => {
           if (newCode === code) {
@@ -206,8 +255,9 @@ function renderHfcPreview() {
       </svg>
       <span>RELOAD</span>
     `;
+
     reloadBtn.addEventListener("click", () => {
-      (<any>sandbox).iFrameResizer.sendMessage({ action: "reload" });
+      (sandbox as any).iFrameResizer.sendMessage({ action: "reload" });
     });
 
     actions.appendChild(openBtn);

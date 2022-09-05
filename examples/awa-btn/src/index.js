@@ -5,8 +5,6 @@ import logo from "./jser-logo.png";
 import props from "hfc-prop-names";
 import svg from "./heart.svg";
 
-console.log(deep);
-
 export default class HFC {
   static tag = "div";
   static props = props;
