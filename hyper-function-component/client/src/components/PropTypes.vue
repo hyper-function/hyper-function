@@ -15,9 +15,9 @@
           :style="{ cursor: item.isObject ? 'pointer' : '' }"
           @click="renderSubType(attrs, item, index)"
         >
-          <span :style="{ paddingLeft: item.level + 'em' }">{{
-            item.name
-          }}</span>
+          <span :style="{ paddingLeft: item.level + 'em' }">
+            {{ item.name }}
+          </span>
         </td>
         <td>{{ item.desc }}</td>
         <td
@@ -46,9 +46,9 @@
           :style="{ cursor: item.isObject ? 'pointer' : '' }"
           @click="renderSubType(events, item, index)"
         >
-          <span :style="{ paddingLeft: item.level + 'em' }">{{
-            item.name
-          }}</span>
+          <span :style="{ paddingLeft: item.level + 'em' }">
+            {{ item.name }}
+          </span>
         </td>
         <td>{{ item.desc }}</td>
         <td
@@ -75,9 +75,9 @@
           :style="{ cursor: item.isObject ? 'pointer' : '' }"
           @click="renderSubType(slots, item, index)"
         >
-          <span :style="{ paddingLeft: item.level + 'em' }">{{
-            item.name
-          }}</span>
+          <span :style="{ paddingLeft: item.level + 'em' }">
+            {{ item.name }}
+          </span>
         </td>
         <td>{{ item.desc }}</td>
         <td
@@ -115,31 +115,38 @@ watch(propTypes, () => {
   parsePropTypes();
 });
 
-async function parsePropTypes() {
-  const types = propTypes.value;
-  attrs.value = packTypes(types.attrs, 0, types.types);
+let TYPES: Record<string, any> = {};
 
-  events.value = Object.keys(types.events).map((name) => {
-    const event = types.events[name];
+async function parsePropTypes() {
+  TYPES = propTypes.value;
+  attrs.value = packTypes(TYPES.Attrs, 0);
+
+  events.value = Object.keys(TYPES.Events).map((name) => {
+    const event = TYPES.Events[name];
     return {
       name,
-      desc: types.desc.events[name] || "",
-      t: event,
-      type: `Function (${Object.keys(event).length})`,
-      types: types.types,
+      desc: event.c || "",
+      t: event.t,
+      type: `Function (${Object.keys(event.t).length})`,
       isObject: true,
       level: 0,
     };
   });
 
-  slots.value = Object.keys(types.slots).map((name) => {
-    const slot = types.slots[name];
+  slots.value = Object.keys(TYPES.Slots).map((name) => {
+    const slot = TYPES.Slots[name];
+    let t = slot.t;
+    let typeName = "Slot";
+    if (typeof t === "string") {
+      typeName = t;
+      t = TYPES[t];
+    }
+
     return {
       name,
-      desc: types.desc.slots[name] || "",
-      t: slot,
-      type: `Slot (${Object.keys(slot).length})`,
-      types: types.types,
+      desc: slot.c || "",
+      t,
+      type: `${typeName} (${Object.keys(t || {}).length})`,
       isObject: true,
       level: 0,
     };
@@ -150,17 +157,7 @@ function renderSubType(arr: RowItem[], item: RowItem, index: number) {
   if (!item.isObject) return;
   if (item.expanded) return;
 
-  let items: any[] = [];
-  if (
-    item.type!.startsWith("Object") ||
-    item.type!.startsWith("Function") ||
-    item.type!.startsWith("Slot")
-  ) {
-    items = packTypes(item.t, item.level! + 1, item.types);
-  } else {
-    const type = item.types[item.t!];
-    items = packTypes(type.t, item.level! + 1, item.types);
-  }
+  let items: any[] = packTypes(item.t, item.level! + 1);
 
   if (items.length) {
     arr.splice(index + 1, 0, ...items);
@@ -169,11 +166,13 @@ function renderSubType(arr: RowItem[], item: RowItem, index: number) {
   item.expanded = true;
 }
 
-function packTypes(obj: any, level: number, types: any) {
+function packTypes(obj: any, level: number) {
   return Object.keys(obj).map((name) => {
     const item = obj[name];
 
-    if (typeof item.t === "string") {
+    if (!item.t) {
+      item.type = "Unknow Type";
+    } else if (typeof item.t === "string") {
       if (item.t[0] === "#") {
         item.type =
           (
@@ -184,22 +183,25 @@ function packTypes(obj: any, level: number, types: any) {
               "#b": "Boolean",
               "#a": "Any",
             } as Record<string, string>
-          )[item.t] + (item.arr ? "[]" : "");
+          )[item.t] + (item.a ? "[]" : "");
       } else {
-        item.isObject = true;
-        const type = types[item.t];
-        item.type = `${item.t}${item.arr ? "[]" : ""} (${
-          Object.keys(type.t).length
-        })`;
+        const type = TYPES[item.t];
+        if (type) {
+          item.isObject = true;
+          item.type = `${item.t}${item.a ? "[]" : ""} (${
+            Object.keys(type).length
+          })`;
+          item.t = type;
+        } else {
+          item.type = "Unknow Type";
+        }
       }
     } else {
       item.isObject = true;
-      item.type = `Object${item.arr ? "[]" : ""} (${
-        Object.keys(item.t).length
-      })`;
+      item.type = `Object${item.a ? "[]" : ""} (${Object.keys(item.t).length})`;
     }
 
-    item.types = types;
+    item.desc = item.c || "";
     item.level = level || 0;
     item.name = name;
     return item;

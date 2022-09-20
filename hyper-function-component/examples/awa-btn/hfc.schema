@@ -1,0 +1,42 @@
+type Attrs {
+  # hihi
+  # hoho
+  name1: String[]
+  u1: User
+  us: EE
+  age: {
+    # hehe
+    a: String
+    b: Int
+  }
+  height: Float
+}
+
+type Events {
+  click: {
+    a: String
+  }
+}
+
+type Slots {
+  user: User
+  us: User[]
+  sr: {
+    a: {
+      r: {
+        e: {
+          a: String
+          # basefss
+          # haihih
+          o: {
+            b: String[]
+          }[]
+        }
+      }
+    }
+  }[]
+}
+
+type User {
+  name: String
+}

@@ -1,116 +1,181 @@
 import path from "path";
 import fs from "fs-extra";
-import webpack from "webpack";
+import colors from "picocolors";
 import EventEmitter from "events";
-// import TerserPlugin from "terser-webpack-plugin";
+import { InlineConfig, build } from "vite";
+import type {
+  RollupWatcher,
+  RollupOutput,
+  OutputChunk,
+  OutputAsset,
+  RollupError,
+} from "rollup";
 
-import { HfcConfig } from "./options.js";
+type HFC = ((a: string) => {
+  changed: () => void;
+  disconnected: () => void;
+}) & {
+  tag: string;
+  hfc: string;
+  ver: string;
+  names: [string[], string[], string[]];
+};
+
+const Ab: HFC = () => {
+  const changed = () => {};
+  const disconnected = () => {};
+
+  return { changed, disconnected };
+};
+
+Ab.tag = "div";
+Ab.hfc = "awa-btn";
+Ab.ver = "1.2.3";
+Ab.names = [[], [], []];
+
+import { ResolvedConfig } from "./config.js";
+
+const outputBuildError = (e: RollupError) => {
+  let msg = colors.red((e.plugin ? `[${e.plugin}] ` : "") + e.message);
+  if (e.id) {
+    msg += `\nfile: ${colors.cyan(
+      e.id + (e.loc ? `:${e.loc.line}:${e.loc.column}` : "")
+    )}`;
+  }
+  if (e.frame) {
+    msg += `\n` + colors.yellow(e.frame);
+  }
+  console.error(msg, { error: e });
+};
 
 export class EsmBuilder extends EventEmitter {
-  compiler: webpack.Compiler;
-  constructor(
-    private hfcConfig: HfcConfig,
-    private webpackConfig: webpack.Configuration
-  ) {
+  distHfcJsPath: string;
+  distHfcCssPath: string;
+  viteConfig: InlineConfig;
+  watcher?: RollupWatcher;
+  constructor(private config: ResolvedConfig) {
     super();
 
-    fs.ensureFileSync(path.join(this.hfcConfig.pkgOutputPath, "hfc.css"));
+    fs.ensureFileSync(path.join(config.pkgOutputPath, "hfc.css"));
 
-    const esmOutputPath = path.resolve(this.hfcConfig.pkgOutputPath, "esm");
-    fs.ensureDirSync(esmOutputPath);
+    this.distHfcJsPath = path.join(config.pkgOutputPath, "hfc.js");
+    this.distHfcCssPath = path.join(config.pkgOutputPath, "hfc.css");
 
     fs.writeFileSync(
-      path.join(esmOutputPath, "index.js"),
+      path.join(config.pkgOutputPath, "index.js"),
       [
-        `import "../hfc.css";`,
+        `import "./hfc.css";`,
         `import HFC from "./hfc.js";`,
-        `HFC._name = "${this.hfcConfig.hfcName}";`,
-        `HFC._v = "${this.hfcConfig.version}";`,
         `export default HFC;`,
         ``,
       ].join("\n")
     );
 
-    Object.assign(this.webpackConfig, {
-      externals: [
-        function ({ request }: { request: string }, callback: any) {
-          const firstChar = request[0];
-          if (firstChar === "." || firstChar === "/") {
-            return callback();
-          }
-
-          const parts = request.split("/");
-          const npmName =
-            firstChar === "@" ? parts[0] + "/" + parts[1] : parts[0];
-
-          if (hfcConfig.dependencies[npmName]) {
-            return callback(null, request);
-          }
-
-          callback();
+    this.viteConfig = {
+      mode: config.mode,
+      plugins: config.plugins,
+      resolve: config.resolve,
+      css: config.css,
+      json: config.json,
+      esbuild: config.esbuild,
+      assetsInclude: config.assetsInclude,
+      publicDir: false,
+      clearScreen: false,
+      envPrefix: "HFC_",
+      logLevel: "silent",
+      build: {
+        target: "esnext",
+        emptyOutDir: false,
+        assetsDir: "",
+        lib: {
+          entry: config.entry,
+          formats: ["es"],
+          fileName: "hfc",
         },
-      ],
-      externalsType: "module",
-    });
+        reportCompressedSize: false,
+        rollupOptions: config.rollupOptions!,
+        minify: false,
+      },
+    };
 
-    this.webpackConfig!.optimization!.minimize = false;
-    // if (this.hfcConfig.command === "build") {
-    //   this.webpackConfig!.optimization!.minimize = true;
-    //   this.webpackConfig!.optimization!.minimizer = [
-    //     new TerserPlugin({
-    //       extractComments: false,
-    //       terserOptions: {
-    //         format: {
-    //           comments: false,
-    //         },
-    //       },
-    //     }),
-    //   ];
-    // }
-
-    this.compiler = webpack(this.webpackConfig);
     this.build();
   }
-  build() {
-    if (this.hfcConfig.command === "build") {
-      this.compiler.run((err, stats) => {
-        if (err) {
-          console.error(err);
-          process.exit(-1);
+  async build() {
+    if (this.watcher) await this.watcher.close();
+
+    const hfcEnv: Record<string, any> = {};
+
+    const env = { ...this.config.env, ...process.env };
+    for (const key in env) {
+      if (key.startsWith("HFC_PUBLIC_")) {
+        hfcEnv[key] = env[key];
+      }
+    }
+
+    hfcEnv["process.env.HFC_PROPS"] = process.env.HFC_PROPS;
+    hfcEnv["process.env.HFC_NAME"] = JSON.stringify(this.config.hfcName);
+    hfcEnv["process.env.HFC_VERSION"] = JSON.stringify(this.config.version);
+
+    this.viteConfig.define = hfcEnv;
+    this.viteConfig.build!.watch = { skipWrite: true };
+    this.watcher = (await build(this.viteConfig)) as RollupWatcher;
+
+    // remove vite listener
+    this.watcher.removeAllListeners("event");
+
+    this.watcher.on("event", async (event) => {
+      if (event.code === "BUNDLE_START") {
+        console.log(colors.cyan(`\nhfc build started...`));
+      } else if (event.code === "BUNDLE_END") {
+        const output = await event.result.generate({
+          format: "es",
+          exports: "auto",
+          sourcemap: false,
+          generatedCode: "es2015",
+          entryFileNames: "hfc.js",
+          chunkFileNames: "[name].js",
+          assetFileNames: "[name].[ext]",
+          inlineDynamicImports: true,
+        });
+
+        await this.writeOutput(output);
+
+        this.emit("build-complete");
+
+        if (this.config.command === "build") {
+          this.watcher!.close();
         }
+      } else if (event.code === "ERROR") {
+        outputBuildError(event.error);
+      }
+    });
+  }
+  private async writeOutput(output: RollupOutput) {
+    let jsChunk: OutputChunk | undefined;
+    let cssAsset: OutputAsset | undefined;
+    for (const item of output.output) {
+      if (item.type === "chunk") {
+        if (item.fileName === "hfc.js") jsChunk = item;
+        continue;
+      }
 
-        if (stats?.hasErrors()) {
-          console.error(stats.compilation.errors);
-        }
+      if (item.fileName === "style.css") {
+        cssAsset = item;
+        continue;
+      }
+    }
 
-        this.emit("build-complete", stats);
-      });
-
+    if (!jsChunk) {
+      console.log("fail to build hfc, hfc.js not found");
       return;
     }
 
-    let isFirstCompile = true;
-    this.compiler.watch({}, async (err, stats) => {
-      if (err) {
-        console.error(err);
-        process.exit(-1);
-      }
+    const js = jsChunk.code;
+    const css = cssAsset ? cssAsset.source : "";
 
-      if (stats?.hasErrors()) {
-        console.error(stats.compilation.errors);
-      }
-
-      if (stats?.hasWarnings()) {
-        console.warn(stats.compilation.warnings);
-      }
-
-      if (isFirstCompile) {
-        this.emit("build-complete", stats);
-      } else {
-        this.emit("rebuild-complete", stats);
-      }
-
-      isFirstCompile = false;
-    });
+    await Promise.all([
+      fs.writeFile(this.distHfcJsPath, js),
+      fs.writeFile(this.distHfcCssPath, css),
+    ]);
   }
 }

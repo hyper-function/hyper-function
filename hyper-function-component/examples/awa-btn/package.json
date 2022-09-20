@@ -19,11 +19,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "lodash.defaultsdeep": "^4.6.1"
+    "dep": "*",
+    "vue": "*"
   },
   "devDependencies": {
     "@types/hyper-function-component": "^1.4.0",
-    "hfc-cli-service": "../../",
+    "hfcpack": "../../",
     "hfc-prop-names": "^1.0.2"
   },
   "hfc": {
