@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 specifiers:
   '@fontsource/fira-mono': ^4.5.9
   '@fontsource/fira-sans': ^4.5.9
-  '@hyper-function/hfz-global': ^1.3.0
+  '@hyper-function/hfz-global': ^1.3.1
   '@originjs/vite-plugin-federation': ^1.1.9
   '@types/connect': ^3.4.35
   '@types/cors': ^2.8.12
@@ -83,7 +83,7 @@ dependencies:
 devDependencies:
   '@fontsource/fira-mono': 4.5.9
   '@fontsource/fira-sans': 4.5.9
-  '@hyper-function/hfz-global': 1.3.0
+  '@hyper-function/hfz-global': 1.3.1
   '@types/connect': 3.4.35
   '@types/cors': 2.8.12
   '@types/fs-extra': 9.0.13
@@ -451,8 +451,8 @@ packages:
     resolution: {integrity: sha512-wGh4mUHjjWzMwJMCo3z4GOYe9a2QKgvg1bge0gIg8Je6LKNID+/EFmcXuUDyk1KbUKHpWJIquVM9kFFyJyRY2A==}
     dev: true
 
-  /@hyper-function/hfz-global/1.3.0:
-    resolution: {integrity: sha512-pARKhKLzT9PSpJvNYyBy5QijpOd8nzPObLxayEhj75AlNOHCMQctuvKCT/5zydff6yJ46xmGcukulO9TAv8Y2w==}
+  /@hyper-function/hfz-global/1.3.1:
+    resolution: {integrity: sha512-04ZvWEO6BOBLmC7W8zrAQ70gZx8XMv/jalCvRZ6BTJ2m9piZbVunLUVXN6kMWCP4VjIwE0YcpWERFqQ7/0Bdlg==}
     dependencies:
       vite: 3.1.3
     transitivePeerDependencies:

@@ -47,6 +47,7 @@ export async function resolveConfig(
   command: "serve" | "build",
   defaultMode = "development"
 ): Promise<ResolvedConfig> {
+  if (command === "build") defaultMode = "production";
   const configEnv = {
     command,
     mode: defaultMode,

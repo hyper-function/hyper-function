@@ -24,10 +24,9 @@ export class HfmBuilder extends EventEmitter {
       root: this.config.pkgOutputPath,
       publicDir: false,
       clearScreen: false,
-      // logLevel: "silent",
+      logLevel: "silent",
       build: {
         assetsDir: "",
-        // always inline
         reportCompressedSize: false,
         lib: {
           name: "hfcExport",
@@ -55,7 +54,7 @@ export class HfmBuilder extends EventEmitter {
           this.config.version
         ),
         emptyOutDir: true,
-        minify: false,
+        minify: this.config.mode === "production",
       },
     };
   }
