@@ -2,36 +2,30 @@ import cors from "cors";
 import path from "path";
 import fs from "fs-extra";
 import sirv from "sirv";
-import polka from "polka";
+import connect from "connect";
+import colors from "picocolors";
 import { dirname } from "desm";
-// @ts-ignore
-import portfinder from "portfinder";
-import prettyBytes from "pretty-bytes";
 
 import kvCache from "./kv-cache.js";
-import { HfcConfig } from "./options.js";
 import bundleSize from "./bundle-size.js";
+import { ResolvedConfig } from "./config.js";
+import { createServer, ServerResponse } from "http";
+import { prettyBytes, sendJson, useUrl } from "./utils.js";
 
 const __dirname = dirname(import.meta.url);
 
 export class DevServer {
-  app: polka.Polka;
+  middlewares: connect.Server;
   eventMessageId = Date.now();
   eventMessages: { id: number; data: any }[] = [];
-  eventResponses: any[] = [];
-  constructor(private hfcConfig: HfcConfig) {
-    this.app = polka();
-    this.app.use(cors());
-    this.app.use((req, res: any, next) => {
-      res.json = (d: any) => {
-        res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify(d));
-      };
-      next();
-    });
+  eventResponses: ServerResponse[] = [];
+  constructor(private config: ResolvedConfig) {
+    this.middlewares = connect();
+    this.middlewares.use(cors());
 
-    this.app.get("/api/events", (req, res) => {
-      const msgId = parseInt(req.query.id + "");
+    this.middlewares.use("/api/events", (req, res) => {
+      const url = useUrl(req);
+      const msgId = parseInt(url.searchParams.get("id") + "");
 
       if (msgId) {
         const msgIndex = this.eventMessages.findIndex(
@@ -40,7 +34,7 @@ export class DevServer {
 
         const nextMsg = this.eventMessages[msgIndex + 1];
         if (nextMsg) {
-          res.json(nextMsg);
+          sendJson(res, nextMsg);
           return;
         }
       }
@@ -54,71 +48,64 @@ export class DevServer {
       });
     });
 
-    this.app.get("/api/meta", async (req, res) => {
-      res.json({
-        name: this.hfcConfig.hfcName,
-        version: this.hfcConfig.version,
-        license: this.hfcConfig.license,
-        deps: this.hfcConfig.dependencies,
+    this.middlewares.use("/api/meta", async (req, res) => {
+      sendJson(res, {
+        name: this.config.hfcName,
+        version: this.config.version,
+        license: this.config.license,
+        deps: this.config.dependencies,
       });
     });
 
-    this.app.get("/api/size", async (req, res) => {
-      const { sizeJs, sizeCss } = await bundleSize(
-        this.hfcConfig.pkgOutputPath
-      );
+    this.middlewares.use("/api/size", async (req, res) => {
+      const { sizeJs, sizeCss } = await bundleSize(this.config.pkgOutputPath);
 
-      res.json({
+      sendJson(res, {
         sizeJs: prettyBytes(sizeJs),
         sizeCss: prettyBytes(sizeCss),
       });
     });
 
-    this.app.get("/api/hfz/template", (req, res) => {
-      const { id } = req.query;
+    this.middlewares.use("/api/hfz/template", (req, res) => {
+      const url = useUrl(req);
+      const id = url.searchParams.get("id");
       const code = kvCache.get("HFZ_TEMPLATE_" + id);
 
-      res.json({
-        name: this.hfcConfig.hfcName,
-        version: this.hfcConfig.version,
+      sendJson(res, {
+        name: this.config.hfcName,
+        version: this.config.version,
         code,
       });
     });
 
-    const wfmStatic = sirv(this.hfcConfig.pkgOutputPath, {
-      dev: true,
-      etag: true,
-    });
+    this.middlewares.use(
+      `/hfm/`,
+      sirv(this.config.hfmOutputPath, {
+        dev: true,
+        etag: true,
+      })
+    );
 
-    const pathPrefix = `/@hyper.fun/${this.hfcConfig.hfcName}@${this.hfcConfig.version}`;
-    const wfmServePath = pathPrefix + "/*";
-    this.app.get(wfmServePath, (req, res) => {
-      const pathname = (req as any)._parsedUrl.pathname;
-      (req as any)._parsedUrl.pathname = pathname.replace(pathPrefix, "");
-      wfmStatic(req, res);
-    });
-
-    this.app.use(
-      "/doc",
-      sirv(this.hfcConfig.docOutputPath, {
+    this.middlewares.use(
+      "/doc/",
+      sirv(this.config.docOutputPath, {
         dev: true,
         etag: true,
       })
     );
 
     const clientPath = path.join(__dirname, "client");
+    this.middlewares.use(sirv(clientPath, { dev: true, etag: true }));
 
-    const renderHtml = fs.readFileSync(
-      path.join(clientPath, "render.html"),
+    const previewHtml = fs.readFileSync(
+      path.join(clientPath, "preview.html"),
       "utf8"
     );
 
-    this.app.get("/render/*", (req, res) => {
+    this.middlewares.use("/preview/", (req, res) => {
       res.setHeader("Content-Type", "text/html");
-      res.end(renderHtml);
+      res.end(previewHtml);
     });
-
-    this.app.use(sirv(clientPath, { dev: true, etag: true }));
   }
   sendMessage(msg: any) {
     const id = this.eventMessageId++;
@@ -129,18 +116,31 @@ export class DevServer {
     this.eventResponses = [];
 
     eventResponses.forEach((res) => {
-      res.json(event);
+      sendJson(res, event);
     });
   }
   async listen() {
-    if (this.hfcConfig.command === "build") return;
-    const port = await portfinder.getPortPromise({
-      port: this.hfcConfig.port,
-    });
+    if (this.config.command === "build") return;
 
-    this.app.listen(port, () => {
+    const httpServer = createServer(this.middlewares);
+    let port = this.config.port!;
+    const onError = (e: Error & { code?: string }) => {
+      if (e.code === "EADDRINUSE") {
+        console.log(`Port ${port} is in use, trying another one...`);
+        httpServer.listen(++port);
+      } else {
+        httpServer.removeListener("error", onError);
+        throw e;
+      }
+    };
+
+    httpServer.on("error", onError);
+
+    httpServer.listen(port, () => {
       console.log();
-      console.log("Preview server running at: http://localhost:" + port);
+      console.log(
+        `${colors.green("➜")} ${colors.cyan(`http://localhost:${port}`)}`
+      );
     });
   }
 }

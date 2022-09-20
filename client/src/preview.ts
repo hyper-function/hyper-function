@@ -1,19 +1,12 @@
-import * as Vue from "vue";
-import "iframe-resizer/js/iframeResizer.contentWindow.min.js";
 import { listenBuildEvents } from "./build-event-listener";
+import "iframe-resizer/js/iframeResizer.contentWindow.min.js";
 
-require("@hyper-function/hfz-global");
+import("vue").then((Vue) => {
+  (<any>window).Vue = Vue;
 
-(<any>window).$HFC_NPM_CDN_URL = "https://unpkg.com";
-(<any>window).Vue = Vue;
-(<any>window).iFrameResizer = {
-  onMessage(msg: any) {
-    if (msg && msg.action === "reload") {
-      location.reload();
-    }
-  },
-  onReady() {},
-};
+  // @ts-ignore
+  import("@hyper-function/hfz-global");
+});
 
 const id = location.pathname.split("/").pop();
 function renderCode({
@@ -27,8 +20,8 @@ function renderCode({
 }) {
   document.title = name + " - " + id;
 
-  (<any>window)[`$HFC_CDN_REWRITE_@hyper.fun/${name}@${version}`] =
-    location.protocol + "//" + location.host;
+  (<any>window)[`$HFC_CDN_REWRITE_${name}_${version}`] =
+    location.protocol + "//" + location.host + "/hfm/";
 
   const container = document.getElementById("app")!;
   container.innerHTML = code;

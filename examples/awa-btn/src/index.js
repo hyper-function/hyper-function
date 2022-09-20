@@ -1,18 +1,22 @@
-import deep from "lodash.defaultsdeep";
 import "./index.css";
 import add from "./add";
 import logo from "./jser-logo.png";
-import props from "hfc-prop-names";
+import * as Vue from "vue";
 import svg from "./heart.svg";
+
+console.log(Vue);
 
 export default class HFC {
   static tag = "div";
-  static props = props;
+  static name = process.env.HFC_NAME;
+  static ver = process.env.HFC_VERSION;
+  static props = process.env.HFC_PROPS;
+
   constructor(container, props) {
     console.log(props);
     const btn = document.createElement("button");
     btn.classList.add("btn");
-    btn.innerText = "AWA BTN!";
+    btn.innerText = "AWA BTN!!!";
     btn.onclick = function () {
       console.log("dispatching click");
       setTimeout(() => {

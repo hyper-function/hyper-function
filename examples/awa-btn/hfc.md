@@ -21,9 +21,10 @@ doc process env: ${HFC_DOC_E2}
 >
   {{ a }} - {{ b }} - {{ c }} - 1
   <span v-if="a === 2">baba</span>
-  <flex-box justify="center">
+  <!-- <flex-box justify="center">
     <awa-btn name="awa" :c="c" @click="hello">{{ a }} 1</awa-btn>
-  </flex-box>
+  </flex-box> -->
+  <awa-btn name="awa" :c="c" @click="hello">{{ a }} 1</awa-btn>
   <div #default></div>
 
   <script>

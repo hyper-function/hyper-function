@@ -3,32 +3,32 @@ import fs from "fs-extra";
 import chokidar from "chokidar";
 import hfcMdParser from "./markdown-parser.js";
 
-import { HfcConfig } from "./options.js";
 import EventEmitter from "events";
+import { ResolvedConfig } from "./config.js";
 
 export class DocBuilder extends EventEmitter {
   mdFilePath: string;
   envs: { re: RegExp; value: string }[] = [];
-  constructor(private hfcConfig: HfcConfig) {
+  constructor(private config: ResolvedConfig) {
     super();
-    this.mdFilePath = path.join(this.hfcConfig.context, "hfc.md");
+    this.mdFilePath = path.join(this.config.context, "hfc.md");
 
-    const env: Record<string, string> = { ...hfcConfig.docEnv };
-
-    Object.keys(process.env).forEach((key) => {
+    const docEnv: Record<string, any> = {};
+    const env = { ...this.config.env, ...process.env };
+    for (const key in env) {
       if (key.startsWith("HFC_DOC_")) {
-        env[key] = process.env[key]!;
+        docEnv[key] = env[key];
       }
-    });
+    }
 
-    Object.keys(env).forEach((key) => {
+    Object.keys(docEnv).forEach((key) => {
       this.envs.push({
         re: new RegExp(`\\$\{${key}\}`, "g"),
-        value: env[key],
+        value: docEnv[key],
       });
     });
 
-    if (this.hfcConfig.command === "serve") {
+    if (this.config.command === "serve") {
       chokidar.watch(this.mdFilePath).on("change", () => this.build());
     }
     this.build();
@@ -40,14 +40,14 @@ export class DocBuilder extends EventEmitter {
     }
 
     content = content.replace(
-      new RegExp(`import:${this.hfcConfig.hfcName}="dev`, "g"),
-      `import:${this.hfcConfig.hfcName}="${this.hfcConfig.version}`
+      new RegExp(`import:${this.config.hfcName}="dev`, "g"),
+      `import:${this.config.hfcName}="${this.config.version}`
     );
 
     await hfcMdParser(content, {
-      outputPath: this.hfcConfig.docOutputPath,
-      basePath: this.hfcConfig.context,
-      hash: this.hfcConfig.command === "serve" ? "filename" : "content",
+      outputPath: this.config.docOutputPath,
+      basePath: this.config.context,
+      hash: this.config.command === "serve" ? "filename" : "content",
     });
 
     this.emit("build-complete");

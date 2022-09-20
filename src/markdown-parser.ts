@@ -1,6 +1,6 @@
 import type { Element } from "hast";
-import fs from "fs/promises";
-import { unified, Plugin } from "unified";
+import fs from "fs-extra";
+import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
@@ -9,22 +9,21 @@ import emoji from "remark-emoji";
 import raw from "rehype-raw";
 import { visit } from "unist-util-visit";
 import sanitize, { defaultSchema } from "rehype-sanitize";
-import deepmerge from "deepmerge";
 import path from "path";
 import { Stats } from "fs";
-import kvCache from "./kv-cache.js";
-import { createRequire } from "module";
+import { createHash } from "crypto";
 
-const require = createRequire(import.meta.url);
-const xxhash = require("webpack/lib/util/hash/xxhash64");
+import cache from "./kv-cache.js";
 
-const sanitizeSchema: any = deepmerge(defaultSchema, {
+const sanitizeSchema = {
+  ...defaultSchema,
   attributes: {
-    div: ["dataHfz", "dataHfzId"],
-    img: ["dataSrc"],
+    ...defaultSchema.attributes,
+    div: [...defaultSchema.attributes!.div, "dataHfz", "dataHfzId"],
+    img: [...defaultSchema.attributes!.img, "dataSrc"],
     code: ["className"],
   },
-});
+};
 
 const supportImgExts = [".jpg", ".jpeg", ".png", ".gif", ".svg"];
 
@@ -49,7 +48,7 @@ export default async (
   try {
     await fs.stat(imgDir);
   } catch (error) {
-    await fs.mkdir(imgDir);
+    await fs.mkdirp(imgDir);
   }
 
   return unified()
@@ -83,7 +82,7 @@ export default async (
                 const id = hfzId++;
                 node.properties!.dataHfzId = id;
 
-                kvCache.set("HFZ_TEMPLATE_" + id, code);
+                cache.set("HFZ_TEMPLATE_" + id, code);
                 node.children = [];
               }
             }
@@ -147,7 +146,10 @@ export default async (
 
             const imgBuf = await fs.readFile(imgPath);
 
-            const imgId = xxhash().update(imgBuf).digest("base64url");
+            const imgId = createHash("sha256")
+              .update(imgBuf)
+              .digest("base64url")
+              .slice(0, 13);
 
             const distImgName = imgId + imgExt;
             const distImgPath = path.join(imgDir, distImgName);

@@ -1,6 +1,6 @@
-@import "~normalize.css/normalize.css";
+@import "normalize.css/normalize.css";
 @import "./styles/prism.css";
-@import "~github-markdown-css/github-markdown-light.css";
+@import "github-markdown-css/github-markdown-light.css";
 
 :root {
   --main-bg: #f9f7ec;
@@ -10,31 +10,39 @@
   --nav-tabs-radius: 5px;
   --nav-tabs-border-width: 2px;
 
-  --font-sans: Fira Sans, -apple-system, BlinkMacSystemFont, Segoe UI,
-    PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica,
-    Arial, sans-serif;
+  --font: "Fira Sans", -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC,
+    Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial,
+    sans-serif;
 
-  --font-monospace: "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
+  --font-mono: "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 @font-face {
   font-family: "Fira Sans";
   font-style: normal;
+  font-display: swap;
   font-weight: 400;
-  src: url("../fonts/fira-sans-v15-latin-regular.woff") format("woff");
+  src: url("@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff")
+    format("woff");
 }
 
 @font-face {
   font-family: "Fira Sans";
   font-style: normal;
-  font-weight: 700;
-  src: url("../fonts/fira-sans-v15-latin-700.woff") format("woff");
+  font-display: swap;
+  font-weight: 600;
+  src: url("@fontsource/fira-sans/files/fira-sans-latin-600-normal.woff")
+    format("woff");
 }
 
 @font-face {
   font-family: "Fira Mono";
-  src: url("../fonts/fira-mono-v12-latin-regular.woff") format("woff");
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff")
+    format("woff");
 }
 
 .fade-enter-active,
@@ -52,7 +60,7 @@
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font);
   font-size: 16px;
   background-color: var(--main-bg);
 }
@@ -120,7 +128,7 @@ body {
 }
 
 .markdown-body {
-  font-family: var(--font-sans);
+  font-family: var(--font);
 }
 
 .markdown-body pre {
@@ -129,7 +137,7 @@ body {
 }
 
 .markdown-body code {
-  font-family: var(--font-monospace) !important;
+  font-family: var(--font-mono) !important;
 }
 
 .markdown-body > h1:first-of-type {

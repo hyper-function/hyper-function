@@ -1,7 +1,7 @@
 import os from "os";
 import fs from "fs-extra";
 import path from "path";
-import chalk from "chalk";
+import colors from "picocolors";
 import minimist from "minimist";
 import inquirer from "inquirer";
 import updateNotifier from "update-notifier";
@@ -22,9 +22,9 @@ function updateCheck() {
   if (notifier.update) {
     message.push(
       "Update available: " +
-        chalk.green.bold(notifier.update.latest) +
-        chalk.gray(" (current: " + notifier.update.current + ")"),
-      "Run " + chalk.magenta("npm install " + pkg.name) + " to update."
+        colors.green(colors.bold(notifier.update.latest)) +
+        colors.gray(" (current: " + notifier.update.current + ")"),
+      "Run " + colors.magenta("npm install " + pkg.name) + " to update."
     );
 
     console.log(message.join(" "));
@@ -45,7 +45,7 @@ async function run(command: string, context: string) {
       try {
         console.log(
           "You can generate token at: " +
-            chalk.green.bold("https://hyper.fun/settings/tokens")
+            colors.green(colors.bold("https://hyper.fun/settings/tokens"))
         );
         const answers = await inquirer.prompt([
           {

@@ -1,93 +1,71 @@
 import EventEmitter from "events";
 import path from "path";
 import chokidar from "chokidar";
-import { createRequire } from "module";
 import fs from "fs-extra";
 
-import { HfcConfig } from "./options.js";
-import parse from "./prop-types-parser.js";
+import { ResolvedConfig } from "./config.js";
+import { parse } from "./schema-parser.js";
 
-const require = createRequire(import.meta.url);
-
-const { existsSync, writeFile } = fs;
-
-export class HfcPropsBuilder extends EventEmitter {
+export class PropsBuilder extends EventEmitter {
   propsFilePath: string;
-  propNamesPath: string;
   propTypesPath: string;
 
-  propTypes: {
-    attrs: Record<string, any>;
-    events: Record<string, any>;
-    slots: Record<string, any>;
-    types: Record<string, any>;
-    desc: Record<string, any>;
-  } = {
-    attrs: {},
-    events: {},
-    slots: {},
-    types: {},
-    desc: {},
-  };
+  public propTypes: {
+    Attrs?: Record<string, any>;
+    Events?: Record<string, any>;
+    Slots?: Record<string, any>;
+    [key: string]: any;
+  } = {};
 
-  propNames: [string[], string[], string[]] = [[], [], []];
+  public propNames: [string[], string[], string[]] = [[], [], []];
 
-  constructor(private hfcConfig: HfcConfig) {
+  constructor(private config: ResolvedConfig) {
     super();
-    this.propsFilePath = path.join(hfcConfig.context, "hfc.d.ts");
+    this.propsFilePath = path.join(config.context, "hfc.schema");
+    this.propTypesPath = path.join(this.config.pkgOutputPath, "hfc.props.json");
 
-    this.propNamesPath = path.join(
-      this.hfcConfig.context,
-      ".hfc",
-      "propnames.js"
-    );
-
-    this.propTypesPath = path.join(
-      this.hfcConfig.pkgOutputPath,
-      "hfc.props.json"
-    );
-
-    if (!existsSync(this.propsFilePath)) {
-      console.log("missing hfc.d.ts");
+    if (!fs.existsSync(this.propsFilePath)) {
+      console.log("missing hfc.schema");
       process.exit(-1);
     }
 
-    if (hfcConfig.command === "serve") {
+    fs.ensureFileSync(this.propTypesPath);
+
+    if (config.command === "serve") {
       chokidar.watch(this.propsFilePath).on("change", () => this.build());
     }
 
     this.build();
   }
-  async build() {
+  build() {
+    const schema = fs.readFileSync(this.propsFilePath, "utf8");
     let res;
     try {
-      res = parse(this.propsFilePath);
+      res = parse(schema);
     } catch (error) {
-      console.log("[hfc.d.ts] Parse error");
+      console.log("[hfc.schema] Parse error");
       console.log((error as any).message);
       process.exit(-1);
     }
 
-    this.propTypes = res.result;
+    res.Attrs = res.Attrs || {};
+    res.Events = res.Events || {};
+    res.Slots = res.Slots || {};
 
-    await writeFile(this.propTypesPath, JSON.stringify(this.propTypes));
+    this.propTypes = res;
 
-    // writeFileSync(
-    //   path.join(this.hfcConfig.pkgOutputPath, "hfc.props.min.json"),
-    //   JSON.stringify(res.minResult)
-    // );
+    fs.writeFileSync(this.propTypesPath, JSON.stringify(this.propTypes));
 
     this.propNames = [
-      Object.keys(res.result.attrs),
-      Object.keys(res.result.events),
-      Object.keys(res.result.slots),
+      Object.keys(res.Attrs),
+      Object.keys(res.Events),
+      Object.keys(res.Slots),
     ];
 
-    await writeFile(
-      this.propNamesPath,
-      `export default ${JSON.stringify(this.propNames)};\n`
-    );
+    process.env.HFC_PROPS = JSON.stringify(this.propNames);
 
-    this.emit("build-complete");
+    process.nextTick(() => {
+      this.emit("build-complete");
+    });
   }
 }
