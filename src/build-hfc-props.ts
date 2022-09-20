@@ -62,7 +62,7 @@ export class PropsBuilder extends EventEmitter {
       Object.keys(res.Slots),
     ];
 
-    process.env.HFC_PROPS = JSON.stringify(this.propNames);
+    process.env.HFC_PROP_NAMES = JSON.stringify(this.propNames);
 
     process.nextTick(() => {
       this.emit("build-complete");

@@ -1,18 +1,21 @@
-// Type definitions for hyper-function-component 2.0
-// Project: https://hyper-function.com/hfc/intro
+// Type definitions for hyper-function-component 2.1
+// Project: https://hyper-function.com/ponent
 // Definitions by: terry-fei <https://github.com/terry-fei>
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 
-declare class HyperFunctionComponent {
-  static tag: string;
-  static ver: string;
-  static name: string;
+type HyperFunctionComponent = ((
+  container: Element,
+  props: HfcProps
+) => {
+  changed: (props: HfcProps) => void;
+  disconnected: () => void;
+}) & {
+  tag: string;
+  hfc: string;
+  ver: string;
   // [AttrNames, EventNames, SlotNames]
-  static props: [string[], string[], string[]];
-  constructor(container: Element, props: HfcProps);
-  changed(props: HfcProps): void;
-  disconnected(): void;
-}
+  names: [string[], string[], string[]];
+};
 
 interface HfcProps {
   attrs: { [k: string]: any };
@@ -25,5 +28,3 @@ interface HfcProps {
   };
   others: { [k: string]: any };
 }
-
-declare module "@hyper.fun/*";

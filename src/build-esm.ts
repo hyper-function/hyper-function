@@ -112,7 +112,7 @@ export class EsmBuilder extends EventEmitter {
       }
     }
 
-    hfcEnv["process.env.HFC_PROPS"] = process.env.HFC_PROPS;
+    hfcEnv["process.env.HFC_PROP_NAMES"] = process.env.HFC_PROP_NAMES;
     hfcEnv["process.env.HFC_NAME"] = JSON.stringify(this.config.hfcName);
     hfcEnv["process.env.HFC_VERSION"] = JSON.stringify(this.config.version);
 
