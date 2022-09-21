@@ -11,22 +11,21 @@
   "keywords": [],
   "type": "module",
   "scripts": {
-    "start": "hfc-cli-service",
-    "build": "hfc-cli-service build",
-    "publish-hfc": "hfc-cli-service publish",
+    "start": "hfcpack",
+    "build": "hfcpack build",
+    "publish-hfc": "hfcpack publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "react-to-hfc": "^1.2.4"
+    "react": ">=16.10.2",
+    "react-dom": ">=16.10.2",
+    "react-to-hfc": "^1.2.5"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.10.5",
-    "@types/hyper-function-component": "^2.0.0",
+    "@types/hyper-function-component": "^2.1.0",
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.11",
-    "hfc-plugin-typescript": "^1.0.2",
-    "hfc-prop-names": "^1.0.3"
+    "@vitejs/plugin-react": "^2.1.0",
+    "hfcpack": "^1.0.6"
   }
 }
