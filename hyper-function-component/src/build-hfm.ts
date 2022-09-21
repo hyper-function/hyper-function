@@ -53,7 +53,7 @@ export class HfmBuilder extends EventEmitter {
           this.config.hfcName,
           this.config.version
         ),
-        emptyOutDir: true,
+        emptyOutDir: false,
         minify: this.config.mode === "production",
       },
     };
