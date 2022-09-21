@@ -3,9 +3,12 @@ import Component from "./component";
 
 export default reactToHfc(Component, {
   tag: "div",
-  hfc: process.env.HFC_NAME!,
-  ver: process.env.HFC_VERSION!,
-  names: process.env.HFC_PROP_NAMES as any,
+  // @ts-ignore
+  hfc: process.env.HFC_NAME,
+  // @ts-ignore
+  ver: process.env.HFC_VERSION,
+  // @ts-ignore
+  names: process.env.HFC_PROP_NAMES,
   connected(container, props) {},
   disconnected() {},
 });

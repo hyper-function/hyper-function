@@ -1,9 +1,7 @@
-import props from "hfc-prop-names";
 import "./index.css";
 
-class AwesomeHfc {
-  constructor(container, props) {
-    container.innerHTML = `
+const HFC = (container, props) => {
+  container.innerHTML = `
       <h1>
         <div>THIS COMPONENT</div>
         <div>CAN BE USED IN</div>
@@ -17,12 +15,13 @@ class AwesomeHfc {
           </ul>
         </div>
       </h1>`;
-  }
-  changed(props) {}
-  disconnected() {}
-}
 
-AwesomeHfc.tag = "div";
-AwesomeHfc.props = props;
+  return { changed(props) {}, disconnected() {} };
+};
 
-export default AwesomeHfc;
+HFC.tag = "div";
+HFC.hfc = process.env.HFC_NAME;
+HFC.ver = process.env.HFC_VERSION;
+HFC.names = process.env.HFC_PROP_NAMES;
+
+export default HFC;
