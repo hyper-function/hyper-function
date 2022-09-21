@@ -25,10 +25,6 @@ export class Service extends EventEmitter {
   async run() {
     this.config = await resolveConfig(this.context, this.command);
 
-    if (this.command === "build") {
-      await fs.remove(path.resolve(this.config.outputPath));
-    }
-
     const devServer = new DevServer(this.config);
 
     let docBuildrReady = false;

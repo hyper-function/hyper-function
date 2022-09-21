@@ -70,6 +70,11 @@ export async function resolveConfig(
   const packageJson = await fs.readJson(path.resolve(context, "package.json"));
 
   const outputPath = path.resolve(context, ".hfc", command);
+
+  if (this.command === "build") {
+    await fs.remove(outputPath);
+  }
+
   fs.ensureDirSync(outputPath);
 
   const pkgOutputPath = path.resolve(outputPath, "pkg");
