@@ -54,7 +54,7 @@ export class HfmBuilder extends EventEmitter {
           this.config.version
         ),
         emptyOutDir: false,
-        minify: this.config.mode === "production",
+        minify: this.config.command === "build",
       },
     };
   }
@@ -78,6 +78,7 @@ export class HfmBuilder extends EventEmitter {
         const hasBuild = await fs.pathExists(depPath);
         if (hasBuild) return;
 
+        const isCommandBuild = this.config.command === "build";
         await esbuild.build({
           entryPoints: [dep],
           outfile: depPath,
@@ -85,9 +86,11 @@ export class HfmBuilder extends EventEmitter {
           format: "iife",
           globalName: `$HFC_SHARE_DEP['${dep}']`,
           define: {
-            "process.env.NODE_ENV": JSON.stringify(this.config.mode),
+            "process.env.NODE_ENV": JSON.stringify(
+              isCommandBuild ? "production" : "development"
+            ),
           },
-          minify: this.config.mode === "production",
+          minify: isCommandBuild,
           treeShaking: false,
           legalComments: "none",
         });
