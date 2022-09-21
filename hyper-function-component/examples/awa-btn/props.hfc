@@ -1,7 +1,7 @@
 type Attrs {
   # hihi
   # hoho
-  name1: String[]
+  name: String[]
   u1: User
   us: EE
   age: {
