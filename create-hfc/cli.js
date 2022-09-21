@@ -58,6 +58,7 @@ async function run() {
   const { template, useCurrentFolder } = answer;
 
   let folder;
+  let folderName;
   if (!useCurrentFolder) {
     const folderAnswer = await prompt([
       {
@@ -75,16 +76,19 @@ async function run() {
     ]);
 
     folder = path.resolve(cwd, folderAnswer.folder);
+    folderName = folderAnswer.folder;
   } else {
     folder = cwd;
   }
 
   fs.copySync(path.resolve(__dirname, "templates", template.folder), folder);
   console.log(chalk.green("Generate success!"));
-  console.log(chalk.green(`cd ${folder}`));
-  console.log(chalk.green(`npm install`));
-  console.log(chalk.green(`npm start`));
+  console.log("");
+  if (folderName) console.log(chalk.cyan(`cd ${folderName}`));
+  console.log(chalk.cyan(`npm install`));
+  console.log(chalk.cyan(`npm start`));
 
+  console.log("");
   console.log(
     "Link: " +
       chalk.magenta("https://hyper-function.com/hfc/create-hfc/getting-started")
