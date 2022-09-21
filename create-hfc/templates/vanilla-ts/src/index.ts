@@ -1,11 +1,7 @@
-import props from "hfc-prop-names";
 import "./index.css";
 
-export default class AwesomeHfc {
-  static tag = "div";
-  static props = props;
-  constructor(container: Element, props: HfcProps) {
-    container.innerHTML = `
+const HFC: HyperFunctionComponent = (container, props) => {
+  container.innerHTML = `
       <h1>
         <div>THIS COMPONENT</div>
         <div>CAN BE USED IN</div>
@@ -19,7 +15,16 @@ export default class AwesomeHfc {
           </ul>
         </div>
       </h1>`;
-  }
-  changed(props: HfcProps) {}
-  disconnected() {}
-}
+
+  return { changed(props: HfcProps) {}, disconnected() {} };
+};
+
+HFC.tag = "div";
+// @ts-ignore
+HFC.hfc = process.env.HFC_NAME;
+// @ts-ignore
+HFC.ver = process.env.HFC_VERSION;
+// @ts-ignore
+HFC.names = process.env.HFC_PROP_NAMES;
+
+export default HFC;

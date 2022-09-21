@@ -11,15 +11,13 @@
   "keywords": [],
   "type": "module",
   "scripts": {
-    "start": "hfc-cli-service",
-    "build": "hfc-cli-service build",
-    "publish-hfc": "hfc-cli-service publish",
+    "start": "hfcpack",
+    "build": "hfcpack build",
+    "publish-hfc": "hfcpack publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@hyper-function/cli-service": "^1.10.5",
-    "@types/hyper-function-component": "^2.0.0",
-    "hfc-plugin-typescript": "^1.0.2",
-    "hfc-prop-names": "^1.0.3"
+    "@types/hyper-function-component": "^2.1.0",
+    "hfcpack": "^1.0.6"
   }
 }
