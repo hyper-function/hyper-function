@@ -21,7 +21,7 @@ export class PropsBuilder extends EventEmitter {
 
   constructor(private config: ResolvedConfig) {
     super();
-    this.propsFilePath = path.join(config.context, "hfc.schema");
+    this.propsFilePath = path.join(config.context, "props.hfc");
     this.propTypesPath = path.join(
       this.config.hfmOutputPath,
       this.config.hfcName,
@@ -30,7 +30,7 @@ export class PropsBuilder extends EventEmitter {
     );
 
     if (!fs.existsSync(this.propsFilePath)) {
-      console.log("missing hfc.schema");
+      console.log("missing props.hfc");
       process.exit(-1);
     }
 
@@ -48,7 +48,7 @@ export class PropsBuilder extends EventEmitter {
     try {
       res = parse(schema);
     } catch (error) {
-      console.log("[hfc.schema] Parse error");
+      console.log("[props.hfc] Parse error");
       console.log((error as any).message);
       process.exit(-1);
     }

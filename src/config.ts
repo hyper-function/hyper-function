@@ -54,7 +54,10 @@ export async function resolveConfig(
   };
 
   let config: HfcConfig;
-  let { default: userConfig } = await import(path.resolve(context, "hfc.js"));
+  let { default: userConfig } = await import(
+    path.resolve(context, "hfcpack.config.js")
+  );
+
   config =
     typeof userConfig === "function" ? await userConfig(configEnv) : userConfig;
 
