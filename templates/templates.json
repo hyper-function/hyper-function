@@ -17,6 +17,14 @@
       "folder": "react-ts"
     },
     {
+      "title": "Preact",
+      "folder": "preact"
+    },
+    {
+      "title": "Preact - TypeScript",
+      "folder": "preact-ts"
+    },
+    {
       "title": "Vue",
       "folder": "vue"
     },

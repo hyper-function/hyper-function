@@ -1,0 +1,29 @@
+{
+  "hfc": {
+    "name": ""
+  },
+  "name": "awesome-hfc",
+  "version": "1.0.0",
+  "license": "MIT",
+  "description": "",
+  "homepage": "",
+  "repository": "",
+  "keywords": [],
+  "type": "module",
+  "scripts": {
+    "start": "hfcpack",
+    "build": "hfcpack build",
+    "publish-hfc": "hfcpack publish",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "preact": ">=10",
+    "preact-to-hfc": "^1.0.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.4.0",
+    "@types/hyper-function-component": "^2.1.0",
+    "@types/react": "^17.0.39",
+    "hfcpack": "^1.0.6"
+  }
+}

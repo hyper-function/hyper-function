@@ -1,0 +1,7 @@
+# ➜ https://hyper-function.com/hfc/create-hfc/hfc-schema
+
+type Attrs {}
+
+type Events {}
+
+type Slots {}
