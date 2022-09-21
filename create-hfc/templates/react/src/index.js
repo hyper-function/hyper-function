@@ -1,11 +1,14 @@
-import { reactToHfc } from "react-to-hfc";
+import { toHFC, toHFCReact } from "react-to-hfc";
 import Component from "./component";
 
-export default reactToHfc(Component, {
+const opts = {
   tag: "div",
   hfc: process.env.HFC_NAME,
   ver: process.env.HFC_VERSION,
   names: process.env.HFC_PROP_NAMES,
-  connected(container, props) {},
+  connected(container) {},
   disconnected() {},
-});
+};
+
+export default toHFC(Component, opts);
+export let ReactHFC = toHFCReact(Component, opts);
