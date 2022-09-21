@@ -11,28 +11,6 @@ import type {
   RollupError,
 } from "rollup";
 
-type HFC = ((a: string) => {
-  changed: () => void;
-  disconnected: () => void;
-}) & {
-  tag: string;
-  hfc: string;
-  ver: string;
-  names: [string[], string[], string[]];
-};
-
-const Ab: HFC = () => {
-  const changed = () => {};
-  const disconnected = () => {};
-
-  return { changed, disconnected };
-};
-
-Ab.tag = "div";
-Ab.hfc = "awa-btn";
-Ab.ver = "1.2.3";
-Ab.names = [[], [], []];
-
 import { ResolvedConfig } from "./config.js";
 
 const outputBuildError = (e: RollupError) => {
@@ -72,7 +50,7 @@ export class EsmBuilder extends EventEmitter {
     );
 
     this.viteConfig = {
-      mode: config.mode,
+      mode: "production",
       plugins: config.plugins,
       resolve: config.resolve,
       css: config.css,

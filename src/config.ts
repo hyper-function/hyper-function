@@ -9,7 +9,7 @@ export interface ConfigEnv {
 
 export type HfcConfig = Pick<
   UserConfig,
-  "mode" | "plugins" | "resolve" | "css" | "json" | "esbuild" | "assetsInclude"
+  "plugins" | "resolve" | "css" | "json" | "esbuild" | "assetsInclude"
 > & {
   entry: string;
   port?: number;
@@ -64,14 +64,14 @@ export async function resolveConfig(
     process.exit(1);
   }
 
-  const mode = config.mode || defaultMode;
+  // const mode = config.mode || defaultMode;
   const env = config.env || {};
 
   const packageJson = await fs.readJson(path.resolve(context, "package.json"));
 
   const outputPath = path.resolve(context, ".hfc", command);
 
-  if (this.command === "build") {
+  if (command === "build") {
     await fs.remove(outputPath);
   }
 
@@ -111,7 +111,7 @@ export async function resolveConfig(
   const resolvedConfig: ResolvedConfig = {
     ...config,
     env,
-    mode,
+    // mode,
     context,
     command,
     rollupOptions,
