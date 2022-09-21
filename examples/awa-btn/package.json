@@ -6,9 +6,9 @@
   "homepage": "",
   "type": "module",
   "scripts": {
-    "start": "hfc-cli-service",
-    "build": "hfc-cli-service build",
-    "publish-hfc": "hfc-cli-service publish",
+    "start": "hfcpack",
+    "build": "hfcpack build",
+    "publish-hfc": "hfcpack publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

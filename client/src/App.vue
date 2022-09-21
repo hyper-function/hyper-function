@@ -36,7 +36,7 @@ async function fetchDocHtml() {
 
 async function fetchPropTypes() {
   const { name, version } = meta.value;
-  const res = await fetch(`/@hyper.fun/${name}@${version}/hfc.props.json`).then(
+  const res = await fetch(`/hfm/${name}/${version}/hfc.props.json`).then(
     (res) => res.json()
   );
 
