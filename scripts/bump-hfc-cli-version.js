@@ -20,8 +20,7 @@ console.log("updating version to", version);
       const packageFile = path.resolve(dir, "package.json");
 
       const packageJson = JSON.parse(fs.readFileSync(packageFile, "utf-8"));
-      packageJson.devDependencies["@hyper-function/cli-service"] =
-        "^" + version;
+      packageJson.devDependencies["hfcpack"] = "^" + version;
       fs.writeFileSync(packageFile, JSON.stringify(packageJson, null, 2));
 
       execSync("npm i --package-lock-only", { cwd: dir });
