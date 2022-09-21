@@ -1,6 +1,11 @@
-import react from "hfc-plugin-react";
+import react from "@vitejs/plugin-react";
 
 export default {
   entry: "./src/index.js",
-  plugins: [react()],
+  plugins: [
+    react({
+      jsxRuntime: "classic",
+      fastRefresh: false,
+    }),
+  ],
 };
