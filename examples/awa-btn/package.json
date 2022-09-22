@@ -1,7 +1,7 @@
 {
   "hfcName": "awa-btn",
   "name": "awesome-hfc",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "awesome button",
   "homepage": "",
   "type": "module",
@@ -20,12 +20,12 @@
   "license": "MIT",
   "dependencies": {
     "dep": "*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "vue": "*"
   },
   "devDependencies": {
-    "@types/hyper-function-component": "^1.4.0",
-    "hfcpack": "../../",
-    "hfc-prop-names": "^1.0.2"
+    "hfcpack": "../../"
   },
   "hfc": {
     "name": "awa-btn"
