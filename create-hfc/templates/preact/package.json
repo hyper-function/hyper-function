@@ -18,12 +18,12 @@
   },
   "dependencies": {
     "preact": ">=10",
-    "preact-to-hfc": "^1.0.0"
+    "preact-to-hfc": "^1.0.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.4.0",
     "@types/hyper-function-component": "^2.1.0",
     "@types/react": "^17.0.39",
-    "hfcpack": "^1.0.6"
+    "hfcpack": "^1.0.9"
   }
 }
