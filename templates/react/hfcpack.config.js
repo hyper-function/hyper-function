@@ -5,7 +5,6 @@ export default {
   plugins: [
     react({
       jsxRuntime: "classic",
-      fastRefresh: false,
     }),
   ],
 };
