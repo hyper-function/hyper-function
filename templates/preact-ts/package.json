@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "preact": ">=10",
-    "preact-to-hfc": "^1.0.0"
+    "preact-to-hfc": "^1.0.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.4.0",
