@@ -1,19 +1,56 @@
 // HFC Federated Module
 import EventEmitter from "events";
-import esbuild from "esbuild";
 import fs from "fs-extra";
 import path from "path";
 import { build, InlineConfig } from "vite";
 import { ResolvedConfig } from "./config.js";
 
-const SHAREABLE_DEPS = ["react", "react-dom", "vue"];
+const SHAREABLE_DEPS: Record<
+  string,
+  {
+    subImports?: string[];
+    buildScript?: string;
+  }
+> = {
+  react: {
+    buildScript: `
+      import * as React from "react";
+      import * as ReactDom from "react-dom";
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.react) shared.react = React;
+      if (!shared['react-dom']) shared['react-dom'] = ReactDom;
+    `,
+  },
+  "react-dom": {},
+  vue: {
+    buildScript: `
+      import * as Vue from "vue";
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.vue) shared.react = Vue;
+    `,
+  },
+  preact: {
+    subImports: ["preact/hooks"],
+    buildScript: `
+      import * as Preact from "preact";
+      import * as PreactHooks from "preact/hooks";
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.preact) shared.react = Preact;
+      if (!shared['preact/hooks']) shared['preact/hooks'] = PreactHooks;
+    `,
+  },
+};
 
 export class HfmBuilder extends EventEmitter {
+  mode: "production" | "development";
   viteConfig!: InlineConfig;
   sharedDeps: { name: string; ver: string }[] = [];
+  externals: string[] = [];
   constructor(private config: ResolvedConfig) {
     super();
+    this.mode = config.command === "build" ? "production" : "development";
   }
+
   async resolveConfig() {
     const entry = path.join(this.config.pkgOutputPath, "index.js");
 
@@ -22,6 +59,12 @@ export class HfmBuilder extends EventEmitter {
 
     this.viteConfig = {
       root: this.config.pkgOutputPath,
+      mode: this.mode,
+      esbuild:
+        this.mode === "production" ? { legalComments: "none" } : undefined,
+      define: {
+        "process.env.NODE_ENV": JSON.stringify(this.mode),
+      },
       publicDir: false,
       clearScreen: false,
       logLevel: "silent",
@@ -35,12 +78,12 @@ export class HfmBuilder extends EventEmitter {
           fileName: () => "hfc.js",
         },
         rollupOptions: {
-          external: this.sharedDeps.map((dep) => dep.name),
+          external: this.externals,
           output: {
             banner: wrapCode.start,
             footer: wrapCode.end,
-            globals: this.sharedDeps.reduce((prev, curr) => {
-              prev[curr.name] = `shared['${curr.name}']`;
+            globals: this.externals.reduce((prev, curr) => {
+              prev[curr] = `shared['${curr}']`;
               return prev;
             }, {} as any),
             inlineDynamicImports: true,
@@ -60,40 +103,64 @@ export class HfmBuilder extends EventEmitter {
   }
   async buildShareDep() {
     await Promise.all(
-      SHAREABLE_DEPS.map(async (dep) => {
-        if (!this.config.dependencies[dep]) return;
+      Object.keys(this.config.dependencies).map(async (name) => {
+        const shareableDep = SHAREABLE_DEPS[name];
+        if (!shareableDep) return;
+        this.externals.push(name);
+        if (shareableDep.subImports) {
+          this.externals.push(...shareableDep.subImports);
+        }
 
-        const depPkgJson = await fs.readJson(
-          path.resolve(process.cwd(), "node_modules", dep, "package.json")
+        if (!shareableDep.buildScript) return;
+
+        const pkgJson = await fs.readJson(
+          path.resolve(
+            this.config.context,
+            "node_modules",
+            name,
+            "package.json"
+          )
         );
 
-        this.sharedDeps.push({ name: dep, ver: depPkgJson.version });
+        this.sharedDeps.push({ name: name, ver: pkgJson.version });
 
         const depPath = path.resolve(
           this.config.hfmOutputPath,
           "share",
-          `${dep}@${depPkgJson.version}.js`
+          `${name}@${pkgJson.version}.js`
         );
 
         const hasBuild = await fs.pathExists(depPath);
         if (hasBuild) return;
 
-        const isCommandBuild = this.config.command === "build";
-        await esbuild.build({
-          entryPoints: [dep],
-          outfile: depPath,
-          bundle: true,
-          format: "iife",
-          globalName: `$HFC_SHARE_DEP['${dep}']`,
+        const entry = path.resolve(this.config.hfmOutputPath, name + ".js");
+        await fs.writeFile(entry, shareableDep.buildScript);
+
+        await build({
+          root: this.config.context,
+          mode: this.mode,
+          esbuild: false,
           define: {
-            "process.env.NODE_ENV": JSON.stringify(
-              isCommandBuild ? "production" : "development"
-            ),
+            "process.env.NODE_ENV": JSON.stringify(this.mode),
           },
-          minify: isCommandBuild,
-          treeShaking: false,
-          legalComments: "none",
+          publicDir: false,
+          clearScreen: false,
+          logLevel: "silent",
+          build: {
+            assetsDir: "",
+            reportCompressedSize: false,
+            lib: {
+              entry,
+              name: "shareDep",
+              formats: ["iife"],
+              fileName: () => `${name}@${pkgJson.version}.js`,
+            },
+            outDir: path.resolve(this.config.hfmOutputPath, "share"),
+            minify: this.mode === "production",
+          },
         });
+
+        await fs.remove(entry);
       })
     );
   }
@@ -103,7 +170,7 @@ export class HfmBuilder extends EventEmitter {
       start: `\
     (function () {
       const currentUrl = document.currentScript.src;
-    
+
       $HFC_LOAD_CSS(currentUrl.replace("hfc.js", "style.css"));
 
       const deps = ${JSON.stringify(

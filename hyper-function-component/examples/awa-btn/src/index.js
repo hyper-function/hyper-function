@@ -2,9 +2,13 @@ import "./index.css";
 import add from "./add";
 import logo from "./jser-logo.png";
 import * as Vue from "vue";
+import * as React from "react";
+import * as ReactDom from "react-dom";
 import svg from "./heart.svg";
 
 console.log(Vue);
+console.log(React);
+console.log(ReactDom);
 
 const HFC = function (container, props) {
   console.log(props);
