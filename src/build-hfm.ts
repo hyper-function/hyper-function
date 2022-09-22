@@ -16,17 +16,17 @@ const SHAREABLE_DEPS: Record<
     buildScript: `
       import * as React from "react";
       import * as ReactDom from "react-dom";
-      window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {};
-      window.$HFC_SHARE_DEP["react"] = React;
-      window.$HFC_SHARE_DEP["react-dom"] = ReactDom;
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.react) shared.react = React;
+      if (!shared['react-dom']) shared['react-dom'] = ReactDom;
     `,
   },
   "react-dom": {},
   vue: {
     buildScript: `
       import * as Vue from "vue";
-      window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {};
-      window.$HFC_SHARE_DEP["vue"] = Vue;
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.vue) shared.react = Vue;
     `,
   },
   preact: {
@@ -34,9 +34,9 @@ const SHAREABLE_DEPS: Record<
     buildScript: `
       import * as Preact from "preact";
       import * as PreactHooks from "preact/hooks";
-      window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {};
-      window.$HFC_SHARE_DEP["preact"] = Preact;
-      window.$HFC_SHARE_DEP["preact/hooks"] = PreactHooks;    
+      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+      if (!shared.preact) shared.react = Preact;
+      if (!shared['preact/hooks']) shared['preact/hooks'] = PreactHooks;
     `,
   },
 };
