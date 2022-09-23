@@ -5,11 +5,11 @@
   <div>CAN BE USED IN</div>
   <div class="brand">
     <ul>
-      <li>REACT</li>
-      <li>VUE</li>
-      <li>HFZ</li>
-      <li>ANGULAR</li>
-      <li>SVELTE</li>
+      <li>React</li>
+      <li>Vue</li>
+      <li>Hfz</li>
+      <li>Angular</li>
+      <li>WebComponents</li>
     </ul>
   </div>
 </h1>
@@ -47,10 +47,10 @@
       width: 0;
     }
     8% {
-      width: 126px;
+      width: 110px;
     }
     16% {
-      width: 126px;
+      width: 110px;
     }
     20% {
       top: 0;
@@ -61,10 +61,10 @@
       width: 0;
     }
     28% {
-      width: 85px;
+      width: 75px;
     }
     36% {
-      width: 85px;
+      width: 75px;
     }
     40% {
       top: -48px;
@@ -75,10 +75,10 @@
       width: 0;
     }
     48% {
-      width: 85px;
+      width: 70px;
     }
     56% {
-      width: 85px;
+      width: 70px;
     }
     60% {
       top: -96px;
@@ -89,10 +89,10 @@
       width: 0;
     }
     68% {
-      width: 172px;
+      width: 145px;
     }
     76% {
-      width: 172px;
+      width: 145px;
     }
     80% {
       top: -144px;
@@ -103,10 +103,10 @@
       width: 0;
     }
     88% {
-      width: 140px;
+      width: 290px;
     }
     96% {
-      width: 140px;
+      width: 290px;
     }
     100% {
       top: -192px;

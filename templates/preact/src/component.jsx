@@ -7,11 +7,11 @@ export default function Component() {
       <div>CAN BE USED IN</div>
       <div className="brand">
         <ul>
-          <li>REACT</li>
-          <li>VUE</li>
-          <li>HFZ</li>
-          <li>ANGULAR</li>
-          <li>SVELTE</li>
+          <li>React</li>
+          <li>Vue</li>
+          <li>Hfz</li>
+          <li>Angular</li>
+          <li>WebComponents</li>
         </ul>
       </div>
     </h1>
