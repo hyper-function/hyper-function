@@ -26,7 +26,7 @@ const SHAREABLE_DEPS: Record<
     buildScript: `
       import * as Vue from "vue";
       var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
-      if (!shared.vue) shared.react = Vue;
+      if (!shared.vue) shared.vue = Vue;
     `,
   },
   preact: {
@@ -34,9 +34,13 @@ const SHAREABLE_DEPS: Record<
     buildScript: `
       import * as Preact from "preact";
       import * as PreactHooks from "preact/hooks";
+      import * as PreactCompat from "preact/compat";
+      import * as PreactJsxRuntime from "preact/jsx-runtime";
       var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
-      if (!shared.preact) shared.react = Preact;
+      if (!shared.preact) shared.preact = Preact;
       if (!shared['preact/hooks']) shared['preact/hooks'] = PreactHooks;
+      if (!shared['preact/compat']) shared['preact/compat'] = PreactCompat;
+      if (!shared['preact/jsx-runtime']) shared['preact/jsx-runtime'] = PreactJsxRuntime;
     `,
   },
 };
