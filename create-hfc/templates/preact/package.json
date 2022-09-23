@@ -24,6 +24,6 @@
     "@preact/preset-vite": "^2.4.0",
     "@types/hyper-function-component": "^2.1.0",
     "@types/react": "^17.0.39",
-    "hfcpack": "^1.0.9"
+    "hfcpack": "^1.0.10"
   }
 }

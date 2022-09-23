@@ -23,6 +23,6 @@
   "devDependencies": {
     "@types/hyper-function-component": "^2.1.0",
     "@vitejs/plugin-vue": "^3.1.0",
-    "hfcpack": "^1.0.9"
+    "hfcpack": "^1.0.10"
   }
 }
