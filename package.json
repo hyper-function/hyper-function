@@ -1,6 +1,6 @@
 {
   "name": "hfcpack",
-  "version": "1.0.8",
+  "version": "1.0.10",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
