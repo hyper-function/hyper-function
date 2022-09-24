@@ -2,6 +2,7 @@
 import EventEmitter from "events";
 import fs from "fs-extra";
 import path from "path";
+import type { OutputOptions } from "rollup";
 import { build, InlineConfig } from "vite";
 import { ResolvedConfig } from "./config.js";
 
@@ -56,13 +57,20 @@ export class HfmBuilder extends EventEmitter {
   }
 
   async resolveConfig() {
-    const entry = path.join(this.config.pkgOutputPath, "index.js");
+    const entry = path.join(this.config.hfmOutputPath, "entry.js");
+    fs.writeFileSync(
+      entry,
+      [
+        `import "../pkg/hfc.css";`,
+        `import HFC from "../pkg/hfc.js";`,
+        `window.$HFC_ITEMS["${this.config.hfcName}"] = HFC;`,
+        ``,
+      ].join("\n")
+    );
 
     await this.buildShareDep();
-    const wrapCode = this.buildWrap();
 
     this.viteConfig = {
-      root: this.config.pkgOutputPath,
       mode: this.mode,
       esbuild:
         this.mode === "production" ? { legalComments: "none" } : undefined,
@@ -84,8 +92,6 @@ export class HfmBuilder extends EventEmitter {
         rollupOptions: {
           external: this.externals,
           output: {
-            banner: wrapCode.start,
-            footer: wrapCode.end,
             globals: this.externals.reduce((prev, curr) => {
               prev[curr] = `shared['${curr}']`;
               return prev;
@@ -176,6 +182,19 @@ export class HfmBuilder extends EventEmitter {
       const currentUrl = document.currentScript.src;
 
       $HFC_LOAD_CSS(currentUrl.replace("hfc.js", "style.css"));
+      const cssVars = ${JSON.stringify(
+        this.config.cssVars.map((item) => ({
+          name: item.name,
+          value: item.value,
+        }))
+      )};
+
+      const rootStyle = getComputedStyle(document.documentElement);
+      cssVars.forEach(item => {
+        if (!rootStyle.getPropertyValue(item.name)) {
+          document.documentElement.style.setProperty(item.name, item.value);
+        }
+      });
 
       const deps = ${JSON.stringify(
         this.sharedDeps.map((dep) => ({ name: dep.name, ver: dep.ver }))
@@ -194,9 +213,11 @@ export class HfmBuilder extends EventEmitter {
         ).then(initHfc);
       }
 
-      let HFC;
+      window.$HFC_ITEMS = window.$HFC_ITEMS || {};
       function get(name) {
-        return () => Promise.resolve(name === "./hfc" ? HFC : undefined);
+        return () => Promise.resolve(name === "./hfc" ? window.$HFC_ITEMS["${
+          this.config.hfcName
+        }"] : undefined);
       }
 
       window.$HFC_CONTAINERS = window.$HFC_CONTAINERS || {};
@@ -207,7 +228,6 @@ export class HfmBuilder extends EventEmitter {
       function initHfc() {
     `,
       end: `
-      HFC = hfcExport;
       }
     })();
       `,
@@ -215,6 +235,13 @@ export class HfmBuilder extends EventEmitter {
   }
 
   async build() {
+    const wrapCode = this.buildWrap();
+    const output = this.viteConfig.build!.rollupOptions!
+      .output! as OutputOptions;
+
+    output.banner = wrapCode.start;
+    output.footer = wrapCode.end;
+
     await build(this.viteConfig);
     this.emit("build-complete");
   }

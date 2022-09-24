@@ -24,23 +24,28 @@ export function defineConfig(config: UserConfigExport): UserConfigExport {
   return config;
 }
 
-export type ResolvedConfig = Readonly<
-  HfcConfig & {
-    name: string;
-    hfcName: string;
-    version: string;
-    license: string;
-    context: string;
-    command: "serve" | "build";
-    outputPath: string;
-    hfcMdFilePath: string;
-    pkgOutputPath: string;
-    hfmOutputPath: string;
-    docOutputPath: string;
-    dependencies: Record<string, string>;
-    devDependencies: Record<string, string>;
-  }
->;
+export interface CssVar {
+  name: string;
+  value: string;
+  comment?: string;
+}
+
+export type ResolvedConfig = HfcConfig & {
+  name: string;
+  hfcName: string;
+  version: string;
+  license: string;
+  context: string;
+  command: "serve" | "build";
+  outputPath: string;
+  hfcMdFilePath: string;
+  pkgOutputPath: string;
+  hfmOutputPath: string;
+  docOutputPath: string;
+  dependencies: Record<string, string>;
+  devDependencies: Record<string, string>;
+  cssVars: CssVar[];
+};
 
 export async function resolveConfig(
   context: string,
@@ -130,6 +135,7 @@ export async function resolveConfig(
     docOutputPath,
     dependencies,
     devDependencies,
+    cssVars: [],
   };
 
   return resolvedConfig;
