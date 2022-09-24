@@ -1,5 +1,3 @@
-import path from "path";
-import fs from "fs-extra";
 import colors from "picocolors";
 import EventEmitter from "events";
 import { dirname } from "desm";
@@ -11,6 +9,7 @@ import { PkgJsonBuilder } from "./build-pkg-json.js";
 
 import { DevServer } from "./dev-server.js";
 import { resolveConfig, ResolvedConfig } from "./config.js";
+import { CssVarBuilder } from "./build-css-variable.js";
 
 // const require = createRequire(import.meta.url);
 const __dirname = dirname(import.meta.url);
@@ -29,12 +28,14 @@ export class Service extends EventEmitter {
 
     let docBuildrReady = false;
     let hfcPropsBuildrReady = false;
+    let cssVarBuildReady = false;
     let pkgJsonBuildrReady = false;
     let pkgBuildrReady = false;
 
     const isReady = () =>
       docBuildrReady &&
       hfcPropsBuildrReady &&
+      cssVarBuildReady &&
       pkgJsonBuildrReady &&
       pkgBuildrReady;
 
@@ -59,6 +60,21 @@ export class Service extends EventEmitter {
       if (isReady() && this.command === "serve") {
         esmBuilder.build();
         devServer.sendMessage({ action: "update-hfc-props" });
+      }
+    });
+
+    const cssVarBuilder = new CssVarBuilder(this.config);
+    cssVarBuilder.on("build-complete", () => {
+      if (!cssVarBuildReady) {
+        cssVarBuildReady = true;
+        runAfterReady();
+      }
+
+      this.emit("css-var-build-complete");
+
+      if (isReady() && this.command === "serve") {
+        esmBuilder.build();
+        devServer.sendMessage({ action: "update-css-var" });
       }
     });
 

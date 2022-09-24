@@ -7,8 +7,8 @@ import { ResolvedConfig } from "./config.js";
 import { parse } from "./schema-parser.js";
 
 export class PropsBuilder extends EventEmitter {
-  propsFilePath: string;
-  propTypesPath: string;
+  propsSrc: string;
+  propsDist: string;
 
   public propTypes: {
     Attrs?: Record<string, any>;
@@ -21,29 +21,29 @@ export class PropsBuilder extends EventEmitter {
 
   constructor(private config: ResolvedConfig) {
     super();
-    this.propsFilePath = path.join(config.context, "props.hfc");
-    this.propTypesPath = path.join(
+    this.propsSrc = path.join(config.context, "props.hfc");
+    this.propsDist = path.join(
       this.config.hfmOutputPath,
       this.config.hfcName,
       this.config.version,
       "hfc.props.json"
     );
 
-    if (!fs.existsSync(this.propsFilePath)) {
+    if (!fs.existsSync(this.propsSrc)) {
       console.log("missing props.hfc");
       process.exit(-1);
     }
 
-    fs.ensureFileSync(this.propTypesPath);
+    fs.ensureFileSync(this.propsDist);
 
     if (config.command === "serve") {
-      chokidar.watch(this.propsFilePath).on("change", () => this.build());
+      chokidar.watch(this.propsSrc).on("change", () => this.build());
     }
 
     this.build();
   }
   build() {
-    const schema = fs.readFileSync(this.propsFilePath, "utf8");
+    const schema = fs.readFileSync(this.propsSrc, "utf8");
     let res;
     try {
       res = parse(schema);
@@ -59,7 +59,7 @@ export class PropsBuilder extends EventEmitter {
 
     this.propTypes = res;
 
-    fs.writeFileSync(this.propTypesPath, JSON.stringify(this.propTypes));
+    fs.writeJsonSync(this.propsDist, this.propTypes);
 
     this.propNames = [
       Object.keys(res.Attrs),

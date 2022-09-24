@@ -39,16 +39,6 @@ export class EsmBuilder extends EventEmitter {
     this.distHfcJsPath = path.join(config.pkgOutputPath, "hfc.js");
     this.distHfcCssPath = path.join(config.pkgOutputPath, "hfc.css");
 
-    fs.writeFileSync(
-      path.join(config.pkgOutputPath, "index.js"),
-      [
-        `import "./hfc.css";`,
-        `import HFC from "./hfc.js";`,
-        `export default HFC;`,
-        ``,
-      ].join("\n")
-    );
-
     this.viteConfig = {
       mode: "production",
       plugins: config.plugins,
