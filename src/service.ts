@@ -5,7 +5,7 @@ import { DocBuilder } from "./build-doc.js";
 import { EsmBuilder } from "./build-esm.js";
 import { HfmBuilder } from "./build-hfm.js";
 import { PropsBuilder } from "./build-hfc-props.js";
-import { PkgJsonBuilder } from "./build-pkg-json.js";
+import { ManifestBuilder } from "./build-manifest.js";
 
 import { DevServer } from "./dev-server.js";
 import { resolveConfig, ResolvedConfig } from "./config.js";
@@ -26,18 +26,18 @@ export class Service extends EventEmitter {
 
     const devServer = new DevServer(this.config);
 
-    let docBuildrReady = false;
-    let hfcPropsBuildrReady = false;
-    let cssVarBuildReady = false;
-    let pkgJsonBuildrReady = false;
-    let pkgBuildrReady = false;
+    let docBuildDone = false;
+    let propsBuildDone = false;
+    let cssVarsBuildDone = false;
+    let manifestBuildDone = false;
+    let pkgBuildDone = false;
 
     const isReady = () =>
-      docBuildrReady &&
-      hfcPropsBuildrReady &&
-      cssVarBuildReady &&
-      pkgJsonBuildrReady &&
-      pkgBuildrReady;
+      docBuildDone &&
+      propsBuildDone &&
+      cssVarsBuildDone &&
+      manifestBuildDone &&
+      pkgBuildDone;
 
     const runAfterReady = () => {
       if (!isReady()) return;
@@ -50,8 +50,8 @@ export class Service extends EventEmitter {
 
     const propsBuilder = new PropsBuilder(this.config);
     propsBuilder.on("build-complete", () => {
-      if (!hfcPropsBuildrReady) {
-        hfcPropsBuildrReady = true;
+      if (!propsBuildDone) {
+        propsBuildDone = true;
         runAfterReady();
       }
 
@@ -65,8 +65,8 @@ export class Service extends EventEmitter {
 
     const cssVarBuilder = new CssVarBuilder(this.config);
     cssVarBuilder.on("build-complete", () => {
-      if (!cssVarBuildReady) {
-        cssVarBuildReady = true;
+      if (!cssVarsBuildDone) {
+        cssVarsBuildDone = true;
         runAfterReady();
       }
 
@@ -74,7 +74,7 @@ export class Service extends EventEmitter {
 
       if (isReady() && this.command === "serve") {
         esmBuilder.build();
-        devServer.sendMessage({ action: "update-css-var" });
+        devServer.sendMessage({ action: "update-hfc-cssvars" });
       }
     });
 
@@ -82,8 +82,8 @@ export class Service extends EventEmitter {
     docBuilder.on("build-complete", () => {
       console.log("doc build complete");
 
-      if (!docBuildrReady) {
-        docBuildrReady = true;
+      if (!docBuildDone) {
+        docBuildDone = true;
         runAfterReady();
       }
 
@@ -94,10 +94,10 @@ export class Service extends EventEmitter {
       }
     });
 
-    const pkgJsonBuilder = new PkgJsonBuilder(this.config);
-    pkgJsonBuilder.on("build-complete", () => {
-      if (!pkgJsonBuildrReady) {
-        pkgJsonBuildrReady = true;
+    const manifestBuilder = new ManifestBuilder(this.config);
+    manifestBuilder.on("build-complete", () => {
+      if (!manifestBuildDone) {
+        manifestBuildDone = true;
         runAfterReady();
       }
 
@@ -118,8 +118,8 @@ export class Service extends EventEmitter {
       if (isFirstBuild) {
         isFirstBuild = false;
 
-        if (!pkgBuildrReady) {
-          pkgBuildrReady = true;
+        if (!pkgBuildDone) {
+          pkgBuildDone = true;
           runAfterReady();
         }
 

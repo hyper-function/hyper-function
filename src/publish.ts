@@ -1,75 +1,61 @@
-import { randomBytes } from "crypto";
 import { readFileSync } from "fs";
-import { tmpdir, homedir } from "os";
+import { homedir } from "os";
 import { join } from "path";
-import tar from "tar";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
-import bundleSize from "./bundle-size.js";
 import fs from "fs-extra";
+import { Manifest } from "./build-manifest";
 
 export async function publish({ token }: { token: string }) {
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
+  const outputPath = join(context, ".hfc", "build");
 
-  const pkgPath = join(context, ".hfc", "build", "pkg");
-  const pkgJsonPath = join(pkgPath, "package.json");
-
-  const pkgJson = await fs.readJSON(pkgJsonPath);
-  const { description } = pkgJson;
-
-  pkgJson.description = `👉  https://hyper.fun/c/${pkgJson.hfc.name}/${
-    pkgJson.version
-  }${description ? ` - ${description}` : ""}`;
-
-  const docHtml = await fs.readFile(
-    join(context, ".hfc", "build", "doc", "index.html"),
-    "utf8"
-  );
-
-  let docImgsTarPath;
-  let pkgTarPath;
-  try {
-    [docImgsTarPath, pkgTarPath] = await Promise.all([
-      packDocImgs(),
-      packHfcPkg(),
-    ]);
-  } catch (error) {
-    console.log("failed to pack:", error);
-    return;
-  }
-
-  const { sizeJs, sizeCss } = await bundleSize(pkgPath);
-
-  const [bannerJpg, bannerJpeg, bannerPng, bannerSvg] = await Promise.all(
-    [".jpg", ".jpeg", ".png", ".svg"].map(async (ext) => {
-      const bannerPath = join(context, "banner" + ext);
-      if (await fs.pathExists(bannerPath)) {
-        return ext;
-      }
-      return null;
-    })
-  );
-
-  const bannerExt = bannerJpg || bannerJpeg || bannerPng || bannerSvg;
-
-  let bannerPath;
-  if (bannerExt) {
-    bannerPath = join(context, "banner" + bannerExt);
-  }
-
+  // ! file must append at the end of formData, string field must before file field
   const form = new FormData();
   form.append("token", token!);
-  form.append("description", description);
-  form.append("manifest", JSON.stringify(pkgJson));
-  form.append("sizeJs", sizeJs + "");
-  form.append("sizeCss", sizeCss + "");
-  form.append("docHtml", docHtml);
-  form.append("docImgs", fileFromSync(docImgsTarPath));
-  form.append("pkg", fileFromSync(pkgTarPath));
-  if (bannerPath) {
-    form.append("banner", fileFromSync(bannerPath));
-    form.append("bannerExt", bannerExt!);
+
+  const docPath = join(outputPath, "doc");
+
+  const manifest: Manifest = fs.readJsonSync(join(docPath, "manifest.json"));
+  form.append("manifest", JSON.stringify(manifest));
+
+  const docMd = readFileSync(join(docPath, "index.md"), "utf8");
+  if (Buffer.byteLength(docMd) > 1024 * 256) {
+    console.error("doc too large, max 256 kb");
+    process.exit(-1);
   }
+
+  form.append("doc", docMd);
+  form.append(
+    "prop-types.json",
+    fileFromSync(join(docPath, "prop-types.json"))
+  );
+  form.append("css-vars.json", fileFromSync(join(docPath, "css-vars.json")));
+
+  const imgFileNames = fs.readdirSync(join(docPath, "imgs"));
+  for (const imgFileName of imgFileNames) {
+    form.append(
+      "docImg",
+      fileFromSync(join(docPath, "imgs", imgFileName)),
+      imgFileName
+    );
+  }
+
+  if (manifest.banner) {
+    form.append(
+      "banner",
+      fileFromSync(join(docPath, manifest.banner)),
+      manifest.banner
+    );
+  }
+
+  const pkgPath = join(outputPath, "pkg");
+  form.append("hfc.js", fileFromSync(join(pkgPath, "hfc.js")));
+  form.append("hfc.css", fileFromSync(join(pkgPath, "hfc.css")));
+
+  const hfmPath = join(outputPath, "hfm", manifest.name, manifest.version);
+  form.append("hfm.js", fileFromSync(join(hfmPath, "hfc.js")));
+  form.append("hfm.css", fileFromSync(join(hfmPath, "style.css")));
 
   const publishUrl =
     process.env.NODE_ENV === "development"
@@ -83,13 +69,13 @@ export async function publish({ token }: { token: string }) {
     })
       .then((res) => res.json())
       .then((res: any) => {
-        if (res.success) {
+        if (res.err === "OK") {
           console.log("publish success");
           return;
         }
 
-        if (res.error) {
-          console.log(res.message);
+        if (res.errmsg) {
+          console.error(res.errmsg);
           return;
         }
 
@@ -99,37 +85,6 @@ export async function publish({ token }: { token: string }) {
     console.log("failed to publish, network error");
     console.error(error);
   }
-}
-
-async function packDocImgs(): Promise<string> {
-  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
-  const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar");
-
-  await tar.create(
-    {
-      cwd: join(context, ".hfc", "build", "doc", "imgs"),
-      file: output,
-    },
-    ["."]
-  );
-
-  return output;
-}
-
-async function packHfcPkg(): Promise<string> {
-  const context = process.env.HFC_CLI_CONTEXT || process.cwd();
-  const output = join(tmpdir(), randomBytes(8).toString("hex") + ".tar.gz");
-
-  await tar.create(
-    {
-      cwd: join(context, ".hfc", "build"),
-      gzip: true,
-      file: output,
-    },
-    ["pkg"]
-  );
-
-  return output;
 }
 
 export function readToken() {

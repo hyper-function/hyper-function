@@ -13,12 +13,7 @@ export class CssVarBuilder extends EventEmitter {
     super();
 
     this.cssVarSrc = path.join(config.context, "variables.css");
-    this.cssVarDist = path.join(
-      this.config.hfmOutputPath,
-      this.config.hfcName,
-      this.config.version,
-      "hfc.cssvar.json"
-    );
+    this.cssVarDist = path.join(this.config.docOutputPath, "css-vars.json");
 
     if (!fs.existsSync(this.cssVarSrc)) {
       console.log("missing variables.css");

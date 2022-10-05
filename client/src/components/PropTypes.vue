@@ -1,98 +1,135 @@
 <template>
-  <div class="prop-types-title">Attrs</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Type</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(item, index) in attrs">
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(attrs, item, index)"
+  <div>
+    <div class="text-xl font-semibold py-2">Attrs</div>
+    <table
+      class="table-fixed w-full text-sm text-left text-gray-500 dark:text-gray-400"
+    >
+      <thead
+        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+        <tr>
+          <th scope="col" class="py-3 pl-6 w-1/5" style="width: 20%">Name</th>
+          <th scope="col" class="py-3 pl-6 w-2/5">Description</th>
+          <th scope="col" class="py-3 pl-6 w-1/5" style="width: 20%">Type</th>
+          <th scope="col" class="py-3 pl-6 w-1/5" style="width: 20%">
+            Default
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(item, index) in attrs"
+          class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
         >
-          <span :style="{ paddingLeft: item.level + 'em' }">
-            {{ item.name }}
-          </span>
-        </td>
-        <td>{{ item.desc }}</td>
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(attrs, item, index)"
-        >
-          {{ item.type }}
-        </td>
-        <td>{{ item.default }}</td>
-      </tr>
-    </tbody>
-  </table>
+          <td
+            class="py-2 pl-6 font-semibold font-mono break-all"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(attrs, item, index)"
+          >
+            <span class="text-gray-200">
+              {{ "·".repeat((item.level || 0) * 2) }}
+            </span>
+            <span>{{ item.name }}</span>
+          </td>
+          <td class="py-2 pl-6 break-words">{{ item.desc }}</td>
+          <td
+            class="py-2 pl-6 break-words"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(attrs, item, index)"
+          >
+            {{ item.type }}
+          </td>
+          <td class="py-2 pl-6 break-words">{{ item.default }}</td>
+        </tr>
+      </tbody>
+    </table>
 
-  <div class="prop-types-title">Events</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(item, index) in events">
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(events, item, index)"
+    <div class="text-xl font-semibold py-2 pt-10">Events</div>
+    <table
+      class="table-fixed w-full text-sm text-left text-gray-500 dark:text-gray-400"
+    >
+      <thead
+        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+        <tr>
+          <th scope="col" class="py-3 pl-6 w-1/5">Name</th>
+          <th scope="col" class="py-3 pl-6 w-3/5">Description</th>
+          <th scope="col" class="py-3 pl-6 w-1/5">Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="(item, index) in events"
+          class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
         >
-          <span :style="{ paddingLeft: item.level + 'em' }">
-            {{ item.name }}
-          </span>
-        </td>
-        <td>{{ item.desc }}</td>
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(events, item, index)"
+          <td
+            class="py-2 pl-6 font-semibold font-mono"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(events, item, index)"
+          >
+            <span class="text-gray-200">
+              {{ "·".repeat((item.level || 0) * 2) }}
+            </span>
+            <span>{{ item.name }}</span>
+          </td>
+          <td class="py-2 pl-6">{{ item.desc }}</td>
+          <td
+            class="py-2 pl-6"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(events, item, index)"
+          >
+            {{ item.type }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text-xl font-semibold py-2 pt-10">Slots</div>
+    <table
+      class="table-fixed w-full text-sm text-left text-gray-500 dark:text-gray-400"
+    >
+      <thead
+        class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+      >
+        <tr>
+          <th scope="col" class="py-3 pl-6 w-1/5">Name</th>
+          <th scope="col" class="py-3 pl-6 w-3/5">Description</th>
+          <th scope="col" class="py-3 pl-6 w-1/5">Type</th>
+        </tr>
+      </thead>
+      <tbody
+        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+      >
+        <tr
+          v-for="(item, index) in slots"
+          class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
         >
-          {{ item.type }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div class="prop-types-title">Slots</div>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="(item, index) in slots">
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(slots, item, index)"
-        >
-          <span :style="{ paddingLeft: item.level + 'em' }">
-            {{ item.name }}
-          </span>
-        </td>
-        <td>{{ item.desc }}</td>
-        <td
-          :style="{ cursor: item.isObject ? 'pointer' : '' }"
-          @click="renderSubType(slots, item, index)"
-        >
-          {{ item.type }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
+          <td
+            class="py-2 pl-6 font-semibold font-mono"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(slots, item, index)"
+          >
+            <span class="text-gray-200">
+              {{ "·".repeat((item.level || 0) * 2) }}
+            </span>
+            <span>{{ item.name }}</span>
+          </td>
+          <td class="py-2 pl-6">{{ item.desc }}</td>
+          <td
+            class="py-2 pl-6"
+            :style="{ cursor: item.isObject ? 'pointer' : '' }"
+            @click="renderSubType(slots, item, index)"
+          >
+            {{ item.type }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { inject, ref, watch } from "vue";
+import { inject, ref, watch, onMounted } from "vue";
 
 type RowItem = Partial<{
   name: string;
@@ -112,6 +149,10 @@ const slots = ref<RowItem[]>([]);
 
 const propTypes = inject<any>("propTypes")!;
 watch(propTypes, () => {
+  parsePropTypes();
+});
+
+onMounted(() => {
   parsePropTypes();
 });
 

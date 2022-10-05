@@ -1,7 +1,6 @@
 type Attrs {
-  # hihi
-  # hoho
-  name: String[]
+  # hihihohohohohohohohohohohohohohohohohohohohohohohohohoho
+  namenamenamenamenamenamenamenamename: String[]
   u1: User
   us: EE
   age: {

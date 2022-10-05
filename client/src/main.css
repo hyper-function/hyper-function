@@ -1,155 +1,97 @@
-@import "normalize.css/normalize.css";
-@import "./styles/prism.css";
-@import "github-markdown-css/github-markdown-light.css";
-
-:root {
-  --main-bg: #f9f7ec;
-  --main-bg-dark: #edebdd;
-  --gray-border: #d5d3cb;
-  --link-hover-color: #007940;
-  --nav-tabs-radius: 5px;
-  --nav-tabs-border-width: 2px;
-
-  --font: "Fira Sans", -apple-system, BlinkMacSystemFont, Segoe UI, PingFang SC,
-    Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial,
-    sans-serif;
-
-  --font-mono: "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco,
-    Consolas, "Liberation Mono", "Courier New", monospace;
-}
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 @font-face {
-  font-family: "Fira Sans";
+  font-family: "Inter";
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url("@fontsource/fira-sans/files/fira-sans-latin-400-normal.woff")
-    format("woff");
+  src: url("@fontsource/inter/files/inter-latin-400-normal.woff2")
+    format("woff2");
 }
 
 @font-face {
-  font-family: "Fira Sans";
+  font-family: "Inter";
   font-style: normal;
   font-display: swap;
   font-weight: 600;
-  src: url("@fontsource/fira-sans/files/fira-sans-latin-600-normal.woff")
-    format("woff");
+  src: url("@fontsource/inter/files/inter-latin-600-normal.woff2")
+    format("woff2");
 }
 
 @font-face {
-  font-family: "Fira Mono";
+  font-family: "Inter";
   font-style: normal;
   font-display: swap;
-  font-weight: 400;
-  src: url("@fontsource/fira-mono/files/fira-mono-latin-400-normal.woff")
-    format("woff");
+  font-weight: 700;
+  src: url("@fontsource/inter/files/inter-latin-700-normal.woff2")
+    format("woff2");
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url("@fontsource/inter/files/inter-latin-800-normal.woff2")
+    format("woff2");
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  font-family: var(--font);
-  font-size: 16px;
-  background-color: var(--main-bg);
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-}
-
-@media (min-width: 1024px) {
-  .container {
-    flex-direction: row;
-  }
-}
-
-.nav {
-  margin-bottom: 20px;
-  box-shadow: inset 0 -1px #eaeaea;
-}
-
-.nav .list {
-  display: flex;
-  list-style: none;
-  padding: 0;
+.shiki p {
+  display: inline;
   margin: 0;
 }
-
-.nav .tab {
-  display: block;
-  cursor: pointer;
-  user-select: none;
-  padding: 14px 20px 12px;
-  border-top-left-radius: var(--nav-tabs-radius);
-  border-top-right-radius: var(--nav-tabs-radius);
-  border-bottom: var(--nav-tabs-border-width) solid transparent;
-  transition: color 300ms, border-bottom-color 300ms;
+.sk-1 {
+  color: var(--tw-prose-pre-bg);
 }
-
-.nav .tab.active {
-  background: var(--main-bg-dark);
+.sk-2 {
+  color: var(--tw-prose-pre-code);
 }
-
-.nav .tab.active,
-.nav .tab:hover {
-  color: var(--link-hover-color);
-  border-bottom-color: var(--link-hover-color);
+.sk-3 {
+  color: #81a1c1;
 }
-
-.main {
-  max-width: 1200px;
-  margin: 15px auto;
-  padding: 0 15px;
+.sk-4 {
+  color: #8fbcbb;
 }
-
-.content {
-  --shadow: 0 2px 3px hsla(51, 50%, 44%, 0.35);
-  flex: 1;
-  margin-bottom: 25px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 5px;
-  box-shadow: var(--shadow);
-  min-height: calc(100vh - 150px);
-  overflow: hidden;
+.sk-5 {
+  color: #a3be8c;
 }
-
-.markdown-body {
-  font-family: var(--font);
+.sk-6 {
+  color: #ebcb8b;
 }
-
-.markdown-body pre {
-  font-size: 1em !important;
-  background-color: #f6f8fa !important;
+.sk-7 {
+  color: #8fbcbb;
 }
-
-.markdown-body code {
-  font-family: var(--font-mono) !important;
+.sk-8 {
+  color: #88c0d0;
 }
-
-.markdown-body > h1:first-of-type {
-  margin-top: 0 !important;
+.sk-9 {
+  color: #616e88;
 }
-
-.markdown-body > h2:first-of-type {
-  margin-top: 0 !important;
+.sk-10 {
+  color: #ebcb8b;
 }
-
-.markdown-body > h3:first-of-type {
-  margin-top: 0 !important;
+.sk-11 {
+  color: #b48ead;
+}
+.sk-12 {
+  color: #bf616a;
+}
+.sk-13 {
+  color: #5e81ac;
+}
+.sk-14 {
+  color: #d08770;
+}
+.sk-i {
+  font-style: italic;
+}
+.sk-b {
+  font-weight: bold;
+}
+.sk-u {
+  text-decoration: underline;
 }
 
 .prop-types table {
@@ -183,120 +125,5 @@ body {
 .prop-types-title {
   font-weight: bold;
   font-size: 1.17em;
-}
-
-.side-bar {
-  min-width: 342px;
-  margin-left: 20px;
-}
-
-.side-bar-title {
-  font-size: 1em;
-  margin: 0.5rem 0;
-  padding-top: 0.5rem;
-}
-
-.side-bar-desc {
-  display: flex;
-  align-items: center;
-}
-
-.side-bar-desc > svg {
-  height: 14px;
-  width: 14px;
-  margin-right: 0.5rem;
-}
-
-.side-bar-no-dep {
-  color: #999;
-  font-size: 90%;
-}
-
-.side-bar-dep-item {
-  display: flex;
-  justify-content: space-between;
-  line-height: 22px;
-  cursor: pointer;
-  margin: 0 -8px;
-  padding: 0 8px;
-}
-
-.side-bar-dep-item span:first-child {
-  color: rgb(0, 172, 91);
-}
-
-.side-bar-dep-item:hover {
-  cursor: pointer;
-  background-color: #edebdd;
-  border-radius: 3px;
-}
-
-.multi-column {
-  display: flex;
-  justify-content: space-between;
-}
-
-.multi-column > div {
-  flex: 1;
-}
-
-.hr-line {
-  height: 1px;
-  background-color: var(--gray-border);
-  margin-top: 8px;
-}
-
-.hfz-preview {
-  display: flex;
-  flex-direction: column;
-}
-
-.hfz-preview iframe {
-  width: 100%;
-  min-width: 100%;
-  height: 0;
-  border: none;
-  transition: height 300ms ease;
-}
-
-.hfz-preview:hover iframe {
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
-}
-
-.hfz-preview-actions {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  margin: 6px 0;
-  visibility: hidden;
-}
-
-.hfz-preview:hover .hfz-preview-actions {
   visibility: visible;
-}
-
-.hfz-preview-actions > button {
-  display: flex;
-  align-items: inherit;
-  height: 22px;
-  line-height: 22px;
-  font-size: 14px;
-  font-weight: 400;
-  border: none;
-  background-color: transparent;
-  outline: none;
-  cursor: pointer;
-  color: #8e8e93;
-}
-
-.hfz-preview-actions > button:hover {
-  color: rgb(0, 172, 91);
-}
-
-.hfz-preview-actions > button svg {
-  margin-right: 4px;
-}
-
-.hfz-code-preview-editor {
-  margin-bottom: 12px;
 }

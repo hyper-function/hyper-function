@@ -80,6 +80,7 @@ export class HfmBuilder extends EventEmitter {
       publicDir: false,
       clearScreen: false,
       logLevel: "silent",
+      css: { postcss: {} },
       build: {
         assetsDir: "",
         reportCompressedSize: false,
@@ -150,6 +151,7 @@ export class HfmBuilder extends EventEmitter {
           root: this.config.context,
           mode: this.mode,
           esbuild: false,
+          css: { postcss: {} },
           define: {
             "process.env.NODE_ENV": JSON.stringify(this.mode),
           },

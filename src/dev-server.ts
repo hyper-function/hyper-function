@@ -1,10 +1,10 @@
 import cors from "cors";
 import path from "path";
-import fs from "fs-extra";
 import sirv from "sirv";
+import fs from "fs-extra";
 import connect from "connect";
-import colors from "picocolors";
 import { dirname } from "desm";
+import colors from "picocolors";
 
 import kvCache from "./kv-cache.js";
 import bundleSize from "./bundle-size.js";
@@ -51,9 +51,12 @@ export class DevServer {
     this.middlewares.use("/api/meta", async (req, res) => {
       sendJson(res, {
         name: this.config.hfcName,
+        desc: this.config.description,
+        keywords: this.config.keywords,
         version: this.config.version,
         license: this.config.license,
         deps: this.config.dependencies,
+        banner: this.config.bannerFileName,
       });
     });
 
