@@ -32,9 +32,11 @@ export interface CssVar {
 
 export type ResolvedConfig = HfcConfig & {
   name: string;
-  hfcName: string;
   version: string;
   license: string;
+  keywords: string[];
+  description: string;
+  hfcName: string;
   context: string;
   command: "serve" | "build";
   outputPath: string;
@@ -45,6 +47,7 @@ export type ResolvedConfig = HfcConfig & {
   dependencies: Record<string, string>;
   devDependencies: Record<string, string>;
   cssVars: CssVar[];
+  bannerFileName: string;
 };
 
 export async function resolveConfig(
@@ -74,8 +77,6 @@ export async function resolveConfig(
 
   // const mode = config.mode || defaultMode;
   const env = config.env || {};
-
-  const packageJson = await fs.readJson(path.resolve(context, "package.json"));
 
   const outputPath = path.resolve(context, ".hfc", command);
 
@@ -113,8 +114,27 @@ export async function resolveConfig(
     return false;
   };
 
+  const packageJson = await fs.readJson(path.resolve(context, "package.json"));
+
+  const keywords = packageJson.keywords || [];
+  const description = packageJson.description;
   const dependencies = packageJson.dependencies || {};
   const devDependencies = packageJson.devDependencies || {};
+
+  config.css = config.css || {};
+  if (!config.css.postcss) {
+    config.css.postcss = {};
+  }
+
+  let bannerFileName = "";
+  for (const ext of [".jpg", ".jpeg", ".png", ".svg", ".webp"]) {
+    const bannerPath = path.join(context, "banner" + ext);
+    if (await fs.pathExists(bannerPath)) {
+      bannerFileName = "banner" + ext;
+      await fs.copyFile(bannerPath, path.join(docOutputPath, bannerFileName));
+      break;
+    }
+  }
 
   const resolvedConfig: ResolvedConfig = {
     ...config,
@@ -122,6 +142,8 @@ export async function resolveConfig(
     // mode,
     context,
     command,
+    keywords,
+    description,
     rollupOptions,
     name: packageJson.name,
     port: Number(process.env.PORT) || Number(config.port) || 7000,
@@ -136,6 +158,7 @@ export async function resolveConfig(
     dependencies,
     devDependencies,
     cssVars: [],
+    bannerFileName,
   };
 
   return resolvedConfig;

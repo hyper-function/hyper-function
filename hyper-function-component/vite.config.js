@@ -25,6 +25,11 @@ export default defineConfig(({ mode }) => {
           index: path.resolve(root, "index.html"),
           preview: path.resolve(root, "preview.html"),
         },
+        output: {
+          entryFileNames: "[name].js",
+          chunkFileNames: "[name].js",
+          assetFileNames: "[name].[ext]",
+        },
       },
     },
   };

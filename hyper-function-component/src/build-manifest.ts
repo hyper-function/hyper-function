@@ -4,8 +4,20 @@ import chokidar from "chokidar";
 import fs from "fs-extra";
 import { ResolvedConfig } from "./config.js";
 
+export interface Manifest {
+  name: string;
+  version: string;
+  banner: string;
+  homepage: string;
+  description: string;
+  keywords: string[];
+  license: string;
+  repository: string;
+  deps: { name: string; v: string; rv: string }[];
+}
+
 const { existsSync, writeFile } = fs;
-export class PkgJsonBuilder extends EventEmitter {
+export class ManifestBuilder extends EventEmitter {
   pkgJsonFilePath: string;
   constructor(private config: ResolvedConfig) {
     super();
@@ -24,8 +36,6 @@ export class PkgJsonBuilder extends EventEmitter {
   async build() {
     const pkg = await fs.readJson(this.pkgJsonFilePath);
 
-    const hfcPage = `https://hyper.fun/c/${this.config.hfcName}/${this.config.version}`;
-
     const homepage = process.env.HFC_HOMEPAGE || pkg.homepage;
     const description = process.env.HFC_DESCRIPTION || pkg.description;
     const repository = process.env.HFC_REPOSITORY || pkg.repository;
@@ -35,34 +45,37 @@ export class PkgJsonBuilder extends EventEmitter {
       keywords = process.env.HFC_KEYWORDS.split(",");
     }
 
-    const newPkg = {
-      hfc: {
-        name: this.config.hfcName,
-      },
+    const deps: Manifest["deps"] = [];
+
+    for (const [name, requiredVersion] of Object.entries(
+      this.config.dependencies
+    )) {
+      const pkgJsonPath = path.resolve(
+        this.config.context,
+        "node_modules",
+        name,
+        "package.json"
+      );
+
+      const pkgJson = await fs.readJson(pkgJsonPath);
+      deps.push({ name, rv: requiredVersion, v: pkgJson.version });
+    }
+
+    const manifest: Manifest = {
       name: this.config.hfcName,
       version: this.config.version,
-      main: "index.js",
-      module: "index.js",
-      type: "module",
+      banner: this.config.bannerFileName,
       homepage,
       description,
-      keywords: ["hyper-function-component", "hfc", ...keywords],
+      keywords,
       license,
       repository,
-      dependencies: this.config.dependencies,
-      // optionalDependencies: {
-      //   "@types/hyper-function-component": "^2.0.0",
-      // },
+      deps,
     };
 
     await writeFile(
-      path.join(this.config.pkgOutputPath, "package.json"),
-      JSON.stringify(newPkg, null, 2)
-    );
-
-    await writeFile(
-      path.join(this.config.pkgOutputPath, "readme.md"),
-      `👉  ${hfcPage}${pkg.description ? ` - ${pkg.description}` : ""}`
+      path.join(this.config.docOutputPath, "manifest.json"),
+      JSON.stringify(manifest)
     );
 
     this.emit("build-complete");

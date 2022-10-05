@@ -1,45 +1,51 @@
 <template>
-  <div class="main">
-    <div class="nav">
-      <ul class="list">
-        <li v-for="item in ['Readme', 'PropTypes']" @click="activeTab = item">
-          <div :class="{ tab: true, active: item === activeTab }">
-            {{ item }}
-          </div>
-        </li>
-      </ul>
-    </div>
-    <div class="container">
-      <div v-show="activeTab === 'Readme'" class="content">
-        <div id="hfc-doc" class="docs markdown-body" ref="docContainer"></div>
-      </div>
-      <div v-show="activeTab === 'PropTypes'" class="content">
-        <Transition name="fade">
-          <div class="prop-types">
-            <PropTypes />
-          </div>
-        </Transition>
+  <div class="my-4 lg:my-8 mx-auto max-w-[1164px]">
+    <div class="flex flex-col mx-4 lg:mx-8 lg:flex-row">
+      <div id="content" class="flex-1 shrink">
+        <HeaderInfo
+          :tabs="tabs"
+          :active-tab="activeTab"
+          @change="activeTab = $event.name"
+        />
+        <div
+          id="hfc-doc"
+          class="prose prose-slate max-w-none"
+          ref="docContainer"
+          v-show="activeTab === 'Readme'"
+        ></div>
+        <div v-if="activeTab === 'PropTypes'">
+          <PropTypes />
+        </div>
+        <div v-if="activeTab === 'CssVars'">
+          <CssVars />
+        </div>
       </div>
 
-      <div class="side-bar">
-        <Sidebar />
-      </div>
+      <Sidebar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { inject, watch, ref, compile } from "vue";
+import { inject, watch, ref } from "vue";
 import { iframeResize } from "iframe-resizer";
 import Sidebar from "../components/Sidebar.vue";
 import PropTypes from "../components/PropTypes.vue";
 import { debounce } from "../utils";
+import HeaderInfo from "../components/Header.vue";
+import CssVars from "../components/CssVars.vue";
 
-const meta = inject<any>("meta")!;
+const manifest = inject<any>("manifest")!;
 const docHtml = inject<any>("docHtml")!;
 const hfcRebuildInfo = inject<any>("hfcRebuildInfo");
 const docContainer = ref<HTMLDivElement | null>(null);
 const activeTab = ref("Readme");
+
+const tabs = ref<{ name: string }[]>([
+  { name: "Readme" },
+  { name: "PropTypes" },
+  { name: "CssVars" },
+]);
 
 watch(() => docHtml.value, renderHfcDoc);
 watch(() => hfcRebuildInfo.value, reloadHfcPreview);
@@ -47,7 +53,8 @@ watch(() => hfcRebuildInfo.value, reloadHfcPreview);
 function showEditor(
   container: HTMLDivElement,
   code: string,
-  onChange: Function
+  onChange: Function,
+  onInit: Function
 ) {
   const editor = document.createElement("iframe");
   editor.setAttribute(
@@ -63,6 +70,7 @@ function showEditor(
     ].join(" ")
   );
 
+  editor.className = "rounded";
   editor.src = "https://code.hyper.fun/embed-editor";
   container.appendChild(editor);
 
@@ -79,6 +87,7 @@ function showEditor(
             code: code,
           },
         });
+        onInit();
       },
       onResized(res: any) {
         if (res.height <= 16) return;
@@ -98,36 +107,66 @@ function showEditor(
 }
 
 function renderHfcDoc() {
-  document.title = meta.value.name;
+  document.title = manifest.value.name;
   const elem = docContainer.value;
   if (!elem) return;
 
+  elem.style.width = "auto";
   // prevent page flashing when reloading
   elem.style.minHeight = elem.clientHeight + "px";
 
   elem.innerHTML = docHtml.value.text;
-  renderHfcDocImgs();
-  renderCodeBlock();
   renderHfcPreview();
+  renderCodeCollapse();
 
   setTimeout(() => {
     elem.style.minHeight = "auto";
   }, 500);
 }
 
-function renderHfcDocImgs() {
-  document
-    .querySelectorAll<HTMLImageElement>("#hfc-doc img")
-    .forEach((imgElem) => {
-      if (imgElem.dataset.src) {
-        imgElem.src = `/doc/imgs/${imgElem.dataset.src}`;
-      }
-    });
-}
+function renderCodeCollapse() {
+  const codeBlocks = document.querySelectorAll<HTMLPreElement>(".shiki");
+  codeBlocks.forEach((elem) => {
+    const isHfzBlock = elem.hasAttribute("data-hfz");
+    if (!isHfzBlock) return;
 
-function renderCodeBlock() {
-  const Prism = (window as any).Prism;
-  if (Prism) Prism.highlightAll();
+    const height = getComputedStyle(elem).height;
+    if (height !== "200px") return;
+
+    const collapse = document.createElement("template");
+    collapse.innerHTML = `
+      <div
+        class="absolute bottom-0 left-0 right-0 flex flex-col"
+      >
+        <div id="mask" style="height: 90px; background: linear-gradient(transparent, var(--tw-prose-pre-bg))" ></div>
+        <div
+          id="btn"
+          style="background-color: var(--tw-prose-pre-bg)"
+          class="flex justify-center items-center h-9 text-gray-400 hover:text-gray-200 cursor-pointer select-none"
+        >
+        </div>
+      </div>
+    `;
+
+    const mask = collapse.content.getElementById("mask")!;
+    mask.removeAttribute("id");
+
+    const openSvg = `<svg width="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="M16.59 8.59L12 13.17L7.41 8.59L6 10l6 6l6-6z"/></svg></span>`;
+    const closeSvg = `<svg width="24" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="m12 8l-6 6l1.41 1.41L12 10.83l4.59 4.58L18 14z"/></svg>`;
+    const btn = collapse.content.getElementById("btn")!;
+    btn.removeAttribute("id");
+    btn.innerHTML = openSvg;
+
+    let isOpen = false;
+    btn.addEventListener("click", () => {
+      isOpen = !isOpen;
+      elem.style.maxHeight = isOpen ? "none" : "200px";
+      mask.style.display = isOpen ? "none" : "block";
+      btn.innerHTML = isOpen ? closeSvg : openSvg;
+    });
+
+    elem.appendChild(collapse.content);
+  });
 }
 
 let sandboxes: HTMLIFrameElement[] = [];
@@ -145,15 +184,22 @@ function renderHfcPreview() {
     sandboxes = [];
   }
 
-  const containers = document.querySelectorAll<HTMLDivElement>("[data-hfz]");
-  containers.forEach((container) => {
-    const id = container.dataset.hfzId;
+  const hfzSnippets = document.querySelectorAll<HTMLDivElement>("[data-hfz]");
+  hfzSnippets.forEach((snippet) => {
+    snippet.style.marginTop = "0";
 
-    let code = decodeURIComponent(container.dataset.hfz!);
-    container.setAttribute("data-hfz", "");
+    const container = document.createElement("div");
+    snippet.before(container);
+
+    const id = snippet.dataset.hfzId;
+    let code = decodeURIComponent(snippet.dataset.hfz!);
+    snippet.setAttribute("data-hfz", "");
     container.classList.add("hfz-preview");
 
     const sandbox = document.createElement("iframe");
+    sandbox.style.boxShadow = "0 0 0 1.2px #ebecf0";
+    sandbox.style.borderRadius = "4px";
+    sandbox.style.marginBottom = "12px";
     sandboxes.push(sandbox);
     sandbox.setAttribute(
       "sandbox",
@@ -182,8 +228,8 @@ function renderHfcPreview() {
             action: "render",
             data: {
               code: code,
-              name: meta.value.name,
-              version: meta.value.version,
+              name: manifest.value.name,
+              version: manifest.value.version,
             },
           });
         },
@@ -195,43 +241,43 @@ function renderHfcPreview() {
       sandbox
     );
 
-    const actions = document.createElement("div");
-    actions.classList.add("hfz-preview-actions");
-
-    const openBtn = document.createElement("button");
-    openBtn.title = "Open in new tab";
-    openBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h5c.55 0 1-.45 1-1s-.45-1-1-1H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1v5c0 .55-.45 1-1 1zM14 4c0 .55.45 1 1 1h2.59l-9.13 9.13c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L19 6.41V9c0 .55.45 1 1 1s1-.45 1-1V4c0-.55-.45-1-1-1h-5c-.55 0-1 .45-1 1z"/>
-      </svg>
-      <span>OPEN</span>
+    const actions = document.createElement("template");
+    actions.innerHTML = `
+      <div class="relative">
+        <div class="absolute flex gap-3 top-3 right-4 z-10">
+          <button class="text-gray-400 hover:text-gray-200 w-6" title="Open in new tab">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M0 0h24v24H0V0z" fill="none"/><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h5c.55 0 1-.45 1-1s-.45-1-1-1H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1v5c0 .55-.45 1-1 1zM14 4c0 .55.45 1 1 1h2.59l-9.13 9.13c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L19 6.41V9c0 .55.45 1 1 1s1-.45 1-1V4c0-.55-.45-1-1-1h-5c-.55 0-1 .45-1 1z"/>
+            </svg>
+          </button>
+          <button class="text-gray-400 hover:text-gray-200 w-6" title="Edit">
+            <svg preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24"><path fill="currentColor" d="m18.988 2.012l3 3L19.701 7.3l-3-3zM8 16h3l7.287-7.287l-3-3L8 13z"/><path fill="currentColor" d="M19 19H8.158c-.026 0-.053.01-.079.01c-.033 0-.066-.009-.1-.01H5V5h6.847l2-2H5c-1.103 0-2 .896-2 2v14c0 1.104.897 2 2 2h14a2 2 0 0 0 2-2v-8.668l-2 2V19z"/></svg>
+          </button>
+          <button class="text-gray-400 hover:text-gray-200 w-6" title="Reload">
+            <svg fill="currentColor" viewBox="0 0 1024 1024"><path d="M768 707.669333V256H469.333333a42.666667 42.666667 0 1 1 0-85.333333h341.333334a42.666667 42.666667 0 0 1 42.666666 42.666666v494.336l55.168-55.168a42.666667 42.666667 0 0 1 60.330667 60.330667l-128 128a42.666667 42.666667 0 0 1-60.330667 0l-128-128a42.666667 42.666667 0 0 1 60.330667-60.330667L768 707.669333zM256 316.330667V768h298.666667a42.666667 42.666667 0 1 1 0 85.333333H213.333333a42.666667 42.666667 0 0 1-42.666666-42.666666V316.330667l-55.168 55.168a42.666667 42.666667 0 0 1-60.330667-60.330667l128-128a42.666667 42.666667 0 0 1 60.330667 0l128 128a42.666667 42.666667 0 0 1-60.330667 60.330667L256 316.330667z"></path></svg>
+          </button>
+        </div>
+      </div>
     `;
+
+    const actionBtns = actions.content.querySelectorAll("button");
+
+    const openBtn = actionBtns[0];
     openBtn.addEventListener("click", () => {
       window.open("/preview/" + id, "_blank");
     });
 
-    const editBtn = document.createElement("button");
-    editBtn.title = "Edit code";
-    editBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"  fill="none" stroke-linecap="round" stroke-linejoin="round">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-        <polyline points="7 8 3 12 7 16" />
-        <polyline points="17 8 21 12 17 16" />
-        <line x1="14" y1="4" x2="10" y2="20" />
-      </svg>
-      <span>EDIT</span>
-    `;
-
+    const editBtn = actionBtns[1];
     let editorContainer: HTMLDivElement | null = null;
     editBtn.addEventListener("click", () => {
       if (editorContainer) {
         container.removeChild(editorContainer);
+        snippet.style.display = "block";
         editorContainer = null;
         return;
       }
 
       editorContainer = document.createElement("div");
-      editorContainer.className = "hfz-code-preview-editor";
       container.appendChild(editorContainer);
       showEditor(
         editorContainer,
@@ -243,28 +289,42 @@ function renderHfcPreview() {
 
           code = newCode;
           (sandbox as any).iFrameResizer.sendMessage({ action: "reload" });
-        }, 250)
+        }, 250),
+        () => {
+          snippet.style.display = "none";
+        }
       );
     });
 
-    const reloadBtn = document.createElement("button");
-    reloadBtn.title = "Reload";
-    reloadBtn.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M0 0h24v24H0V0z" fill="none"/><path d="M17.65 6.35c-1.63-1.63-3.94-2.57-6.48-2.31-3.67.37-6.69 3.35-7.1 7.02C3.52 15.91 7.27 20 12 20c3.19 0 5.93-1.87 7.21-4.56.32-.67-.16-1.44-.9-1.44-.37 0-.72.2-.88.53-1.13 2.43-3.84 3.97-6.8 3.31-2.22-.49-4.01-2.3-4.48-4.52C5.31 9.44 8.26 6 12 6c1.66 0 3.14.69 4.22 1.78l-1.51 1.51c-.63.63-.19 1.71.7 1.71H19c.55 0 1-.45 1-1V6.41c0-.89-1.08-1.34-1.71-.71l-.64.65z"/>
-      </svg>
-      <span>RELOAD</span>
-    `;
-
+    const reloadBtn = actionBtns[2];
     reloadBtn.addEventListener("click", () => {
       (sandbox as any).iFrameResizer.sendMessage({ action: "reload" });
     });
 
-    actions.appendChild(openBtn);
-    actions.appendChild(editBtn);
-    actions.appendChild(reloadBtn);
-
-    container.appendChild(actions);
+    container.appendChild(actions.content);
   });
 }
 </script>
+<style>
+.hfz-preview {
+  position: relative;
+  margin-bottom: 12px;
+}
+.hfz-preview iframe {
+  width: 100%;
+  min-width: 100%;
+  height: 0;
+  border: none;
+  transition: height 300ms ease;
+}
+
+.shiki {
+  position: relative;
+  overflow: hidden;
+}
+.shiki[data-hfz] {
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+}
+</style>
