@@ -1,6 +1,7 @@
 import { readFileSync } from "fs";
 import { homedir } from "os";
 import { join } from "path";
+import colors from "picocolors";
 import fetch, { FormData, fileFromSync } from "node-fetch";
 
 import fs from "fs-extra";
@@ -55,7 +56,7 @@ export async function publish({ token }: { token: string }) {
 
   const hfmPath = join(outputPath, "hfm", manifest.name, manifest.version);
   form.append("hfm.js", fileFromSync(join(hfmPath, "hfc.js")));
-  form.append("hfm.css", fileFromSync(join(hfmPath, "style.css")));
+  form.append("style.css", fileFromSync(join(hfmPath, "style.css")));
 
   const publishUrl =
     process.env.NODE_ENV === "development"
@@ -70,7 +71,7 @@ export async function publish({ token }: { token: string }) {
       .then((res) => res.json())
       .then((res: any) => {
         if (res.err === "OK") {
-          console.log("publish success");
+          console.log(colors.green("publish success"));
           return;
         }
 

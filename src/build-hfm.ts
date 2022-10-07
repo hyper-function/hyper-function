@@ -31,7 +31,7 @@ const SHAREABLE_DEPS: Record<
     `,
   },
   preact: {
-    subImports: ["preact/hooks"],
+    subImports: ["preact/hooks", "preact/compat", "preact/jsx-runtime"],
     buildScript: `
       import * as Preact from "preact";
       import * as PreactHooks from "preact/hooks";
