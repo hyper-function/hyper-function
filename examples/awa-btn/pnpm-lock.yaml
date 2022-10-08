@@ -1,23 +1,19 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@types/hyper-function-component': ^1.4.0
-  dep: '*'
-  hfc-prop-names: ^1.0.2
   hfcpack: ../../
+  lodash: ^4.17.21
   react: ^18.2.0
   react-dom: ^18.2.0
   vue: '*'
 
 dependencies:
-  dep: 0.18.3
+  lodash: 4.17.21
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   vue: 3.2.39
 
 devDependencies:
-  '@types/hyper-function-component': 1.4.0
-  hfc-prop-names: 1.0.3
   hfcpack: link:../..
 
 packages:
@@ -48,10 +44,6 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: false
-
-  /@types/hyper-function-component/1.4.0:
-    resolution: {integrity: sha512-oMuIycmB/DYkixUPdFbeGihKQyQsk+x2nwvn1EBIK8DPR9SeFZajX8+PdR3+9h9Qp6hupaUVgoWmcR26cwGzdg==}
-    dev: true
 
   /@vue/compiler-core/3.2.39:
     resolution: {integrity: sha512-mf/36OWXqWn0wsC40nwRRGheR/qoID+lZXbIuLnr4/AngM0ov8Xvv8GHunC0rKRIkh60bTqydlqTeBo49rlbqw==}
@@ -140,35 +132,16 @@ packages:
     resolution: {integrity: sha512-Z1PhmomIfypOpoMjRQB70jfvy/wxT50qW08YXO5lMIJkrdq4yOTR+AW7FqutScmB9NkLwxo+jU+kZLbofZZq/w==}
     dev: false
 
-  /dep/0.18.3:
-    resolution: {integrity: sha512-fvN3Iwj2AcI9NQa/UzJybcRS0/moLvAtI1tBkxDYIzJ2zS3j+JisB/j+//ZTy9iIgjhFWB7yDZFS+TwDqP+djQ==}
-    hasBin: true
-    dev: false
-    bundledDependencies:
-      - fs-extra
-      - gunzip-maybe
-      - node-gyp
-      - npm-package-arg
-      - npm-path
-      - promise-each
-      - request
-      - semver
-      - tar-fs
-      - tar-stream
-      - update-notifier
-      - which
-      - yargs
-
   /estree-walker/2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
     dev: false
 
-  /hfc-prop-names/1.0.3:
-    resolution: {integrity: sha512-08tSXK1cBK3BUrmtidsBQlnHsdhMTUOAGpstNLGGWuwcuAKeviG+wHP3oYAXIYdVYrjrndub+kofvu6dF8BNdQ==}
-    dev: true
-
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+    dev: false
+
+  /lodash/4.17.21:
+    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
   /loose-envify/1.4.0:

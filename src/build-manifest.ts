@@ -13,7 +13,8 @@ export interface Manifest {
   keywords: string[];
   license: string;
   repository: string;
-  deps: { name: string; v: string; rv: string }[];
+  deps: ResolvedConfig["dependencies"];
+  sharedNpmImportMap: ResolvedConfig["sharedNpmImportMap"];
 }
 
 const { existsSync, writeFile } = fs;
@@ -45,24 +46,9 @@ export class ManifestBuilder extends EventEmitter {
       keywords = process.env.HFC_KEYWORDS.split(",");
     }
 
-    const deps: Manifest["deps"] = [];
-
-    for (const [name, requiredVersion] of Object.entries(
-      this.config.dependencies
-    )) {
-      const pkgJsonPath = path.resolve(
-        this.config.context,
-        "node_modules",
-        name,
-        "package.json"
-      );
-
-      const pkgJson = await fs.readJson(pkgJsonPath);
-      deps.push({ name, rv: requiredVersion, v: pkgJson.version });
-    }
-
     const manifest: Manifest = {
       name: this.config.hfcName,
+      deps: this.config.dependencies,
       version: this.config.version,
       banner: this.config.bannerFileName,
       homepage,
@@ -70,7 +56,7 @@ export class ManifestBuilder extends EventEmitter {
       keywords,
       license,
       repository,
-      deps,
+      sharedNpmImportMap: this.config.sharedNpmImportMap,
     };
 
     await writeFile(

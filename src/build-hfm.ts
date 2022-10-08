@@ -1,55 +1,34 @@
 // HFC Federated Module
-import EventEmitter from "events";
-import fs from "fs-extra";
 import path from "path";
-import type { OutputOptions } from "rollup";
+import fs from "fs-extra";
+import EventEmitter from "events";
 import { build, InlineConfig } from "vite";
+import esbuild from "esbuild";
+import type { OutputOptions } from "rollup";
 import { ResolvedConfig } from "./config.js";
 
-const SHAREABLE_DEPS: Record<
-  string,
-  {
-    subImports?: string[];
-    buildScript?: string;
+function generateSharedNpmBuildScript(name: string) {
+  let script = `
+    const shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
+    import * as m from "${name}";
+    if (!shared["${name}"]) shared["${name}"] = m;
+  `;
+
+  // special case for react-dom, which must bundle with react
+  if (name === "react") {
+    script += `
+      import * as m1 from "react-dom";
+      if (!shared["react-dom"]) shared["react-dom"] = m1;
+    `;
   }
-> = {
-  react: {
-    buildScript: `
-      import * as React from "react";
-      import * as ReactDom from "react-dom";
-      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
-      if (!shared.react) shared.react = React;
-      if (!shared['react-dom']) shared['react-dom'] = ReactDom;
-    `,
-  },
-  "react-dom": {},
-  vue: {
-    buildScript: `
-      import * as Vue from "vue";
-      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
-      if (!shared.vue) shared.vue = Vue;
-    `,
-  },
-  preact: {
-    subImports: ["preact/hooks", "preact/compat", "preact/jsx-runtime"],
-    buildScript: `
-      import * as Preact from "preact";
-      import * as PreactHooks from "preact/hooks";
-      import * as PreactCompat from "preact/compat";
-      import * as PreactJsxRuntime from "preact/jsx-runtime";
-      var shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
-      if (!shared.preact) shared.preact = Preact;
-      if (!shared['preact/hooks']) shared['preact/hooks'] = PreactHooks;
-      if (!shared['preact/compat']) shared['preact/compat'] = PreactCompat;
-      if (!shared['preact/jsx-runtime']) shared['preact/jsx-runtime'] = PreactJsxRuntime;
-    `,
-  },
-};
+
+  return script;
+}
 
 export class HfmBuilder extends EventEmitter {
   mode: "production" | "development";
   viteConfig!: InlineConfig;
-  sharedDeps: { name: string; ver: string }[] = [];
+  sharedDeps: { npm: string; name: string; ver: string; rv: string }[] = [];
   externals: string[] = [];
   constructor(private config: ResolvedConfig) {
     super();
@@ -68,7 +47,7 @@ export class HfmBuilder extends EventEmitter {
       ].join("\n")
     );
 
-    await this.buildShareDep();
+    await this.buildSharedNpmPkg();
 
     this.viteConfig = {
       mode: this.mode,
@@ -112,67 +91,55 @@ export class HfmBuilder extends EventEmitter {
       },
     };
   }
-  async buildShareDep() {
+
+  async buildSharedNpmPkg() {
     await Promise.all(
       Object.keys(this.config.dependencies).map(async (name) => {
-        const shareableDep = SHAREABLE_DEPS[name];
-        if (!shareableDep) return;
-        this.externals.push(name);
-        if (shareableDep.subImports) {
-          this.externals.push(...shareableDep.subImports);
-        }
+        const sharedPkg = this.config.sharedNpmImportMap[name];
+        if (!sharedPkg) return;
 
-        if (!shareableDep.buildScript) return;
+        const dep = this.config.dependencies[name];
+        await Promise.all(
+          sharedPkg.imports.map(async (importPath) => {
+            this.externals.push(importPath);
+            if (importPath === "react") this.externals.push("react-dom");
 
-        const pkgJson = await fs.readJson(
-          path.resolve(
-            this.config.context,
-            "node_modules",
-            name,
-            "package.json"
-          )
+            this.sharedDeps.push({
+              npm: name,
+              name: importPath,
+              ver: dep.v,
+              rv: dep.rv,
+            });
+
+            const outfile = path.resolve(
+              this.config.hfmOutputPath,
+              "share",
+              `${importPath}@${dep.v}.js`
+            );
+
+            const hasBuild = await fs.pathExists(outfile);
+            if (hasBuild) return;
+
+            const entry = path.join(
+              this.config.hfmOutputPath,
+              "shared-entry",
+              importPath + ".js"
+            );
+
+            await fs.ensureFile(entry);
+            await fs.writeFile(entry, generateSharedNpmBuildScript(importPath));
+            await esbuild.build({
+              entryPoints: [entry],
+              bundle: true,
+              minify: this.mode === "production",
+              define: {
+                "process.env.NODE_ENV": JSON.stringify(this.mode),
+              },
+              format: "iife",
+              outfile,
+            });
+          })
         );
-
-        this.sharedDeps.push({ name: name, ver: pkgJson.version });
-
-        const depPath = path.resolve(
-          this.config.hfmOutputPath,
-          "share",
-          `${name}@${pkgJson.version}.js`
-        );
-
-        const hasBuild = await fs.pathExists(depPath);
-        if (hasBuild) return;
-
-        const entry = path.resolve(this.config.hfmOutputPath, name + ".js");
-        await fs.writeFile(entry, shareableDep.buildScript);
-
-        await build({
-          root: this.config.context,
-          mode: this.mode,
-          esbuild: false,
-          css: { postcss: {} },
-          define: {
-            "process.env.NODE_ENV": JSON.stringify(this.mode),
-          },
-          publicDir: false,
-          clearScreen: false,
-          logLevel: "silent",
-          build: {
-            assetsDir: "",
-            reportCompressedSize: false,
-            lib: {
-              entry,
-              name: "shareDep",
-              formats: ["iife"],
-              fileName: () => `${name}@${pkgJson.version}.js`,
-            },
-            outDir: path.resolve(this.config.hfmOutputPath, "share"),
-            minify: this.mode === "production",
-          },
-        });
-
-        await fs.remove(entry);
       })
     );
   }
@@ -199,7 +166,11 @@ export class HfmBuilder extends EventEmitter {
       });
 
       const deps = ${JSON.stringify(
-        this.sharedDeps.map((dep) => ({ name: dep.name, ver: dep.ver }))
+        this.sharedDeps.map((dep) => ({
+          name: dep.name,
+          ver: dep.ver,
+          rv: dep.rv,
+        }))
       )};
       const shared = (window.$HFC_SHARE_DEP = window.$HFC_SHARE_DEP || {});
 
