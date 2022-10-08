@@ -11,8 +11,9 @@ export default async function (outputPath: string) {
 
   const [js, css] = await Promise.all([miniJs(contentJs), miniCss(contentCss)]);
 
-  const sizeJs = js === "" ? 0 : gzipSync(Buffer.from(js || "")).byteLength;
-  const sizeCss = css === "" ? 0 : gzipSync(Buffer.from(css)).byteLength;
+  const sizeJs = js === "" ? 0 : gzipSync(Buffer.from(js), { level: 9 }).length;
+  const sizeCss =
+    css === "" ? 0 : gzipSync(Buffer.from(css), { level: 9 }).length;
 
   return { sizeJs, sizeCss };
 }

@@ -111,10 +111,10 @@ import { inject, computed, ref, onMounted } from "vue";
 
 const manifest = inject<any>("manifest");
 const deps = computed(() => {
-  const deps = manifest.value.deps || [];
-  return deps.map((item: any) => ({
-    name: item.name,
-    version: item.rv,
+  const deps = Object.keys(manifest.value.deps || {});
+  return deps.map((name: any) => ({
+    name,
+    version: manifest.value.deps[name].rv,
   }));
 });
 

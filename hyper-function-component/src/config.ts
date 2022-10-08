@@ -15,6 +15,7 @@ export type HfcConfig = Pick<
   port?: number;
   env?: Record<string, any>;
   rollupOptions?: BuildOptions["rollupOptions"];
+  sharedNpmImports?: string[];
 };
 
 export type UserConfigFn = (env: ConfigEnv) => UserConfig | Promise<UserConfig>;
@@ -44,11 +45,24 @@ export type ResolvedConfig = HfcConfig & {
   pkgOutputPath: string;
   hfmOutputPath: string;
   docOutputPath: string;
-  dependencies: Record<string, string>;
+  dependencies: Record<string, { v: string; rv: string }>;
   devDependencies: Record<string, string>;
   cssVars: CssVar[];
   bannerFileName: string;
+  sharedNpmImportMap: Record<string, { imports: string[] }>;
 };
+
+const SHARED_NPM_IMPORTS = [
+  "react",
+  "react-dom",
+  "vue",
+  "preact",
+  "jquery",
+  "d3",
+  "chart.js",
+  "apexcharts",
+  "echarts",
+];
 
 export async function resolveConfig(
   context: string,
@@ -118,8 +132,43 @@ export async function resolveConfig(
 
   const keywords = packageJson.keywords || [];
   const description = packageJson.description;
-  const dependencies = packageJson.dependencies || {};
   const devDependencies = packageJson.devDependencies || {};
+
+  const dependencies: ResolvedConfig["dependencies"] = {};
+  await Promise.all(
+    Object.entries<string>(packageJson.dependencies || {}).map(
+      async ([name, requiredVersion]) => {
+        const pkgJsonPath = path.resolve(
+          context,
+          "node_modules",
+          name,
+          "package.json"
+        );
+
+        const pkgJson = await fs.readJson(pkgJsonPath);
+        dependencies[name] = { rv: requiredVersion, v: pkgJson.version };
+      }
+    )
+  );
+
+  const sharedNpmImportMap: ResolvedConfig["sharedNpmImportMap"] = {};
+
+  for (const importItem of new Set([
+    ...SHARED_NPM_IMPORTS,
+    ...(config.sharedNpmImports || []),
+  ])) {
+    const arr = importItem.split("/");
+    let npmName = arr[0];
+    if (npmName[0] === "@") npmName += "/" + arr[1];
+
+    // special case for react-dom, which must bundle with react
+    if (npmName === "react-dom") continue;
+
+    sharedNpmImportMap[npmName] = sharedNpmImportMap[npmName] || {
+      imports: [],
+    };
+    sharedNpmImportMap[npmName].imports.push(importItem);
+  }
 
   config.css = config.css || {};
   if (!config.css.postcss) {
@@ -159,6 +208,7 @@ export async function resolveConfig(
     devDependencies,
     cssVars: [],
     bannerFileName,
+    sharedNpmImportMap,
   };
 
   return resolvedConfig;
