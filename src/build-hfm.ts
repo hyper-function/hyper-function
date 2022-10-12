@@ -196,7 +196,7 @@ export class HfmBuilder extends EventEmitter {
       window.$HFC_CONTAINERS = window.$HFC_CONTAINERS || {};
       window.$HFC_CONTAINERS["${
         this.config.hfcName
-      }"] = { get: get, init: init };
+      }"] = { get: get, init: init, deps: deps };
 
       function initHfc() {
     `,

@@ -40,6 +40,8 @@ export type ResolvedConfig = HfcConfig & {
   hfcName: string;
   context: string;
   command: "serve" | "build";
+  cssVars: CssVar[];
+  bannerFileName: string;
   outputPath: string;
   hfcMdFilePath: string;
   pkgOutputPath: string;
@@ -47,8 +49,6 @@ export type ResolvedConfig = HfcConfig & {
   docOutputPath: string;
   dependencies: Record<string, { v: string; rv: string }>;
   devDependencies: Record<string, string>;
-  cssVars: CssVar[];
-  bannerFileName: string;
   sharedNpmImportMap: Record<string, { imports: string[] }>;
 };
 
@@ -161,6 +161,7 @@ export async function resolveConfig(
     let npmName = arr[0];
     if (npmName[0] === "@") npmName += "/" + arr[1];
 
+    if (!dependencies[npmName]) continue;
     // special case for react-dom, which must bundle with react
     if (npmName === "react-dom") continue;
 

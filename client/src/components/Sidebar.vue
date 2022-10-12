@@ -3,8 +3,7 @@
     <div class="mb-4 flex justify-center" v-if="manifest.banner">
       <img
         :src="'/doc/' + manifest.banner"
-        class="rounded-md w-full max-w-xs"
-        style="aspect-ratio: 16 / 9"
+        class="rounded-md w-full max-w-xs aspect-video"
       />
     </div>
     <div class="mb-4">
@@ -12,7 +11,7 @@
       <div
         class="border border-gray-200 rounded-md mb-2 py-2 px-3 truncate cursor-pointer text-gray-600 hover:bg-gray-50 select-all font-mono"
       >
-        hfc add {{ manifest.name }}@{{ manifest.version }}
+        hfc i {{ manifest.name }}@{{ manifest.version }}
       </div>
       <div
         class="border border-gray-200 rounded-md py-2 px-3 truncate cursor-pointer text-gray-600 hover:bg-gray-50 select-all font-mono"
@@ -20,20 +19,21 @@
         import:{{ manifest.name }}="{{ manifest.version }}"
       </div>
     </div>
-    <div class="flex">
+
+    <div class="flex pb-3 border-b border-b-gray-200">
       <div class="sidebar-item flex flex-col flex-1">
-        <div class="font-semibold text-gray-500">Version</div>
+        <div class="font-semibold text-gray-500 leading-6">Version</div>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 470 470">
             <path
               d="M416,160a64,64,0,1,0-96.27,55.24c-2.29,29.08-20.08,37-75,48.42-17.76,3.68-35.93,7.45-52.71,13.93V151.39a64,64,0,1,0-64,0V360.61a64,64,0,1,0,64.42.24c2.39-18,16-24.33,65.26-34.52,27.43-5.67,55.78-11.54,79.78-26.95,29-18.58,44.53-46.78,46.36-83.89A64,64,0,0,0,416,160ZM160,64a32,32,0,1,1-32,32A32,32,0,0,1,160,64Zm0,384a32,32,0,1,1,32-32A32,32,0,0,1,160,448ZM352,192a32,32,0,1,1,32-32A32,32,0,0,1,352,192Z"
             />
           </svg>
-          {{ manifest.version }}
+          <div class="flex-1 truncate">{{ manifest.version }}</div>
         </div>
       </div>
       <div class="sidebar-item flex flex-col flex-1">
-        <span class="font-semibold text-gray-500">License</span>
+        <span class="font-semibold text-gray-500 leading-6">License</span>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
             <path
@@ -43,16 +43,14 @@
               style="stroke-width: 0.15625"
             />
           </svg>
-          {{ manifest.license }}
+          <div class="flex-1 truncate">{{ manifest.license }}</div>
         </div>
       </div>
     </div>
 
-    <hr class="my-3 h-px bg-gray-200 border-0 dark:bg-gray-700" />
-
-    <div class="flex">
+    <div class="flex py-3 border-b border-b-gray-200">
       <div class="sidebar-item flex flex-col flex-1">
-        <div class="font-semibold text-gray-500">SizeJs</div>
+        <div class="font-semibold text-gray-500 leading-6">SizeJs</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
             <path
@@ -62,11 +60,11 @@
               style="stroke-width: 0.15625"
             />
           </svg>
-          {{ sizeJs }}
+          <div class="flex-1 truncate">{{ sizeJs }}</div>
         </div>
       </div>
       <div class="sidebar-item flex flex-col flex-1">
-        <div class="font-semibold text-gray-500">SizeCss</div>
+        <div class="font-semibold text-gray-500 leading-6">SizeCss</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg
             class="w-4 h-4 mr-2"
@@ -82,15 +80,13 @@
               style="stroke-width: 0.15625"
             />
           </svg>
-          {{ sizeCss }}
+          <div class="flex-1 truncate">{{ sizeCss }}</div>
         </div>
       </div>
     </div>
 
-    <hr class="my-3 h-px bg-gray-200 border-0 dark:bg-gray-700" />
-
     <div>
-      <h3 class="font-semibold text-gray-500 my-2">Dependencies</h3>
+      <h3 class="font-semibold text-gray-500 my-2 leading-6">Dependencies</h3>
       <div class="text-slate-400 text-sm" v-if="deps.length === 0">
         No Dependency
       </div>

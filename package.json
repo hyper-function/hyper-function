@@ -1,6 +1,6 @@
 {
   "name": "hfcpack",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "",
   "main": "dist/service.js",
   "type": "module",
@@ -70,6 +70,7 @@
     "iframe-resizer": "^4.3.2",
     "jest": "^27.1.0",
     "normalize.css": "^8.0.1",
+    "pretty-bytes": "^6.0.0",
     "rollup": "^2.79.0",
     "tailwindcss": "^3.1.8",
     "typescript": "^4.8.3",

@@ -5,13 +5,13 @@
     {{ manifest.name || "\0" }}
   </h1>
 
-  <p class="mb-4 text-lg text-gray-500 dark:text-gray-400">
+  <p class="text-lg text-gray-500 dark:text-gray-400">
     {{ manifest.description || "\0" }}
   </p>
 
-  <div class="border-b border-gray-200 dark:border-gray-800"></div>
+  <div class="my-4 border-b border-gray-200 dark:border-gray-800"></div>
 
-  <ul class="flex pb-5 pt-4 space-x-8 text-sm font-semibold">
+  <ul class="flex pb-5 space-x-8 text-sm font-semibold">
     <li v-for="tab in tabs" :key="tab.name">
       <a
         :class="

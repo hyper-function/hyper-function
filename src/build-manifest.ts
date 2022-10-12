@@ -13,7 +13,7 @@ export interface Manifest {
   keywords: string[];
   license: string;
   repository: string;
-  deps: ResolvedConfig["dependencies"];
+  dependencies: ResolvedConfig["dependencies"];
   sharedNpmImportMap: ResolvedConfig["sharedNpmImportMap"];
 }
 
@@ -48,7 +48,6 @@ export class ManifestBuilder extends EventEmitter {
 
     const manifest: Manifest = {
       name: this.config.hfcName,
-      deps: this.config.dependencies,
       version: this.config.version,
       banner: this.config.bannerFileName,
       homepage,
@@ -56,6 +55,7 @@ export class ManifestBuilder extends EventEmitter {
       keywords,
       license,
       repository,
+      dependencies: this.config.dependencies,
       sharedNpmImportMap: this.config.sharedNpmImportMap,
     };
 
