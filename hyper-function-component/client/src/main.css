@@ -93,37 +93,3 @@
 .sk-u {
   text-decoration: underline;
 }
-
-.prop-types table {
-  font-size: 14px;
-  border-collapse: separate;
-  border-spacing: 0;
-  empty-cells: show;
-  width: 100%;
-  border-bottom: 1px solid var(--gray-border);
-  margin-bottom: 30px;
-  margin-top: 10px;
-  line-height: 1.75;
-}
-
-.prop-types thead {
-  font-size: 12px;
-  font-weight: 500;
-  box-sizing: border-box;
-  background: var(--main-bg-dark);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.prop-types th,
-.prop-types td {
-  box-sizing: border-box;
-  padding: 6px 12px;
-  text-align: left;
-}
-
-.prop-types-title {
-  font-weight: bold;
-  font-size: 1.17em;
-  visibility: visible;
-}

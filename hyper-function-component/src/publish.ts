@@ -60,8 +60,8 @@ export async function publish({ token }: { token: string }) {
 
   const publishUrl =
     process.env.NODE_ENV === "development"
-      ? "http://localhost:3000/hfc/publish"
-      : "https://api.hyper.fun/hfc/publish";
+      ? "http://localhost:3000/publish"
+      : "https://api.hfc.hyper.fun/publish";
 
   try {
     await fetch(publishUrl, {

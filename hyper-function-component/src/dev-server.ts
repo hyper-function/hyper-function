@@ -5,12 +5,13 @@ import fs from "fs-extra";
 import connect from "connect";
 import { dirname } from "desm";
 import colors from "picocolors";
+import prettyBytes from "pretty-bytes";
 
 import kvCache from "./kv-cache.js";
 import bundleSize from "./bundle-size.js";
 import { ResolvedConfig } from "./config.js";
 import { createServer, ServerResponse } from "http";
-import { prettyBytes, sendJson, useUrl } from "./utils.js";
+import { sendJson, useUrl } from "./utils.js";
 
 const __dirname = dirname(import.meta.url);
 
