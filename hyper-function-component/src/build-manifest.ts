@@ -49,7 +49,7 @@ export class ManifestBuilder extends EventEmitter {
     const manifest: Manifest = {
       name: this.config.hfcName,
       version: this.config.version,
-      banner: this.config.bannerFileName,
+      banner: this.config.bannerPath,
       homepage,
       description,
       keywords,

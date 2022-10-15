@@ -93,3 +93,13 @@
 .sk-u {
   text-decoration: underline;
 }
+
+.no-img-bg {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    #eef1f5 10px,
+    #eef1f5 calc(2 * 10px)
+  );
+}
