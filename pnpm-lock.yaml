@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@fontsource/inter': ^4.5.12
-  '@hyper-function/hfz-global': ^1.3.1
+  '@hyper-function/hfz-global': ^1.3.3
   '@tailwindcss/typography': ^0.5.7
   '@types/connect': ^3.4.35
   '@types/cors': ^2.8.12
@@ -83,7 +83,7 @@ dependencies:
 
 devDependencies:
   '@fontsource/inter': 4.5.12
-  '@hyper-function/hfz-global': 1.3.1
+  '@hyper-function/hfz-global': 1.3.3
   '@tailwindcss/typography': 0.5.7_tailwindcss@3.1.8
   '@types/connect': 3.4.35
   '@types/cors': 2.8.12
@@ -449,8 +449,8 @@ packages:
     resolution: {integrity: sha512-bGKk4/8tube/nCk8hav0ZDBVbzJzc7m0Vt4xF5p15IN4YImwGdtKG38Oq5bU8xHNS+VfvbFFCepgQNj7Pr/Lvg==}
     dev: true
 
-  /@hyper-function/hfz-global/1.3.1:
-    resolution: {integrity: sha512-04ZvWEO6BOBLmC7W8zrAQ70gZx8XMv/jalCvRZ6BTJ2m9piZbVunLUVXN6kMWCP4VjIwE0YcpWERFqQ7/0Bdlg==}
+  /@hyper-function/hfz-global/1.3.3:
+    resolution: {integrity: sha512-/OTB8P5h6FJ2w035THR2rf8tQw5jmUkUA6DOpvbOm63X2LfYjCuJ5ixJGheA9o8LUTHIWuZXeQDa7FWbhRpGCw==}
     dependencies:
       vite: 3.1.3
     transitivePeerDependencies:

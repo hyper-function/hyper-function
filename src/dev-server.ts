@@ -57,7 +57,7 @@ export class DevServer {
         version: this.config.version,
         license: this.config.license,
         deps: this.config.dependencies,
-        banner: this.config.bannerFileName,
+        banner: this.config.bannerPath,
       });
     });
 

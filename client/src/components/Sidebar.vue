@@ -1,10 +1,7 @@
 <template>
-  <div class="lg:ml-8 lg:w-[300px]">
-    <div class="mb-4 flex justify-center" v-if="manifest.banner">
-      <img
-        :src="'/doc/' + manifest.banner"
-        class="rounded-md w-full max-w-xs aspect-video"
-      />
+  <div class="md:absolute md:top-0 md:right-0 md:w-[300px] overflow-hidden">
+    <div class="mb-4 flex aspect-video no-img-bg" v-if="manifest.banner">
+      <img :src="'/doc/' + manifest.banner" class="rounded-md w-full" />
     </div>
     <div class="mb-4">
       <div class="font-semibold text-gray-500 py-1">Install</div>
@@ -21,7 +18,7 @@
     </div>
 
     <div class="flex pb-3 border-b border-b-gray-200">
-      <div class="sidebar-item flex flex-col flex-1">
+      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
         <div class="font-semibold text-gray-500 leading-6">Version</div>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 470 470">
@@ -32,7 +29,7 @@
           <div class="flex-1 truncate">{{ manifest.version }}</div>
         </div>
       </div>
-      <div class="sidebar-item flex flex-col flex-1">
+      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
         <span class="font-semibold text-gray-500 leading-6">License</span>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
@@ -49,7 +46,7 @@
     </div>
 
     <div class="flex py-3 border-b border-b-gray-200">
-      <div class="sidebar-item flex flex-col flex-1">
+      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
         <div class="font-semibold text-gray-500 leading-6">SizeJs</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
@@ -63,7 +60,7 @@
           <div class="flex-1 truncate">{{ sizeJs }}</div>
         </div>
       </div>
-      <div class="sidebar-item flex flex-col flex-1">
+      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
         <div class="font-semibold text-gray-500 leading-6">SizeCss</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg

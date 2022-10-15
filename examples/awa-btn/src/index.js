@@ -1,16 +1,14 @@
 import "./index.css";
 import add from "./add";
 import logo from "./jser-logo.png";
-import * as Vue from "vue";
+import { createApp } from "vue";
 import * as React from "react";
 import * as ReactDom from "react-dom";
-import floor from "lodash/floor";
 import svg from "./heart.svg";
 
-console.log(Vue);
+console.log(createApp);
 console.log(React);
 console.log(ReactDom);
-console.log(floor);
 
 const HFC = function (container, props) {
   console.log(props);

@@ -5,7 +5,7 @@
     {{ manifest.name || "\0" }}
   </h1>
 
-  <p class="text-lg text-gray-500 dark:text-gray-400">
+  <p class="text text-gray-500 dark:text-gray-400">
     {{ manifest.description || "\0" }}
   </p>
 

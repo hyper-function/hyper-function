@@ -1,5 +1,5 @@
 export default {
   entry: "./src/index.js",
   plugins: [],
-  sharedNpmImports: ["lodash/floor"],
+  sharedNpmImports: ["vue/dist/vue.esm-browser.prod.js"],
 };

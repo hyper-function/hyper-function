@@ -153,7 +153,7 @@ function verifyHfcName(input: string) {
   return true;
 }
 
-async function askForHfcName(context: string) {
+async function askForHfcName() {
   const prompt = inquirer.createPromptModule();
   const answer = await prompt([
     {
@@ -167,26 +167,7 @@ async function askForHfcName(context: string) {
     },
   ]);
 
-  const { name } = answer;
-  const pkgJsonPath = path.join(context, "package.json");
-  const pkgJson = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
-  const hfcObject = pkgJson.hfc || {};
-  hfcObject.name = name;
-  pkgJson.hfc = hfcObject;
-  fs.writeFileSync(pkgJsonPath, JSON.stringify(pkgJson, null, 2));
-
-  const docPath = path.join(context, "hfc.md");
-  let doc = fs.readFileSync(docPath, "utf-8");
-  if (doc.split("\n").length <= 10) {
-    doc += `
-\`\`\`html render
-<template hfz import:${name}="dev">
-  <${name}></${name}>
-</template>
-\`\`\`
-`;
-    fs.writeFileSync(docPath, doc);
-  }
+  return answer.name;
 }
 
 (async () => {
@@ -196,13 +177,37 @@ async function askForHfcName(context: string) {
   }
 
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
-  const cwdPkg = await fs.readJson(path.join(context, "package.json"));
+  const cwdPkgPath = path.join(context, "package.json");
+  const cwdPkg = await fs.readJson(cwdPkgPath);
   if (
     !cwdPkg.hfc ||
     !cwdPkg.hfc.name ||
     verifyHfcName(cwdPkg.hfc.name) !== true
   ) {
-    await askForHfcName(context);
+    const name = await askForHfcName();
+
+    const hfcObject = cwdPkg.hfc || {};
+    hfcObject.name = name;
+    cwdPkg.hfc = hfcObject;
+    fs.writeFileSync(cwdPkgPath, JSON.stringify(cwdPkg, null, 2));
+
+    const docPath = path.join(context, "hfc.md");
+    let doc = fs.readFileSync(docPath, "utf-8");
+    if (doc.split("\n").length <= 10) {
+      doc += `
+\`\`\`html render
+<template hfz import:${name}="dev">
+  <${name}></${name}>
+</template>
+\`\`\`
+`;
+      fs.writeFileSync(docPath, doc);
+    }
+  }
+
+  if (!/^\d+(?:\.\d+){2}$/.test(cwdPkg.version)) {
+    console.log("version format must be X.Y.Z, eg: 1.2.3");
+    process.exit(-1);
   }
 
   run(argv._[0], context);

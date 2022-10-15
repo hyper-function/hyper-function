@@ -64,10 +64,10 @@ export class HfmBuilder extends EventEmitter {
         assetsDir: "",
         reportCompressedSize: false,
         lib: {
-          name: "hfcExport",
+          name: "hfmExport",
           entry,
           formats: ["iife"],
-          fileName: () => "hfc.js",
+          fileName: () => "hfm.js",
         },
         rollupOptions: {
           external: this.externals,

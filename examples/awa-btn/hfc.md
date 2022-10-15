@@ -32,7 +32,7 @@ sasef </pre>
   {{ a }} - {{ b }} - {{ c }} - 13
   <span v-if="a === 2">baba</span>
   <!-- <flex-box justify="center">
-    <awa-btn name="awa" :c="c" @click="hello">{{ a }} 1</awa-btn>
+    <awa-btn name="awa" :c="c" @click="hello">{{ a }} 1</awa-btn> aaaavvvvvvvzzzzzzzzeeeeeeeee
   </flex-box> -->
   <awa-btn name="awa" :c="c" @click="hello">{{ a }} 1</awa-btn>
   <div #default></div>
@@ -69,7 +69,7 @@ sasef </pre>
 <img src="./src/jser-logo.png" width="182" align="right" />
 
 ![logo](./src/jser-logo.png)
-![](./banner.jpeg)
+![](./banner.png)
 
 ## Autolink literals
 

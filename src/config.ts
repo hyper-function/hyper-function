@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import fs from "fs-extra";
 import path from "path";
 import { UserConfig, BuildOptions } from "vite";
@@ -41,7 +42,7 @@ export type ResolvedConfig = HfcConfig & {
   context: string;
   command: "serve" | "build";
   cssVars: CssVar[];
-  bannerFileName: string;
+  bannerPath: string;
   outputPath: string;
   hfcMdFilePath: string;
   pkgOutputPath: string;
@@ -98,16 +99,15 @@ export async function resolveConfig(
     await fs.remove(outputPath);
   }
 
-  fs.ensureDirSync(outputPath);
-
   const pkgOutputPath = path.resolve(outputPath, "pkg");
-  fs.ensureDirSync(pkgOutputPath);
-
   const hfmOutputPath = path.resolve(outputPath, "hfm");
-  fs.ensureDirSync(hfmOutputPath);
-
   const docOutputPath = path.resolve(outputPath, "doc");
-  fs.ensureDirSync(docOutputPath);
+
+  await Promise.all(
+    [outputPath, pkgOutputPath, hfmOutputPath, docOutputPath].map((p) =>
+      fs.ensureDir(p)
+    )
+  );
 
   const rollupOptions: BuildOptions["rollupOptions"] =
     config.rollupOptions || {};
@@ -176,13 +176,23 @@ export async function resolveConfig(
     config.css.postcss = {};
   }
 
-  let bannerFileName = "";
+  let bannerPath = "";
   for (const ext of [".jpg", ".jpeg", ".png", ".svg", ".webp"]) {
-    const bannerPath = path.join(context, "banner" + ext);
-    if (await fs.pathExists(bannerPath)) {
-      bannerFileName = "banner" + ext;
-      await fs.copyFile(bannerPath, path.join(docOutputPath, bannerFileName));
-      break;
+    const p = path.join(context, "banner" + ext);
+    if (await fs.pathExists(p)) {
+      const buf = await fs.readFile(p);
+      if (buf.byteLength > 256 * 1024) {
+        console.log("banner img too large, max 256kb");
+        process.exit(-1);
+      }
+
+      const imgId = createHash("sha256")
+        .update(buf)
+        .digest("base64url")
+        .slice(0, 8);
+
+      bannerPath = imgId + ext;
+      await fs.copyFile(p, path.join(docOutputPath, bannerPath));
     }
   }
 
@@ -200,6 +210,7 @@ export async function resolveConfig(
     hfcName: process.env.HFC_NAME || packageJson.hfc.name,
     version: process.env.HFC_VERSION || packageJson.version,
     license: process.env.HFC_LICENSE || packageJson.license || "",
+    bannerPath,
     outputPath,
     hfcMdFilePath,
     pkgOutputPath,
@@ -208,7 +219,6 @@ export async function resolveConfig(
     dependencies,
     devDependencies,
     cssVars: [],
-    bannerFileName,
     sharedNpmImportMap,
   };
 

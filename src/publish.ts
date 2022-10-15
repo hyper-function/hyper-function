@@ -55,7 +55,7 @@ export async function publish({ token }: { token: string }) {
   form.append("hfc.css", fileFromSync(join(pkgPath, "hfc.css")));
 
   const hfmPath = join(outputPath, "hfm", manifest.name, manifest.version);
-  form.append("hfm.js", fileFromSync(join(hfmPath, "hfc.js")));
+  form.append("hfm.js", fileFromSync(join(hfmPath, "hfm.js")));
   form.append("style.css", fileFromSync(join(hfmPath, "style.css")));
 
   const publishUrl =

@@ -178,7 +178,7 @@ function processImgs({
         const imgId = createHash("sha256")
           .update(buf)
           .digest("base64url")
-          .slice(0, 13);
+          .slice(0, 8);
 
         const distImgName = imgId + ext;
         await fs.writeFile(path.resolve(imgOutputPath, distImgName), buf);

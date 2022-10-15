@@ -1,7 +1,7 @@
 <template>
-  <div class="my-4 lg:my-8 mx-auto max-w-[1164px]">
-    <div class="flex flex-col mx-4 lg:mx-8 lg:flex-row">
-      <div id="content" class="flex-1 shrink">
+  <div class="my-4 md:my-8 mx-auto max-w-[1164px]">
+    <div class="mx-4 md:mx-8 md:pr-[332px] relative">
+      <div id="content" class="">
         <HeaderInfo
           :tabs="tabs"
           :active-tab="activeTab"
