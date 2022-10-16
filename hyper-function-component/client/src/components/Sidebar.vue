@@ -1,25 +1,28 @@
 <template>
   <div class="md:absolute md:top-0 md:right-0 md:w-[300px] overflow-hidden">
-    <div class="mb-4 flex aspect-video no-img-bg" v-if="manifest.banner">
-      <img :src="'/doc/' + manifest.banner" class="rounded-md w-full" />
+    <div
+      class="flex mb-4 rounded-md aspect-video no-img-bg"
+      v-if="manifest.banner"
+    >
+      <img :src="'/doc/' + manifest.banner" class="w-full rounded-md" />
     </div>
     <div class="mb-4">
-      <div class="font-semibold text-gray-500 py-1">Install</div>
+      <div class="py-1 font-semibold text-gray-500">Install</div>
       <div
-        class="border border-gray-200 rounded-md mb-2 py-2 px-3 truncate cursor-pointer text-gray-600 hover:bg-gray-50 select-all font-mono"
+        class="px-3 py-2 mb-2 font-mono text-gray-600 truncate border border-gray-200 rounded-md cursor-pointer select-all hover:bg-gray-50"
       >
         hfc i {{ manifest.name }}@{{ manifest.version }}
       </div>
       <div
-        class="border border-gray-200 rounded-md py-2 px-3 truncate cursor-pointer text-gray-600 hover:bg-gray-50 select-all font-mono"
+        class="px-3 py-2 font-mono text-gray-600 truncate border border-gray-200 rounded-md cursor-pointer select-all hover:bg-gray-50"
       >
         import:{{ manifest.name }}="{{ manifest.version }}"
       </div>
     </div>
 
     <div class="flex pb-3 border-b border-b-gray-200">
-      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
-        <div class="font-semibold text-gray-500 leading-6">Version</div>
+      <div class="flex flex-col overflow-hidden sidebar-item basis-1/2">
+        <div class="font-semibold leading-6 text-gray-500">Version</div>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" viewBox="0 0 470 470">
             <path
@@ -29,8 +32,8 @@
           <div class="flex-1 truncate">{{ manifest.version }}</div>
         </div>
       </div>
-      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
-        <span class="font-semibold text-gray-500 leading-6">License</span>
+      <div class="flex flex-col overflow-hidden sidebar-item basis-1/2">
+        <span class="font-semibold leading-6 text-gray-500">License</span>
         <div class="flex items-center">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
             <path
@@ -46,8 +49,8 @@
     </div>
 
     <div class="flex py-3 border-b border-b-gray-200">
-      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
-        <div class="font-semibold text-gray-500 leading-6">SizeJs</div>
+      <div class="flex flex-col overflow-hidden sidebar-item basis-1/2">
+        <div class="font-semibold leading-6 text-gray-500">SizeJs</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 100 100">
             <path
@@ -60,8 +63,8 @@
           <div class="flex-1 truncate">{{ sizeJs }}</div>
         </div>
       </div>
-      <div class="sidebar-item flex flex-col overflow-hidden basis-1/2">
-        <div class="font-semibold text-gray-500 leading-6">SizeCss</div>
+      <div class="flex flex-col overflow-hidden sidebar-item basis-1/2">
+        <div class="font-semibold leading-6 text-gray-500">SizeCss</div>
         <div class="flex items-center" @mouseenter="getSize">
           <svg
             class="w-4 h-4 mr-2"
@@ -83,8 +86,8 @@
     </div>
 
     <div>
-      <h3 class="font-semibold text-gray-500 my-2 leading-6">Dependencies</h3>
-      <div class="text-slate-400 text-sm" v-if="deps.length === 0">
+      <h3 class="my-2 font-semibold leading-6 text-gray-500">Dependencies</h3>
+      <div class="text-sm text-slate-400" v-if="deps.length === 0">
         No Dependency
       </div>
       <div

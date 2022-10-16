@@ -1,6 +1,5 @@
 import colors from "picocolors";
 import EventEmitter from "events";
-import { dirname } from "desm";
 import { DocBuilder } from "./build-doc.js";
 import { EsmBuilder } from "./build-esm.js";
 import { HfmBuilder } from "./build-hfm.js";
@@ -10,9 +9,6 @@ import { ManifestBuilder } from "./build-manifest.js";
 import { DevServer } from "./dev-server.js";
 import { resolveConfig, ResolvedConfig } from "./config.js";
 import { CssVarBuilder } from "./build-css-variable.js";
-
-// const require = createRequire(import.meta.url);
-const __dirname = dirname(import.meta.url);
 
 export class Service extends EventEmitter {
   config!: ResolvedConfig;
