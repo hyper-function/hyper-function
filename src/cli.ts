@@ -1,17 +1,19 @@
 import os from "os";
 import fs from "fs-extra";
-import path from "path";
+import { dirname, join } from "path";
 import colors from "picocolors";
 import minimist from "minimist";
 import inquirer from "inquirer";
 import updateNotifier from "update-notifier";
 import pleaseUpgradeNode from "please-upgrade-node";
-import * as desm from "desm";
+import { fileURLToPath } from "url";
 
 import { Service } from "./service.js";
 import { publish, readToken } from "./publish.js";
 
-const pkg = fs.readJSONSync(desm.join(import.meta.url, "..", "package.json"));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const pkg = fs.readJSONSync(join(__dirname, "..", "package.json"));
 
 pleaseUpgradeNode(pkg);
 
@@ -73,8 +75,8 @@ async function run(command: string, context: string) {
       }
     }
 
-    fs.mkdirSync(path.join(os.homedir(), ".hfc"), { recursive: true });
-    fs.writeFileSync(path.join(os.homedir(), ".hfc", "token"), token);
+    fs.mkdirSync(join(os.homedir(), ".hfc"), { recursive: true });
+    fs.writeFileSync(join(os.homedir(), ".hfc", "token"), token);
     console.log("login success");
   } else if (command === "build") {
     const service = new Service(context, "build");
@@ -177,7 +179,7 @@ async function askForHfcName() {
   }
 
   const context = process.env.HFC_CLI_CONTEXT || process.cwd();
-  const cwdPkgPath = path.join(context, "package.json");
+  const cwdPkgPath = join(context, "package.json");
   const cwdPkg = await fs.readJson(cwdPkgPath);
   if (
     !cwdPkg.hfc ||
@@ -191,7 +193,7 @@ async function askForHfcName() {
     cwdPkg.hfc = hfcObject;
     fs.writeFileSync(cwdPkgPath, JSON.stringify(cwdPkg, null, 2));
 
-    const docPath = path.join(context, "hfc.md");
+    const docPath = join(context, "hfc.md");
     let doc = fs.readFileSync(docPath, "utf-8");
     if (doc.split("\n").length <= 10) {
       doc += `

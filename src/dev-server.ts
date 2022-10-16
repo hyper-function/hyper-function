@@ -1,9 +1,8 @@
 import cors from "cors";
-import path from "path";
+import path, { dirname } from "path";
 import sirv from "sirv";
 import fs from "fs-extra";
 import connect from "connect";
-import { dirname } from "desm";
 import colors from "picocolors";
 import prettyBytes from "pretty-bytes";
 
@@ -12,8 +11,10 @@ import bundleSize from "./bundle-size.js";
 import { ResolvedConfig } from "./config.js";
 import { createServer, ServerResponse } from "http";
 import { sendJson, useUrl } from "./utils.js";
+import { fileURLToPath } from "url";
 
-const __dirname = dirname(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class DevServer {
   middlewares: connect.Server;
